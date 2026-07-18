@@ -128,7 +128,15 @@ export default function Subscribe() {
           'Cancel any time',
           'First essay in every series always free',
           '7-day free trial — no charge until day 8',
-          'Questions? hello@humanweather.social',
+          <>
+            Questions?{' '}
+            <a
+              href="mailto:hello@humanweather.social"
+              className="text-[#c4a84a] hover:text-[#e0c870] transition-colors duration-300 not-italic"
+            >
+              hello@humanweather.social
+            </a>
+          </>,
         ].map((note, i) => (
           <div key={i} className="font-serif italic text-sm text-[#c8b99a] flex items-center justify-center gap-2">
             <span className="text-[#c4a84a]">✦</span>

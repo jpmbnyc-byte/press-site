@@ -40,7 +40,14 @@ export default function Footer() {
           </div>
           <div>
             <div className="font-mono text-[8px] tracking-[0.25em] uppercase text-[var(--hw-gold)] mb-4">Connect</div>
-            <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--hw-ink2)]">humanweather.social</p>
+            <a
+              href="https://humanweather.social"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--hw-ink2)] hover:text-[var(--hw-gold)] transition-colors duration-300 inline-block"
+            >
+              humanweather.social
+            </a>
             <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--hw-ink2)] mt-2.5">@pbwyworldwide</p>
             <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--hw-ink2)] mt-2.5">PBWY™</p>
           </div>
