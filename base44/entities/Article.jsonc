@@ -1,0 +1,98 @@
+{
+  "name": "Article",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "series_id": {
+      "type": "string"
+    },
+    "series_label": {
+      "type": "string"
+    },
+    "series_slug": {
+      "type": "string"
+    },
+    "series_order": {
+      "type": "integer",
+      "default": 1
+    },
+    "author_id": {
+      "type": "string"
+    },
+    "author_name": {
+      "type": "string"
+    },
+    "body_md": {
+      "type": "string"
+    },
+    "excerpt": {
+      "type": "string"
+    },
+    "hero_image_url": {
+      "type": "string"
+    },
+    "hero_image_caption": {
+      "type": "string"
+    },
+    "hero_image_alt": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "scheduled",
+        "published",
+        "archived",
+        "featured"
+      ],
+      "default": "draft"
+    },
+    "access_level": {
+      "type": "string",
+      "enum": [
+        "free",
+        "members"
+      ],
+      "default": "free"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "featured_order": {
+      "type": "integer",
+      "default": 0
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "reading_time_mins": {
+      "type": "integer",
+      "default": 9
+    },
+    "view_count": {
+      "type": "integer",
+      "default": 0
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title",
+    "slug"
+  ]
+}

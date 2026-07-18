@@ -1,0 +1,39 @@
+{
+  "name": "Author",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "string"
+    },
+    "short_bio": {
+      "type": "string"
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "article_count": {
+      "type": "integer",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "slug"
+  ]
+}

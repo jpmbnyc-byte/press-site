@@ -1,0 +1,49 @@
+{
+  "name": "Series",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "total_essays": {
+      "type": "integer",
+      "default": 7
+    },
+    "color_accent": {
+      "type": "string"
+    },
+    "access_level": {
+      "type": "string",
+      "enum": [
+        "free_first",
+        "members_only",
+        "all_free"
+      ],
+      "default": "free_first"
+    },
+    "sort_order": {
+      "type": "integer"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "essay_count_published": {
+      "type": "integer",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "slug"
+  ]
+}

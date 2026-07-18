@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0rem;
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Cormorant Garamond', serif;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-mono: 'Space Mono', monospace;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Human Weather brand tokens — Day mode (default) */
+    --hw-bg: #faf8f4;
+    --hw-ink: #111111;
+    --hw-ink2: #3a3530;
+    --hw-ink3: #6a6560;
+    --hw-gold: #9a7d2e;
+    --hw-gold-lt: #c4a84a;
+    --hw-gold-dk: #6b5420;
+    --hw-surface: #f0e8d8;
+    --hw-rust: #7a3318;
+    --hw-sage: #3d5c45;
+    --hw-dark-bg: #0e0d0a;
+    --hw-dark-ink: #f0e9d8;
+    --hw-dark-ink2: #c8b99a;
+    --hw-dark-surface: #1a1810;
+  }
+
+  [data-mode="night"] {
+    --hw-bg: #0e0d0a;
+    --hw-ink: #f0e9d8;
+    --hw-ink2: #c8b99a;
+    --hw-ink3: #8a7d60;
+    --hw-gold: #c4a84a;
+    --hw-gold-lt: #e0c870;
+    --hw-surface: #1a1810;
+    --hw-rust: #c4623a;
+    --hw-sage: #6aaa7a;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+}
+
+@layer utilities {
+  .hw-ornament {
+    @apply text-center tracking-[0.3em] my-12 text-base;
+    color: var(--hw-gold);
+    opacity: 0.3;
+  }
+
+  .hw-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  .hw-rule {
+    border-color: var(--hw-gold);
+    opacity: 0.22;
+  }
+
+  /* Article reading body */
+  .article-body > p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    line-height: 1.9;
+    color: var(--hw-ink2);
+    text-align: justify;
+    margin-bottom: 1.5rem;
+  }
+
+  .article-body > p:first-of-type::first-letter {
+    font-size: 4.8em;
+    font-weight: 600;
+    color: var(--hw-gold);
+    float: left;
+    line-height: 0.78;
+    margin-right: 0.08em;
+    margin-top: 0.05em;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .article-body > blockquote {
+    border-top: 2px solid var(--hw-gold);
+    border-bottom: 2px solid var(--hw-gold);
+    max-width: 520px;
+    margin: 2.5rem auto;
+    padding: 1.5rem 0;
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--hw-ink2);
+  }
+
+  .article-body > blockquote p {
+    font-size: 1.5rem;
+    font-style: italic;
+    text-align: center;
+    color: var(--hw-ink2);
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+
+  /* Somatic field animation */
+  @keyframes somatic-pulse {
+    0% { background: rgba(196,168,74,0.04); box-shadow: 0 0 0 rgba(196,168,74,0); }
+    40% { background: rgba(196,168,74,0.55); box-shadow: 0 0 10px rgba(196,168,74,0.35); }
+    100% { background: rgba(196,168,74,0.12); box-shadow: 0 0 2px rgba(196,168,74,0.1); }
+  }
+
+  .hw-somatic-cell {
+    background: rgba(196,168,74,0.04);
+    animation: somatic-pulse 2.4s ease-out forwards;
+  }
+
+  @keyframes hw-fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hw-fade-up {
+    animation: hw-fade-up 0.7s ease-out forwards;
+  }
+
+  /* Corner frame ornaments */
+  .hw-corner-tl::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+    border-top: 1px solid var(--hw-gold);
+    border-left: 1px solid var(--hw-gold);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .hw-corner-br::after {
+    content: '';
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+    border-bottom: 1px solid var(--hw-gold);
+    border-right: 1px solid var(--hw-gold);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}

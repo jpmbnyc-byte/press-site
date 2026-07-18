@@ -1,0 +1,30 @@
+{
+  "name": "Newsletter",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "homepage",
+        "article_footer",
+        "about",
+        "app",
+        "subscribe_page"
+      ],
+      "default": "homepage"
+    },
+    "confirmed": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "email"
+  ]
+}
