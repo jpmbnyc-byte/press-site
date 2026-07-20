@@ -18,32 +18,27 @@ import Subscribe from '@/pages/Subscribe';
 import Gospels from '@/pages/Gospels';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
+  // Brief boot state only — never redirect away from the public press site.
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0e0d0a] gap-4">
+        <div className="w-8 h-8 border-2 border-[#c4a84a] border-t-transparent animate-spin" />
+        <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a]/70">
+          Opening the field journal…
+        </div>
       </div>
     );
   }
 
-  // Handle authentication errors
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
-    }
+  // Soft handling only — public site must always render routes.
+  if (authError?.type === 'user_not_registered') {
+    return <UserNotRegisteredError />;
   }
 
-  // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/journal" element={<Journal />} />

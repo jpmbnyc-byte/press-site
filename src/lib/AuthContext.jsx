@@ -5,6 +5,34 @@ import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
 const AuthContext = createContext();
 
+const PUBLIC_SETTINGS_TIMEOUT_MS = 8000;
+
+function clearStoredAuthTokens() {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    window.localStorage.removeItem('base44_access_token');
+    window.localStorage.removeItem('token');
+  } catch {
+    /* ignore */
+  }
+}
+
+function withTimeout(promise, ms, label = 'Request timed out') {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(label)), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,19 +40,25 @@ export const AuthProvider = ({ children }) => {
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
   const [authError, setAuthError] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
+  const [appPublicSettings, setAppPublicSettings] = useState(null);
 
   useEffect(() => {
     checkAppState();
   }, []);
 
+  const finishAnonymous = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+    setIsLoadingAuth(false);
+    setIsLoadingPublicSettings(false);
+    setAuthChecked(true);
+  };
+
   const checkAppState = async () => {
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
-      
-      // First, check app public settings (with token if available)
-      // This will tell us if auth is required, user not registered, etc.
+
       const publicApiBase = appParams.appBaseUrl
         ? `${String(appParams.appBaseUrl).replace(/\/$/, '')}/api/apps/public`
         : '/api/apps/public';
@@ -32,124 +66,108 @@ export const AuthProvider = ({ children }) => {
       const appClient = createAxiosClient({
         baseURL: publicApiBase,
         headers: {
-          'X-App-Id': appParams.appId
+          'X-App-Id': appParams.appId,
         },
-        token: appParams.token, // Include token if available
-        interceptResponses: true
+        token: appParams.token,
+        interceptResponses: true,
       });
-      
+
       try {
-        const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
+        const publicSettings = await withTimeout(
+          appClient.get(`/prod/public-settings/by-id/${appParams.appId}`),
+          PUBLIC_SETTINGS_TIMEOUT_MS,
+          'Public settings timed out'
+        );
         setAppPublicSettings(publicSettings);
-        
-        // If we got the app public settings successfully, check if user is authenticated
+
+        // Press site is public — never hard-block on auth. Optional token only.
         if (appParams.token) {
-          await checkUserAuth();
+          await checkUserAuth({ clearOnFailure: true });
         } else {
-          setIsLoadingAuth(false);
-          setIsAuthenticated(false);
-          setAuthChecked(true);
+          finishAnonymous();
         }
         setIsLoadingPublicSettings(false);
       } catch (appError) {
         console.error('App state check failed:', appError);
-        
-        // Handle app-level errors
-        if (appError.status === 403 && appError.data?.extra_data?.reason) {
-          const reason = appError.data.extra_data.reason;
-          if (reason === 'auth_required') {
-            setAuthError({
-              type: 'auth_required',
-              message: 'Authentication required'
-            });
-          } else if (reason === 'user_not_registered') {
-            setAuthError({
-              type: 'user_not_registered',
-              message: 'User not registered for this app'
-            });
-          } else {
-            setAuthError({
-              type: reason,
-              message: appError.message
-            });
-          }
-        } else {
-          setAuthError({
-            type: 'unknown',
-            message: appError.message || 'Failed to load app'
-          });
-        }
-        setIsLoadingPublicSettings(false);
-        setIsLoadingAuth(false);
+
+        // Public press site: never redirect into Base44 login from Vercel.
+        // Clear bad tokens and continue rendering the journal.
+        clearStoredAuthTokens();
+        setAuthError({
+          type: 'unknown',
+          message: appError.message || 'Failed to load app settings',
+        });
+        finishAnonymous();
       }
     } catch (error) {
       console.error('Unexpected error:', error);
+      clearStoredAuthTokens();
       setAuthError({
         type: 'unknown',
-        message: error.message || 'An unexpected error occurred'
+        message: error.message || 'An unexpected error occurred',
       });
-      setIsLoadingPublicSettings(false);
-      setIsLoadingAuth(false);
+      finishAnonymous();
     }
   };
 
-  const checkUserAuth = async () => {
+  const checkUserAuth = async ({ clearOnFailure = true } = {}) => {
     try {
-      // Now check if the user is authenticated
       setIsLoadingAuth(true);
-      const currentUser = await base44.auth.me();
+      const currentUser = await withTimeout(
+        base44.auth.me(),
+        PUBLIC_SETTINGS_TIMEOUT_MS,
+        'Auth check timed out'
+      );
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
       setAuthChecked(true);
     } catch (error) {
       console.error('User auth check failed:', error);
-      setIsLoadingAuth(false);
-      setIsAuthenticated(false);
-      setAuthChecked(true);
-      
-      // If user auth fails, it might be an expired token
-      if (error.status === 401 || error.status === 403) {
-        setAuthError({
-          type: 'auth_required',
-          message: 'Authentication required'
-        });
+      if (clearOnFailure) {
+        clearStoredAuthTokens();
       }
+      // Do not set auth_required — that previously triggered an infinite
+      // login redirect loop and a blank page on Vercel.
+      setUser(null);
+      setIsAuthenticated(false);
+      setIsLoadingAuth(false);
+      setAuthChecked(true);
     }
   };
 
-  const logout = (shouldRedirect = true) => {
+  const logout = (shouldRedirect = false) => {
     setUser(null);
     setIsAuthenticated(false);
-    
+    clearStoredAuthTokens();
+
     if (shouldRedirect) {
-      // Use the SDK's logout method which handles token cleanup and redirect
       base44.auth.logout(window.location.href);
-    } else {
-      // Just remove the token without redirect
-      base44.auth.logout();
     }
   };
 
   const navigateToLogin = () => {
-    // Use the SDK's redirectToLogin method
-    base44.auth.redirectToLogin(window.location.href);
+    // Intentionally no-op for the public press site so we never leave
+    // humanweather.vercel.app for a Base44 login redirect loop.
+    console.warn('Login redirect suppressed on public press site');
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated, 
-      isLoadingAuth,
-      isLoadingPublicSettings,
-      authError,
-      appPublicSettings,
-      authChecked,
-      logout,
-      navigateToLogin,
-      checkUserAuth,
-      checkAppState
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoadingAuth,
+        isLoadingPublicSettings,
+        authError,
+        appPublicSettings,
+        authChecked,
+        logout,
+        navigateToLogin,
+        checkUserAuth,
+        checkAppState,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
