@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
+import AuthorPortrait from '@/components/AuthorPortrait';
 
 export default function Article() {
   const { slug } = useParams();
@@ -91,12 +92,15 @@ export default function Article() {
         {article.excerpt && (
           <p className="font-serif italic text-lg text-[var(--hw-ink2)] max-w-[540px] mb-8">{article.excerpt}</p>
         )}
-        <div className="flex items-center gap-3 pb-6 border-b border-[rgba(154,125,46,0.18)]">
-          <div className="w-11 h-11 bg-[var(--hw-ink)] text-[var(--hw-gold)] flex items-center justify-center font-mono text-xs">
-            JP
-          </div>
-          <div className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--hw-ink3)]">
-            JP Bobo · {article.published_at || '2026'} · {article.reading_time_mins || 9} min read
+        <div className="flex items-center gap-4 pb-8 border-b border-[rgba(154,125,46,0.22)]">
+          <AuthorPortrait size="md" />
+          <div className="flex flex-col gap-[2px]">
+            <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--hw-ink)]">
+              {article.author_name || 'JP Bobo'}
+            </div>
+            <div className="font-mono text-[9px] tracking-[0.15em] uppercase text-[var(--hw-ink3)]">
+              {article.published_at || '2026'} · {article.reading_time_mins || 9} min read
+            </div>
           </div>
         </div>
       </header>

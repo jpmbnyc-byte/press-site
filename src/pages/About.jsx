@@ -116,9 +116,13 @@ export default function About() {
           <div className="flex flex-col sm:flex-row gap-8 items-start">
           <div className="flex-shrink-0">
             <img
-              src="https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/500b00ca1_IMG_4897.jpeg"
+              src="/jp-bobo.jpg"
               alt="JP Bobo, founder of Human Weather"
-              className="w-44 sm:w-52 h-56 sm:h-72 object-cover border border-[rgba(154,125,46,0.4)]"
+              className="w-44 sm:w-52 h-56 sm:h-72 object-cover object-[center_18%] border border-[rgba(154,125,46,0.4)]"
+              onError={(e) => {
+                e.currentTarget.src =
+                  'https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/500b00ca1_IMG_4897.jpeg';
+              }}
             />
             <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--hw-ink)] mt-3">
               JP Bobo

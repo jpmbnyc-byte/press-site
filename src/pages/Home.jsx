@@ -214,7 +214,7 @@ export default function Home() {
             to="/gospels"
             className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#1C1C1C] transition-all duration-500"
           >
-            Enter Gospels Live →
+            Enter the Chamber →
           </Link>
         </div>
       </section>
