@@ -1,6 +1,8 @@
 #env
 .env
 .env.*
+!.env.example
+!.env.production
 
 # Logs
 /logs
@@ -30,3 +32,8 @@ dist-ssr
 .env
 .vite
 base44/.app.jsonc
+
+# Local agent skill installs
+.agents
+.claude
+skills-lock.json

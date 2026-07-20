@@ -48,6 +48,8 @@ export default function Home() {
   }
 
   const hero = featured[currentSlide];
+  // Match humanweather.base44.app: "This Week" highlights the featured dispatch essay.
+  const dispatch = featured[0] || latest[0];
 
   return (
     <div>
@@ -104,29 +106,33 @@ export default function Home() {
         </section>
       )}
 
-      {/* Weekly Dispatch Strip */}
-      <section className="bg-[#1a1810] py-16 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-          <div className="flex-1">
-            <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a] mb-4">This Week</div>
-            <h2 className="font-serif text-3xl text-[#f0e9d8] font-light mb-3">The Distance We Choose</h2>
-            <p className="font-serif italic text-base text-[#f0e9d8] opacity-50 max-w-xl">
-              On relational proximity, the four dimensions of nearness, and what happens when one of the parties is God.
-            </p>
-          </div>
-          <div className="text-left md:text-right">
-            <Link
-              to="/journal/relational-faith-the-distance-we-choose"
-              className="inline-block font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] border border-[#c4a84a] px-6 py-3 hover:bg-[#c4a84a] hover:text-[#0e0d0a] transition-all duration-300"
-            >
-              Read the dispatch →
-            </Link>
-            <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#f0e9d8] opacity-30 mt-3">
-              1,247 readers
+      {/* Weekly Dispatch Strip — driven by the featured live essay */}
+      {dispatch && (
+        <section className="bg-[#1a1810] py-16 px-6">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div className="flex-1">
+              <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a] mb-4">This Week</div>
+              <h2 className="font-serif text-3xl text-[#f0e9d8] font-light mb-3">
+                {dispatch.subtitle || dispatch.title}
+              </h2>
+              <p className="font-serif italic text-base text-[#f0e9d8] opacity-50 max-w-xl">
+                {dispatch.excerpt || dispatch.subtitle}
+              </p>
+            </div>
+            <div className="text-left md:text-right">
+              <Link
+                to={`/journal/${dispatch.slug}`}
+                className="inline-block font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] border border-[#c4a84a] px-6 py-3 hover:bg-[#c4a84a] hover:text-[#0e0d0a] transition-all duration-300"
+              >
+                Read the dispatch →
+              </Link>
+              <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#f0e9d8] opacity-30 mt-3">
+                {(dispatch.view_count || 0).toLocaleString()} readers
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Journal Grid — Latest Three */}
       <section className="py-20 px-6 max-w-6xl mx-auto">
