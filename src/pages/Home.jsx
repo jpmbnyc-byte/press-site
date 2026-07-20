@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import SomaticField from '@/components/SomaticField';
 import ArticleCard from '@/components/ArticleCard';
 import NewsletterSignup from '@/components/NewsletterSignup';
+
+const HERO_IMAGE =
+  'https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/5efc2a849_generated_image.png';
 
 export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [latest, setLatest] = useState([]);
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -19,7 +20,7 @@ export default function Home() {
         const live = allArticles.filter(a => a.status === 'published' || a.status === 'featured');
         const feat = live.filter(a => a.featured || a.status === 'featured');
         setFeatured(feat.length ? feat : live.slice(0, 1));
-        setLatest(live.slice(0, 3));
+        setLatest(live.slice(0, 4));
 
         const allSeries = await base44.entities.Series.list('sort_order', 10);
         setSeries(allSeries.filter(s => s.is_active));
@@ -31,144 +32,163 @@ export default function Home() {
     })();
   }, []);
 
-  useEffect(() => {
-    if (featured.length <= 1) return;
-    const timer = setInterval(() => {
-      setCurrentSlide(s => (s + 1) % featured.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [featured.length]);
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0e0d0a]">
-        <div className="w-8 h-8 border-2 border-[#c4a84a] border-t-transparent rounded-none animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--hw-bg)]">
+        <div className="w-8 h-8 border-2 border-[var(--hw-gold)] border-t-transparent animate-spin" />
       </div>
     );
   }
 
-  const hero = featured[currentSlide];
+  const spotlight = featured[1] || latest[0];
 
   return (
-    <div>
-      {/* Hero Carousel */}
-      {hero && (
-        <section
-          className="relative h-[440px] md:h-[560px] flex items-center justify-center overflow-hidden"
-          onMouseEnter={() => {}}
-        >
-          {hero.hero_image_url && (
-            <img
-              src={hero.hero_image_url}
-              alt={hero.hero_image_alt || ''}
-              className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
-            />
-          )}
-          <div className="absolute inset-0 bg-[rgba(10,8,6,0.62)]" />
-          <div className="relative z-10 text-center px-6 max-w-3xl">
-            <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a] mb-6">
-              {hero.series_label || 'Human Weather'}
-            </div>
-            <h1 className="font-serif text-[clamp(36px,6vw,60px)] font-light text-[#f0e9d8] tracking-[-0.02em] leading-[1.08] mb-6">
-              {hero.title}
-            </h1>
-            {hero.subtitle && (
-              <p className="font-serif italic text-xl text-[#f0e9d8] opacity-65 mb-8 max-w-xl mx-auto">
-                {hero.subtitle}
-              </p>
-            )}
-            <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#f0e9d8] opacity-40 mb-8">
-              JP Bobo · {hero.reading_time_mins || 9} min read
-            </div>
+    <div className="bg-[var(--hw-bg)]">
+      {/* Brand hero — full-bleed image + Field Station CTAs */}
+      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+        <img
+          src={HERO_IMAGE}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover animate-[hw-hero-in_1.2s_ease-out]"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(28,28,28,0.20) 0%, rgba(28,28,28,0.60) 100%)',
+          }}
+        />
+        <div className="relative z-10 text-center px-6 max-w-2xl animate-[hw-rise_0.9s_ease-out_0.15s_both]">
+          <div className="font-mono text-[10px] tracking-[0.4em] uppercase text-[#F7F4EE] opacity-70 mb-8">
+            A Field Journal
+          </div>
+          <h1 className="font-serif text-[clamp(48px,9vw,96px)] font-light text-[#F7F4EE] leading-[0.95] tracking-[-0.02em] mb-8">
+            Human Weather
+          </h1>
+          <p className="font-serif italic text-xl md:text-2xl text-[#F7F4EE] opacity-80 leading-relaxed max-w-lg mx-auto mb-10">
+            The emotional climate of modern life. A field journal exploring the seasons, storms, and
+            patterns within us.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to={`/journal/${hero.slug}`}
-              className="inline-block font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border border-[#c4a84a] px-8 py-3 hover:bg-[#c4a84a] hover:text-[#0e0d0a] transition-all duration-300"
+              to="/subscribe"
+              className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#1C1C1C] transition-all duration-500"
             >
-              Read Essay →
+              Enter the Field Station
+            </Link>
+            <Link
+              to="/journal"
+              className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#1C1C1C] transition-all duration-500"
+            >
+              Read the Journal
             </Link>
           </div>
-          {featured.length > 1 && (
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-              {featured.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentSlide(i)}
-                  className={`w-2 h-2 transition-colors duration-300 ${
-                    i === currentSlide ? 'bg-[#c4a84a]' : 'bg-[#f0e9d8] opacity-30'
-                  }`}
-                  aria-label={`Go to slide ${i + 1}`}
+        </div>
+      </section>
+
+      {/* Featured essay spotlight */}
+      {spotlight && (
+        <section className="py-24 md:py-32 px-6">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+            <div>
+              {spotlight.hero_image_url ? (
+                <img
+                  src={spotlight.hero_image_url}
+                  alt={spotlight.hero_image_alt || ''}
+                  className="w-full aspect-[4/5] object-cover"
                 />
-              ))}
+              ) : (
+                <div className="w-full aspect-[4/5] bg-[var(--hw-surface)]" />
+              )}
             </div>
-          )}
+            <div>
+              <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-6">
+                {spotlight.series_label || 'Featured'}
+              </div>
+              <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-light text-[var(--hw-ink)] leading-[1.05] tracking-[-0.01em] mb-6">
+                {spotlight.title}
+              </h2>
+              {spotlight.subtitle && (
+                <p className="font-serif italic text-xl text-[var(--hw-ink2)] mb-6 leading-relaxed">
+                  {spotlight.subtitle}
+                </p>
+              )}
+              {spotlight.excerpt && (
+                <p className="font-body text-base text-[var(--hw-ink2)] mb-8 leading-[1.75] max-w-md">
+                  {spotlight.excerpt}
+                </p>
+              )}
+              <Link
+                to={`/journal/${spotlight.slug}`}
+                className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-gold)] pb-1 hover:text-[var(--hw-gold)] transition-colors duration-300"
+              >
+                Read Essay →
+              </Link>
+            </div>
+          </div>
         </section>
       )}
 
-      {/* Weekly Dispatch Strip */}
-      <section className="bg-[#1a1810] py-16 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-          <div className="flex-1">
-            <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a] mb-4">This Week</div>
-            <h2 className="font-serif text-3xl text-[#f0e9d8] font-light mb-3">The Distance We Choose</h2>
-            <p className="font-serif italic text-base text-[#f0e9d8] opacity-50 max-w-xl">
-              On relational proximity, the four dimensions of nearness, and what happens when one of the parties is God.
-            </p>
-          </div>
-          <div className="text-left md:text-right">
-            <Link
-              to="/journal/relational-faith-the-distance-we-choose"
-              className="inline-block font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] border border-[#c4a84a] px-6 py-3 hover:bg-[#c4a84a] hover:text-[#0e0d0a] transition-all duration-300"
-            >
-              Read the dispatch →
-            </Link>
-            <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#f0e9d8] opacity-30 mt-3">
-              1,247 readers
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="flex items-center justify-center py-8">
+        <div className="w-20 h-px bg-[var(--hw-gold)] opacity-30" />
+        <span className="mx-4 text-[var(--hw-gold)] opacity-40 text-xs">✦</span>
+        <div className="w-20 h-px bg-[var(--hw-gold)] opacity-30" />
+      </div>
 
-      {/* Journal Grid — Latest Three */}
-      <section className="py-20 px-6 max-w-6xl mx-auto">
-        <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-3">From the Journal</div>
-        <h2 className="font-serif text-4xl font-light text-[var(--hw-ink)] mb-12">Recent Essays</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {latest.map(article => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
-        </div>
-        <div className="mt-12 text-center">
-          <Link
-            to="/journal"
-            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-3 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 inline-block"
-          >
-            View All Essays →
-          </Link>
-        </div>
-      </section>
-
-      {/* The Series — All Seven */}
-      <section className="py-20 px-6 border-t border-[rgba(154,125,46,0.18)]">
+      {/* Recent reports */}
+      <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-serif text-4xl font-light text-[var(--hw-ink)] mb-3">Seven Series. One Question.</h2>
-          <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-12 max-w-2xl">
+          <div className="flex items-baseline justify-between mb-16">
+            <div>
+              <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-3">
+                From the Journal
+              </div>
+              <h2 className="font-serif text-[clamp(32px,5vw,44px)] font-light text-[var(--hw-ink)]">
+                Recent Reports
+              </h2>
+            </div>
+            <Link
+              to="/journal"
+              className="hidden md:inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-gold)] pb-1 hover:text-[var(--hw-gold)] transition-colors duration-300"
+            >
+              View Archive →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-16">
+            {latest.map(article => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Seven series */}
+      <section className="py-24 px-6 border-t border-[rgba(108,87,89,0.18)]">
+        <div className="max-w-6xl mx-auto">
+          <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-4">
+            Seven Corridors
+          </div>
+          <h2 className="font-serif text-[clamp(32px,5vw,44px)] font-light text-[var(--hw-ink)] mb-4">
+            Seven Series. One Question.
+          </h2>
+          <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-16 max-w-2xl">
             What is the weather inside you, and what is it doing to everything you touch?
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {series.map((s, i) => (
               <Link
                 key={s.id}
                 to={`/series/${s.slug}`}
-                className="group block border-t-2 border-[var(--hw-gold)] pt-4 hover:border-[var(--hw-gold-lt)] transition-colors duration-300"
+                className="group block border-t border-[var(--hw-gold)] pt-5 hover:border-[var(--hw-gold-lt)] transition-colors duration-500"
               >
-                <div className="font-mono text-[9px] text-[var(--hw-gold)] mb-2">
+                <div className="font-mono text-[10px] text-[var(--hw-gold)] mb-3">
                   {String(i + 1).padStart(2, '0')}
                 </div>
-                <h3 className="font-serif text-xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-1">
+                <h3 className="font-serif text-2xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-500 mb-2">
                   {s.name}
                 </h3>
-                <p className="font-serif italic text-sm text-[var(--hw-rust)] mb-2">{s.tagline}</p>
-                <div className="font-mono text-[8px] tracking-[0.15em] uppercase text-[var(--hw-ink3)]">
+                <p className="font-serif italic text-sm text-[var(--hw-ink2)] mb-3">{s.tagline}</p>
+                <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-ink3)]">
                   {s.essay_count_published || 0} of 7 essays
                 </div>
               </Link>
@@ -177,37 +197,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The App Callout */}
-      <section className="bg-[#0e0d0a] py-24 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1">
-            <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a] mb-4">The Practice</div>
-            <h2 className="font-serif text-4xl font-light text-[#f0e9d8] mb-6">Map Your Internal Climate</h2>
-            <p className="font-serif text-lg text-[#c8b99a] leading-relaxed mb-8 max-w-md">
-              The Human Weather app maps what you feel in your body and prescribes regulated responses — breathwork,
-              frequency therapy, light therapy, and sacred commands. The publication is the intellectual world that
-              practice lives inside.
-            </p>
-            <a
-              href="https://humanweather.social"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border border-[#c4a84a] px-8 py-3 hover:bg-[#c4a84a] hover:text-[#0e0d0a] transition-all duration-300 inline-block"
-            >
-              Open humanweather.social →
-            </a>
+      {/* Gospels Live callout */}
+      <section className="py-24 px-6 bg-[#0e0d0a]">
+        <div className="max-w-3xl mx-auto text-center animate-[hw-rise_0.8s_ease-out]">
+          <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#c4a84a] mb-5">
+            Gospels Live
           </div>
-          <div className="flex-shrink-0 w-56 md:w-64">
-            <SomaticField size={8} />
-            <div className="text-center font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a] opacity-50 mt-6">
-              Somatic Field
-            </div>
-          </div>
+          <h2 className="font-serif text-[clamp(28px,4vw,44px)] font-light text-[#f0e9d8] mb-6 leading-tight">
+            The oldest somatic map, spoken aloud.
+          </h2>
+          <p className="font-serif italic text-lg text-[#c8b99a] mb-10 max-w-xl mx-auto leading-relaxed">
+            Be not afraid. Peace, be still. Take heart. Living commands from the Gospels — regulation
+            protocols older than polyvagal theory.
+          </p>
+          <Link
+            to="/gospels"
+            className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#1C1C1C] transition-all duration-500"
+          >
+            Enter Gospels Live →
+          </Link>
         </div>
       </section>
 
-      {/* Newsletter Signup */}
-      <section className="py-24 px-6 bg-[var(--hw-bg)] transition-colors duration-500">
+      <section className="py-24 px-6 text-center border-t border-[rgba(108,87,89,0.18)]">
+        <div className="max-w-xl mx-auto">
+          <div className="font-serif text-[clamp(28px,4vw,40px)] font-light italic text-[var(--hw-ink)] leading-relaxed mb-8">
+            &ldquo;We are not forecasting the weather. We are living inside it.&rdquo;
+          </div>
+          <div className="w-16 h-px bg-[var(--hw-gold)] opacity-40 mx-auto" />
+        </div>
+      </section>
+
+      <section className="py-24 px-6 bg-[var(--hw-surface)]">
         <NewsletterSignup source="homepage" />
       </section>
     </div>

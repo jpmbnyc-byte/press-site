@@ -11,6 +11,7 @@ export default function Masthead() {
   const navItems = [
     { label: 'Journal', path: '/journal' },
     { label: 'Series', path: '/series' },
+    { label: 'Gospels', path: '/gospels' },
     { label: 'About', path: '/about' },
     { label: 'Subscribe', path: '/subscribe' },
   ];
@@ -25,12 +26,14 @@ export default function Masthead() {
           <span className="font-mono text-[11px] text-[#f0e9d8]">.</span>
         </Link>
         <nav className="hidden md:flex items-center gap-7">
-          {navItems.slice(0, 3).map(item => (
+          {navItems.slice(0, 4).map(item => (
             <Link
               key={item.path}
               to={item.path}
               className={`font-mono text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
-                location.pathname === item.path ? 'text-[#c4a84a]' : 'text-[#c8b99a] hover:text-[#c4a84a]'
+                location.pathname === item.path || location.pathname.startsWith(item.path + '/')
+                  ? 'text-[#c4a84a]'
+                  : 'text-[#c8b99a] hover:text-[#c4a84a]'
               }`}
             >
               {item.label}

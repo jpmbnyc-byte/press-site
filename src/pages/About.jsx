@@ -113,15 +113,21 @@ export default function About() {
       {/* Section IV — The Founder */}
       <section className="py-20 px-6 max-w-3xl mx-auto">
         <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-4">IV — The Founder</div>
-        <div className="flex flex-col sm:flex-row gap-8 items-start">
-          <div className="w-20 h-20 bg-[var(--hw-ink)] text-[var(--hw-gold)] flex items-center justify-center font-mono text-lg flex-shrink-0">
-            JP
-          </div>
-          <div>
-            <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-[var(--hw-ink)] mb-1">JP Bobo</div>
-            <div className="font-serif italic text-sm text-[var(--hw-ink3)] mb-4">
+          <div className="flex flex-col sm:flex-row gap-8 items-start">
+          <div className="flex-shrink-0">
+            <img
+              src="https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/500b00ca1_IMG_4897.jpeg"
+              alt="JP Bobo, founder of Human Weather"
+              className="w-44 sm:w-52 h-56 sm:h-72 object-cover border border-[rgba(154,125,46,0.4)]"
+            />
+            <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--hw-ink)] mt-3">
+              JP Bobo
+            </div>
+            <div className="font-serif italic text-sm text-[var(--hw-ink3)]">
               Bayonne NJ · Crown Heights Brooklyn
             </div>
+          </div>
+          <div>
             <div className="space-y-4 font-serif text-lg leading-relaxed text-[var(--hw-ink2)]">
               <p>
                 JP comes from sales operations — the world of pipelines, forecasts, and measurable proximity.
