@@ -1,10 +1,22 @@
 {
   "name": "Human Weather",
   "short_name": "Human Weather",
-  "description": "A premium editorial platform on emotional climate, faith, bliss, diaspora, and the interior life.",
+  "description": "Journaling the climate within and around us. Essays on life, faith & culture.",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "/favicon-day.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-night.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     },
