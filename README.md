@@ -68,6 +68,18 @@ After pushing your changes to git, open the Base44 dashboard and publish the app
 base44 dashboard open
 ```
 
+## Deploy On Vercel (press site)
+
+This repo is a Vite SPA. Content (essays, series, newsletter) stays on the hosted Base44 backend at `https://humanweather.base44.app`. Vercel serves the frontend and proxies `/api/*` to that backend.
+
+1. Import this GitHub repo in Vercel (framework preset: Vite, output: `dist`).
+2. Production env is already set in `.env.production` (`VITE_BASE44_APP_ID`, `VITE_BASE44_APP_BASE_URL`). You can override the same keys in the Vercel dashboard if needed.
+3. Deploy. `vercel.json` rewrites:
+   - `/api/*` → `https://humanweather.base44.app/api/*`
+   - all other routes → `/index.html` (SPA routing)
+
+What ships from this build: Home, Journal, Article, Series, About, Subscribe, theme, newsletter form, and reading UI — all reading/writing Base44 entities at runtime.
+
 ## Docs & Support
 
 Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
