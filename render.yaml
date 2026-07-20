@@ -1,0 +1,28 @@
+# Render Blueprint — auto-deploys from this repo so git pushes refresh the live site.
+# Dashboard: https://dashboard.render.com · Service: press-site-kyn2.onrender.com
+services:
+  - type: web
+    name: press-site-kyn2
+    runtime: static
+    repo: https://github.com/jpmbnyc-byte/press-site
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_BASE44_APP_ID
+        value: 6a57ce138c2f29923fec6bc4
+      - key: VITE_BASE44_APP_BASE_URL
+        value: https://humanweather.base44.app
+      - key: VITE_BASE44_SERVER_URL
+        value: https://base44.app
+      - key: NODE_VERSION
+        value: "22"

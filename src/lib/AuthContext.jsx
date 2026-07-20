@@ -25,8 +25,12 @@ export const AuthProvider = ({ children }) => {
       
       // First, check app public settings (with token if available)
       // This will tell us if auth is required, user not registered, etc.
+      // Match base44Client: same-origin /api in local/Base44 hosting; platform API on Render/static.
+      const apiOrigin =
+        import.meta.env.VITE_BASE44_SERVER_URL ||
+        (import.meta.env.PROD ? 'https://base44.app' : '');
       const appClient = createAxiosClient({
-        baseURL: `/api/apps/public`,
+        baseURL: `${apiOrigin}/api/apps/public`,
         headers: {
           'X-App-Id': appParams.appId
         },

@@ -68,6 +68,12 @@ After pushing your changes to git, open the Base44 dashboard and publish the app
 base44 dashboard open
 ```
 
+### Render (live static site)
+
+This repo also deploys to [Render](https://press-site-kyn2.onrender.com/) as a static site. Pushes to `main` auto-redeploy when the Render service is connected to this GitHub repo (see `render.yaml`).
+
+Production builds bake the public Human Weather Base44 app id from `.env.production`, and the SDK talks to `https://base44.app` so essays and series load from the same backend as [humanweather.base44.app](https://humanweather.base44.app/).
+
 ## Docs & Support
 
 Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
