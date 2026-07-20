@@ -15,6 +15,7 @@ import Series from '@/pages/Series';
 import SeriesDetail from '@/pages/SeriesDetail';
 import About from '@/pages/About';
 import Subscribe from '@/pages/Subscribe';
+import Gospels from '@/pages/Gospels';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -50,6 +51,7 @@ const AuthenticatedApp = () => {
         <Route path="/series" element={<Series />} />
         <Route path="/series/:slug" element={<SeriesDetail />} />
         <Route path="/about" element={<About />} />
+        <Route path="/gospels" element={<Gospels />} />
         <Route path="/subscribe" element={<Subscribe />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />

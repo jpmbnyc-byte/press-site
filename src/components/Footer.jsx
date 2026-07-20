@@ -24,6 +24,7 @@ export default function Footer() {
               {[
                 { label: 'Journal', path: '/journal' },
                 { label: 'Series', path: '/series' },
+                { label: 'Gospels Live', path: '/gospels' },
                 { label: 'About', path: '/about' },
                 { label: 'Subscribe', path: '/subscribe' },
               ].map(item => (
