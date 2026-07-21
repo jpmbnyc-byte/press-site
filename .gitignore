@@ -33,6 +33,7 @@ dist-ssr
 .vite
 base44/.app.jsonc
 
-# Stripe setup output (contains price IDs; safe but keep local)
+# Stripe setup output / local secrets (never commit)
 scripts/.stripe-setup.json
+scripts/.vercel-stripe-env.txt
 
