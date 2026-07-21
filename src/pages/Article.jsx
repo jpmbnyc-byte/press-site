@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
 import AuthorPortrait from '@/components/AuthorPortrait';
 import { startCheckout } from '@/lib/stripeCheckout';
+import { setEssayPageMeta, setHomePageMeta } from '@/lib/pageMeta';
 
 export default function Article() {
   const { slug } = useParams();
@@ -32,6 +33,7 @@ export default function Article() {
         const found = all.find(a => a.slug === slug);
         if (found) {
           setArticle(found);
+          setEssayPageMeta(found);
           try {
             await base44.entities.Article.update(found.id, {
               view_count: (found.view_count || 0) + 1,
@@ -50,6 +52,7 @@ export default function Article() {
       }
     })();
     window.scrollTo(0, 0);
+    return () => setHomePageMeta();
   }, [slug]);
 
   useEffect(() => {

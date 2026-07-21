@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import ArticleCard from '@/components/ArticleCard';
 import NewsletterSignup from '@/components/NewsletterSignup';
+import { setHomePageMeta } from '@/lib/pageMeta';
 
 const HERO_IMAGE =
   'https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/5efc2a849_generated_image.png';
@@ -12,6 +13,10 @@ export default function Home() {
   const [latest, setLatest] = useState([]);
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setHomePageMeta();
+  }, []);
 
   useEffect(() => {
     (async () => {
