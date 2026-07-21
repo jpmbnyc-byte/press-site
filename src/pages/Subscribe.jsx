@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { startCheckout, openBillingPortal } from '@/lib/stripeCheckout';
 
 const tiers = [
   {
@@ -11,7 +13,9 @@ const tiers = [
       'About page and series overview',
       'Reader profile',
     ],
+    planId: null,
     cta: 'Start Reading',
+    href: '/journal',
     highlighted: false,
     filled: false,
   },
@@ -27,6 +31,10 @@ const tiers = [
       'Member-only weekly dispatch',
       'Early access to new app features',
       '7-day free trial',
+    ],
+    planOptions: [
+      { id: 'member_monthly', label: '$9 / month' },
+      { id: 'member_yearly', label: '$72 / year' },
     ],
     cta: 'Start Free Trial',
     highlighted: true,
@@ -44,6 +52,7 @@ const tiers = [
       'First 500 subscribers only',
       '7-day free trial',
     ],
+    planId: 'member_app_yearly',
     cta: 'Join + App Bundle',
     highlighted: true,
     filled: true,
@@ -51,6 +60,35 @@ const tiers = [
 ];
 
 export default function Subscribe() {
+  const [searchParams] = useSearchParams();
+  const [memberPlan, setMemberPlan] = useState('member_yearly');
+  const [loadingPlan, setLoadingPlan] = useState(null);
+  const [error, setError] = useState('');
+
+  const handleCheckout = async (planId) => {
+    if (!planId) return;
+    setError('');
+    setLoadingPlan(planId);
+    try {
+      await startCheckout(planId);
+    } catch (err) {
+      setError(err.message || 'Checkout failed. Please try again.');
+      setLoadingPlan(null);
+    }
+  };
+
+  const handleManage = async () => {
+    setError('');
+    setLoadingPlan('portal');
+    try {
+      const sessionId = searchParams.get('session_id');
+      await openBillingPortal({ sessionId });
+    } catch (err) {
+      setError(err.message || 'Could not open billing portal.');
+      setLoadingPlan(null);
+    }
+  };
+
   return (
     <div className="bg-[#0e0d0a] min-h-screen px-6 py-16">
       <div className="max-w-[520px] mx-auto text-center mb-16">
@@ -67,17 +105,22 @@ export default function Subscribe() {
         </p>
       </div>
 
-      {/* Pricing cards */}
+      {error && (
+        <div className="max-w-xl mx-auto mb-8 border border-[#c4a84a]/40 px-4 py-3 text-center font-serif text-sm text-[#f0e9d8]">
+          {error}
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        {tiers.map(tier => (
+        {tiers.map((tier) => (
           <div
             key={tier.name}
             className={`relative p-8 flex flex-col ${
               tier.filled
                 ? 'bg-[#c4a84a] text-[#0e0d0a]'
                 : tier.highlighted
-                ? 'border-2 border-[#c4a84a] text-[#f0e9d8]'
-                : 'border border-[rgba(196,168,74,0.3)] text-[#f0e9d8]'
+                  ? 'border-2 border-[#c4a84a] text-[#f0e9d8]'
+                  : 'border border-[rgba(196,168,74,0.3)] text-[#f0e9d8]'
             }`}
           >
             {tier.badge && (
@@ -99,30 +142,64 @@ export default function Subscribe() {
             <div className="font-serif text-2xl font-light mb-6">{tier.price}</div>
             <div className={`h-px mb-6 ${tier.filled ? 'bg-[#0e0d0a] opacity-20' : 'bg-[#c4a84a] opacity-25'}`} />
             <ul className="space-y-3 mb-8 flex-1">
-              {tier.features.map((f, i) => (
-                <li key={i} className="font-serif text-sm leading-relaxed flex gap-2">
+              {tier.features.map((f) => (
+                <li key={f} className="font-serif text-sm leading-relaxed flex gap-2">
                   <span className={tier.filled ? 'text-[#0e0d0a]' : 'text-[#c4a84a]'}>✦</span>
                   <span>{f}</span>
                 </li>
               ))}
             </ul>
-            <Link
-              to="/journal"
-              className={`font-mono text-[10px] tracking-[0.25em] uppercase px-6 py-4 text-center transition-all duration-300 ${
-                tier.filled
-                  ? 'bg-[#0e0d0a] text-[#c4a84a] hover:bg-[#1a1810]'
-                  : tier.highlighted
-                  ? 'bg-[#c4a84a] text-[#0e0d0a] hover:bg-[#e0c870]'
-                  : 'border border-[#c4a84a] text-[#c4a84a] hover:bg-[#c4a84a] hover:text-[#0e0d0a]'
-              }`}
-            >
-              {tier.cta}
-            </Link>
+
+            {tier.planOptions && (
+              <div className="flex gap-2 mb-4">
+                {tier.planOptions.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setMemberPlan(opt.id)}
+                    className={`flex-1 font-mono text-[9px] tracking-[0.15em] uppercase px-2 py-2 border transition-colors ${
+                      memberPlan === opt.id
+                        ? 'bg-[#c4a84a] text-[#0e0d0a] border-[#c4a84a]'
+                        : 'border-[#c4a84a]/50 text-[#c4a84a] hover:border-[#c4a84a]'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {tier.href ? (
+              <Link
+                to={tier.href}
+                className={`font-mono text-[10px] tracking-[0.25em] uppercase px-6 py-4 text-center transition-all duration-300 border border-[#c4a84a] text-[#c4a84a] hover:bg-[#c4a84a] hover:text-[#0e0d0a]`}
+              >
+                {tier.cta}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled={!!loadingPlan}
+                onClick={() =>
+                  handleCheckout(tier.planOptions ? memberPlan : tier.planId)
+                }
+                className={`font-mono text-[10px] tracking-[0.25em] uppercase px-6 py-4 text-center transition-all duration-300 disabled:opacity-60 ${
+                  tier.filled
+                    ? 'bg-[#0e0d0a] text-[#c4a84a] hover:bg-[#1a1810]'
+                    : 'bg-[#c4a84a] text-[#0e0d0a] hover:bg-[#e0c870]'
+                }`}
+              >
+                {loadingPlan &&
+                (loadingPlan === tier.planId ||
+                  (tier.planOptions && loadingPlan === memberPlan))
+                  ? 'Redirecting…'
+                  : tier.cta}
+              </button>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Notes */}
       <div className="max-w-md mx-auto space-y-3 text-center">
         {[
           'Cancel any time',
@@ -143,6 +220,14 @@ export default function Subscribe() {
             {note}
           </div>
         ))}
+        <button
+          type="button"
+          onClick={handleManage}
+          disabled={loadingPlan === 'portal'}
+          className="mt-6 font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border-b border-[#c4a84a]/40 pb-1 hover:text-[#e0c870] transition-colors disabled:opacity-60"
+        >
+          {loadingPlan === 'portal' ? 'Opening…' : 'Manage existing membership →'}
+        </button>
       </div>
     </div>
   );

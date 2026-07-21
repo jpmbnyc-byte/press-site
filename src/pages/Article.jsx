@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
 import AuthorPortrait from '@/components/AuthorPortrait';
+import { startCheckout } from '@/lib/stripeCheckout';
 
 export default function Article() {
   const { slug } = useParams();
@@ -10,6 +11,19 @@ export default function Article() {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [checkoutPlan, setCheckoutPlan] = useState(null);
+  const [checkoutError, setCheckoutError] = useState('');
+
+  const handleCheckout = async (planId) => {
+    setCheckoutError('');
+    setCheckoutPlan(planId);
+    try {
+      await startCheckout(planId);
+    } catch (err) {
+      setCheckoutError(err.message || 'Checkout failed. Please try again.');
+      setCheckoutPlan(null);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -156,27 +170,42 @@ export default function Article() {
             <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-8 max-w-md mx-auto">
               Join to read all 49 essays across seven series.
             </p>
+            {checkoutError && (
+              <p className="font-serif text-sm text-[var(--hw-gold)] mb-4">{checkoutError}</p>
+            )}
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4 max-w-md mx-auto">
-              <Link
-                to="/subscribe"
-                className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300"
+              <button
+                type="button"
+                disabled={!!checkoutPlan}
+                onClick={() => handleCheckout('member_monthly')}
+                className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 disabled:opacity-60"
               >
-                $9 / month
-              </Link>
-              <Link
-                to="/subscribe"
-                className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300"
+                {checkoutPlan === 'member_monthly' ? 'Redirecting…' : '$9 / month'}
+              </button>
+              <button
+                type="button"
+                disabled={!!checkoutPlan}
+                onClick={() => handleCheckout('member_yearly')}
+                className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 disabled:opacity-60"
               >
-                $72 / year — save 33%
-              </Link>
+                {checkoutPlan === 'member_yearly' ? 'Redirecting…' : '$72 / year — save 33%'}
+              </button>
             </div>
-            <Link
-              to="/subscribe"
-              className="inline-block font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-bg)] bg-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold-lt)] transition-all duration-300 mb-4"
+            <button
+              type="button"
+              disabled={!!checkoutPlan}
+              onClick={() => handleCheckout('member_app_yearly')}
+              className="inline-block font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-bg)] bg-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold-lt)] transition-all duration-300 mb-4 disabled:opacity-60"
             >
-              $96 / year — Member + App Bundle
-            </Link>
-            <p className="font-serif italic text-sm text-[var(--hw-ink3)] mt-6">
+              {checkoutPlan === 'member_app_yearly'
+                ? 'Redirecting…'
+                : '$96 / year — Member + App Bundle'}
+            </button>
+            <p className="font-serif italic text-sm text-[var(--hw-ink3)] mt-2">
+              <Link to="/subscribe" className="text-[var(--hw-gold)] hover:underline">
+                Compare plans
+              </Link>
+              {' · '}
               First essay in every series is always free.
             </p>
           </div>
