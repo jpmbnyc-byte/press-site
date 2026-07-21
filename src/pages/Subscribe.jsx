@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { startCheckout, openBillingPortal } from '@/lib/stripeCheckout';
 
 const tiers = [
@@ -60,7 +60,6 @@ const tiers = [
 ];
 
 export default function Subscribe() {
-  const [searchParams] = useSearchParams();
   const [memberPlan, setMemberPlan] = useState('member_yearly');
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
@@ -81,8 +80,7 @@ export default function Subscribe() {
     setError('');
     setLoadingPlan('portal');
     try {
-      const sessionId = searchParams.get('session_id');
-      await openBillingPortal({ sessionId });
+      await openBillingPortal();
     } catch (err) {
       setError(err.message || 'Could not open billing portal.');
       setLoadingPlan(null);

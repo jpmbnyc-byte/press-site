@@ -80,42 +80,24 @@ This repo is a Vite SPA. Content (essays, series, newsletter) stays on the hoste
 
 What ships from this build: Home, Journal, Article, Series, About, Subscribe, Gospels, theme, newsletter form, and reading UI — all reading/writing Base44 entities at runtime.
 
-## Stripe memberships (live Checkout)
+## Stripe memberships (live Payment Links)
 
-Subscribe CTAs use Stripe Checkout Sessions (`mode: subscription`) with a 7-day trial. Server routes live under `/api/stripe/*` on Vercel (not proxied to Base44).
+Subscribe and Article paywall CTAs open live Stripe Payment Links (7-day trial on each plan).
 
-| Plan | Price | Checkout `planId` |
+| Plan | Price | Live Payment Link |
 |------|--------|-------------------|
-| Member monthly | $9/mo | `member_monthly` |
-| Member yearly | $72/yr | `member_yearly` |
-| Member + App | $96/yr | `member_app_yearly` |
+| Member monthly | $9/mo | https://buy.stripe.com/fZuaEYbbh4UabB94kt8N204 |
+| Member yearly | $72/yr | https://buy.stripe.com/cNi4gAdjpeuKgVt8AJ8N205 |
+| Member + App | $96/yr | https://buy.stripe.com/bJeeVe1AHfyO5cL18h8N206 |
 
-### Connect your Stripe account
-
-1. Create a [restricted API key](https://docs.stripe.com/keys/restricted-api-keys) with permissions to manage Products, Prices, Checkout Sessions, Billing Portal, and Webhooks (use `rk_live_…` for production).
-2. From the repo root, create products/prices (and optional Payment Links):
+To recreate products/prices/links in Stripe:
 
 ```bash
+npm install stripe --no-save
 STRIPE_SECRET_KEY=rk_live_... SITE_URL=https://humanweather.vercel.app npm run stripe:setup
 ```
 
-3. In the Vercel project → Settings → Environment Variables, add what the script prints:
-   - `STRIPE_SECRET_KEY`
-   - `STRIPE_PRICE_MEMBER_MONTHLY`
-   - `STRIPE_PRICE_MEMBER_YEARLY`
-   - `STRIPE_PRICE_MEMBER_APP_YEARLY`
-   - `SITE_URL=https://humanweather.vercel.app`
-   - `STRIPE_WEBHOOK_SECRET` (after step 4)
-4. In Stripe Dashboard → Developers → Webhooks, add endpoint:
-   - URL: `https://humanweather.vercel.app/api/stripe/webhook`
-   - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
-   - Copy the signing secret into `STRIPE_WEBHOOK_SECRET`
-5. Redeploy Vercel so the new env vars apply.
-6. Smoke-test: open `/subscribe` → Start Free Trial → complete Checkout with a [test card](https://docs.stripe.com/testing) in test mode, or a real card in live mode.
-
-Billing portal: “Manage existing membership” on `/subscribe` (needs a prior Checkout `session_id` or customer id).
-
-Local tip: Stripe API routes need the Vercel runtime (`vercel dev`) or a deployed preview; plain `npm run dev` only proxies `/api` to Base44.
+Webhook (optional, for server-side fulfillment): point Stripe at your own endpoint when API routes are restored. Until then, manage subscriptions in the Stripe Dashboard.
 
 ## Docs & Support
 

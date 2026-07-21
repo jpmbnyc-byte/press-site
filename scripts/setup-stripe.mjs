@@ -14,13 +14,21 @@
 import { writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import Stripe from 'stripe';
+import { createRequire } from 'node:module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_API_KEY;
 
 if (!key) {
   console.error('Set STRIPE_SECRET_KEY (sk_live_... or test key) before running.');
+  process.exit(1);
+}
+
+let Stripe;
+try {
+  Stripe = createRequire(import.meta.url)('stripe');
+} catch {
+  console.error('Missing dependency. Run: npm install stripe --no-save');
   process.exit(1);
 }
 
