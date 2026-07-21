@@ -15,6 +15,7 @@ import Series from '@/pages/Series';
 import SeriesDetail from '@/pages/SeriesDetail';
 import About from '@/pages/About';
 import Subscribe from '@/pages/Subscribe';
+import CheckoutSuccess from '@/pages/CheckoutSuccess';
 import Gospels from '@/pages/Gospels';
 
 const AuthenticatedApp = () => {
@@ -48,6 +49,7 @@ const AuthenticatedApp = () => {
         <Route path="/about" element={<About />} />
         <Route path="/gospels" element={<Gospels />} />
         <Route path="/subscribe" element={<Subscribe />} />
+        <Route path="/subscribe/success" element={<CheckoutSuccess />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

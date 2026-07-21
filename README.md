@@ -78,7 +78,26 @@ This repo is a Vite SPA. Content (essays, series, newsletter) stays on the hoste
    - `/api/*` → `https://humanweather.base44.app/api/*`
    - all other routes → `/index.html` (SPA routing)
 
-What ships from this build: Home, Journal, Article, Series, About, Subscribe, theme, newsletter form, and reading UI — all reading/writing Base44 entities at runtime.
+What ships from this build: Home, Journal, Article, Series, About, Subscribe, Gospels, theme, newsletter form, and reading UI — all reading/writing Base44 entities at runtime.
+
+## Stripe memberships (live Payment Links)
+
+Subscribe and Article paywall CTAs open live Stripe Payment Links (7-day trial on each plan).
+
+| Plan | Price | Live Payment Link |
+|------|--------|-------------------|
+| Member monthly | $9/mo | https://buy.stripe.com/fZuaEYbbh4UabB94kt8N204 |
+| Member yearly | $72/yr | https://buy.stripe.com/cNi4gAdjpeuKgVt8AJ8N205 |
+| Member + App | $96/yr | https://buy.stripe.com/bJeeVe1AHfyO5cL18h8N206 |
+
+To recreate products/prices/links in Stripe:
+
+```bash
+npm install stripe --no-save
+STRIPE_SECRET_KEY=rk_live_... SITE_URL=https://humanweather.vercel.app npm run stripe:setup
+```
+
+Webhook (optional, for server-side fulfillment): point Stripe at your own endpoint when API routes are restored. Until then, manage subscriptions in the Stripe Dashboard.
 
 ## Docs & Support
 
