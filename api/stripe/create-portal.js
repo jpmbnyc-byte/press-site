@@ -1,6 +1,6 @@
-import { getStripe, getSiteOrigin, setCors } from './_lib.js';
+const { getStripe, getSiteOrigin, setCors, readJsonBody } = require('./_lib');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const origin = getSiteOrigin(req);
   setCors(res, origin);
 
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
+    const body = await readJsonBody(req);
     const { customerId, sessionId } = body;
 
     const stripe = getStripe();
@@ -40,4 +40,4 @@ export default async function handler(req, res) {
       error: error.message || 'Unable to open billing portal',
     });
   }
-}
+};

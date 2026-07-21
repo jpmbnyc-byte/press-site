@@ -1,8 +1,14 @@
-import { getStripe, getSiteOrigin, getPriceIdForPlan, setCors } from './_lib.js';
+const {
+  getStripe,
+  getSiteOrigin,
+  getPriceIdForPlan,
+  setCors,
+  readJsonBody,
+} = require('./_lib');
 
 const TRIAL_DAYS = 7;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const origin = getSiteOrigin(req);
   setCors(res, origin);
 
@@ -15,7 +21,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
+    const body = await readJsonBody(req);
     const { planId, email } = body;
 
     if (!planId) {
@@ -54,4 +60,4 @@ export default async function handler(req, res) {
       error: error.message || 'Unable to create checkout session',
     });
   }
-}
+};

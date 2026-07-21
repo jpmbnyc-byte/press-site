@@ -1,11 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/api/((?!stripe/).*)",
-      "destination": "https://humanweather.base44.app/api/$1"
+      "source": "/api/:path*",
+      "destination": "https://humanweather.base44.app/api/:path*"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],

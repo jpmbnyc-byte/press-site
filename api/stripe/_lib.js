@@ -1,9 +1,10 @@
 /**
  * Shared Stripe helpers for Vercel serverless routes.
+ * Filename prefixed with _ so Vercel does not deploy it as its own function.
  */
-import Stripe from 'stripe';
+const Stripe = require('stripe');
 
-export function getStripe() {
+function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
     throw new Error('STRIPE_SECRET_KEY is not configured');
@@ -13,7 +14,7 @@ export function getStripe() {
   });
 }
 
-export function getSiteOrigin(req) {
+function getSiteOrigin(req) {
   const fromEnv = process.env.SITE_URL || process.env.VITE_SITE_URL;
   if (fromEnv) return fromEnv.replace(/\/$/, '');
 
@@ -22,7 +23,7 @@ export function getSiteOrigin(req) {
   return `${proto}://${host}`;
 }
 
-export function getPriceIdForPlan(planId) {
+function getPriceIdForPlan(planId) {
   const map = {
     member_monthly: process.env.STRIPE_PRICE_MEMBER_MONTHLY,
     member_yearly: process.env.STRIPE_PRICE_MEMBER_YEARLY,
@@ -35,8 +36,30 @@ export function getPriceIdForPlan(planId) {
   return priceId;
 }
 
-export function setCors(res, origin) {
+function setCors(res, origin) {
   res.setHeader('Access-Control-Allow-Origin', origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Stripe-Signature');
 }
+
+async function readJsonBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  if (typeof req.body === 'string' && req.body) {
+    return JSON.parse(req.body);
+  }
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  const raw = Buffer.concat(chunks).toString('utf8');
+  if (!raw) return {};
+  return JSON.parse(raw);
+}
+
+module.exports = {
+  getStripe,
+  getSiteOrigin,
+  getPriceIdForPlan,
+  setCors,
+  readJsonBody,
+};

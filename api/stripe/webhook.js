@@ -1,10 +1,4 @@
-import { getStripe } from './_lib.js';
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+const { getStripe } = require('./_lib');
 
 async function readRawBody(req) {
   const chunks = [];
@@ -14,7 +8,7 @@ async function readRawBody(req) {
   return Buffer.concat(chunks);
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -62,3 +56,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: `Webhook Error: ${error.message}` });
   }
 }
+
+// Disable body parsing so Stripe signature verification receives the raw body.
+handler.config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+module.exports = handler;
