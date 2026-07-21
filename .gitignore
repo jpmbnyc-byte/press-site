@@ -37,3 +37,5 @@ base44/.app.jsonc
 scripts/.stripe-setup.json
 scripts/.vercel-stripe-env.txt
 
+.agents/
+skills-lock.json

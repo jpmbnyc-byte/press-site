@@ -16,6 +16,9 @@ import SeriesDetail from '@/pages/SeriesDetail';
 import About from '@/pages/About';
 import Subscribe from '@/pages/Subscribe';
 import CheckoutSuccess from '@/pages/CheckoutSuccess';
+import Account from '@/pages/Account';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
 import Gospels from '@/pages/Gospels';
 
 const AuthenticatedApp = () => {
@@ -50,6 +53,9 @@ const AuthenticatedApp = () => {
         <Route path="/gospels" element={<Gospels />} />
         <Route path="/subscribe" element={<Subscribe />} />
         <Route path="/subscribe/success" element={<CheckoutSuccess />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

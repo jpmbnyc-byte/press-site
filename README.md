@@ -15,94 +15,73 @@ See the [Base44 CLI docs](https://docs.base44.com/developers/references/cli/get-
 
 ## Run Locally
 
-Run the full local development environment from the project root:
-
 ```bash
 base44 dev
 ```
 
-`base44 dev` starts the local Base44 development backend and, when this app is configured for it, also starts the frontend dev server for you. Use the frontend URL printed by the command.
-
-For example, when the Base44 project config includes a `serveCommand`, `base44 dev` can launch the frontend too:
-
-```json5
-{
-  "site": {
-    "serveCommand": "npm run dev"
-  }
-}
-```
-
-In a Base44 project this lives in `base44/config.jsonc`.
-
-## Run Only The Frontend
-
-If you only want to work on the frontend against the hosted Base44 backend, run:
+For frontend-only work against the hosted backend:
 
 ```bash
 npm run dev
 ```
 
-Open the local URL printed by Vite.
-
-## Use The Hosted Backend
-
-For frontend-only development, create or update `.env.local` in the project root:
-
-```bash
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=https://your-app.base44.app
-```
-
-`VITE_BASE44_APP_ID` identifies the Base44 app.
-
-`VITE_BASE44_APP_BASE_URL` tells the Base44 Vite plugin where to send local `/api` requests. Point it at your deployed Base44 app URL when you want the local frontend to use the hosted backend.
-
-When you use `base44 dev`, the command injects the local Base44 values for you, so `.env.local` is mainly needed for frontend-only workflows.
-
-## Publish Your Changes
-
-After pushing your changes to git, open the Base44 dashboard and publish the app:
-
-```bash
-base44 dashboard open
-```
-
 ## Deploy On Vercel (press site)
 
-This repo is a Vite SPA. Content (essays, series, newsletter) stays on the hosted Base44 backend at `https://humanweather.base44.app`. Vercel serves the frontend and proxies `/api/*` to that backend.
+This repo is a Vite SPA. Content stays on Base44 at `https://humanweather.base44.app`. Vercel serves the frontend and proxies `/api/*` to that backend.
 
 1. Import this GitHub repo in Vercel (framework preset: Vite, output: `dist`).
-2. Production env is already set in `.env.production` (`VITE_BASE44_APP_ID`, `VITE_BASE44_APP_BASE_URL`). You can override the same keys in the Vercel dashboard if needed.
-3. Deploy. `vercel.json` rewrites:
-   - `/api/*` → `https://humanweather.base44.app/api/*`
-   - all other routes → `/index.html` (SPA routing)
+2. Production env is in `.env.production`.
+3. Deploy. `vercel.json` rewrites `/api/*` → Base44 and SPA routes → `index.html`.
 
-What ships from this build: Home, Journal, Article, Series, About, Subscribe, Gospels, theme, newsletter form, and reading UI — all reading/writing Base44 entities at runtime.
+## Membership closed loop (auth + Stripe + paywall + app)
 
-## Stripe memberships (live Payment Links)
+### Flow
 
-Subscribe and Article paywall CTAs open live Stripe Payment Links (7-day trial on each plan).
+1. Reader **creates an account / logs in** (`/register`, `/login`).
+2. Chooses a plan on `/subscribe` → Base44 function `createCheckout` opens Stripe Checkout (7-day trial) with `client_reference_id = user.id`.
+3. Stripe webhook → Base44 function `stripeWebhook` sets User membership fields.
+4. **Members essays** show only a preview until `membership_status` is `trialing` or `active`.
+5. **Member + App bundle** (`member_app_yearly`) also sets `app_access` + `app_unlock_token` for **humanweather.social**.
 
-| Plan | Price | Live Payment Link |
-|------|--------|-------------------|
-| Member monthly | $9/mo | https://buy.stripe.com/fZuaEYbbh4UabB94kt8N204 |
-| Member yearly | $72/yr | https://buy.stripe.com/cNi4gAdjpeuKgVt8AJ8N205 |
-| Member + App | $96/yr | https://buy.stripe.com/bJeeVe1AHfyO5cL18h8N206 |
+### Bundle → PWA
 
-To recreate products/prices/links in Stripe:
+- Unlock URL pattern: `https://humanweather.social/?hw_unlock=1&email=…&token=…`
+- Verification API (for the PWA):  
+  `POST https://humanweather.base44.app/functions/verifyAppAccess`  
+  body: `{ "email": "…", "token": "…" }` → `{ access: true|false, … }`
+
+### Deploy backend (required once)
+
+From repo root (must be logged into Base44 CLI):
 
 ```bash
-npm install stripe --no-save
-STRIPE_SECRET_KEY=rk_live_... SITE_URL=https://humanweather.vercel.app npm run stripe:setup
+npx base44 login
+npx base44 entities push
+npx base44 functions deploy
+# Set secrets in Base44 dashboard or via CLI if available:
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET
+# STRIPE_PRICE_MEMBER_MONTHLY=price_1TvRUwL5xkl5Azg8hpLAksIu
+# STRIPE_PRICE_MEMBER_YEARLY=price_1TvRUxL5xkl5Azg8b4m7xmZh
+# STRIPE_PRICE_MEMBER_APP_YEARLY=price_1TvRUyL5xkl5Azg8afW0Kfau
+# SITE_URL=https://humanweather.vercel.app
+# HW_SOCIAL_APP_URL=https://humanweather.social
 ```
 
-Webhook (optional, for server-side fulfillment): point Stripe at your own endpoint when API routes are restored. Until then, manage subscriptions in the Stripe Dashboard.
+Point the Stripe webhook (live) to:
+
+```
+https://humanweather.base44.app/functions/stripeWebhook
+```
+
+Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`.
+
+### User fields
+
+See `base44/entities/User.jsonc`: `stripe_customer_id`, `membership_plan`, `membership_status`, `membership_period_end`, `app_access`, `app_unlock_token`, `app_access_granted_at`.
 
 ## Docs & Support
 
 Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
-
-Base44 CLI command reference: [https://docs.base44.com/developers/references/cli/commands/introduction](https://docs.base44.com/developers/references/cli/commands/introduction)
 
 Support: [https://app.base44.com/support](https://app.base44.com/support)

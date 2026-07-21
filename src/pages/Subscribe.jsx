@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { startCheckout, openBillingPortal } from '@/lib/stripeCheckout';
+import { useAuth } from '@/lib/AuthContext';
+import { getAppUnlockUrl, hasAppAccess, hasPressAccess } from '@/lib/membership';
 
 const tiers = [
   {
@@ -60,9 +62,24 @@ const tiers = [
 ];
 
 export default function Subscribe() {
+  const [params] = useSearchParams();
+  const { user, isAuthenticated, refreshUser } = useAuth();
   const [memberPlan, setMemberPlan] = useState('member_yearly');
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const plan = params.get('plan');
+    if (plan && isAuthenticated) {
+      startCheckout(plan).catch((err) => {
+        setError(err.message || 'Checkout failed');
+      });
+    }
+  }, [params, isAuthenticated]);
+
+  useEffect(() => {
+    refreshUser?.();
+  }, [refreshUser]);
 
   const handleCheckout = async (planId) => {
     if (!planId) return;
@@ -87,6 +104,10 @@ export default function Subscribe() {
     }
   };
 
+  const press = hasPressAccess(user);
+  const app = hasAppAccess(user);
+  const unlockUrl = getAppUnlockUrl(user);
+
   return (
     <div className="bg-[#0e0d0a] min-h-screen px-6 py-16">
       <div className="max-w-[520px] mx-auto text-center mb-16">
@@ -101,7 +122,39 @@ export default function Subscribe() {
         <p className="font-serif italic text-lg text-[#c8b99a] max-w-md mx-auto">
           Seven series. Forty-nine essays. One question. And an app that maps what you feel.
         </p>
+        {!isAuthenticated && (
+          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] mt-6">
+            <Link to="/login?next=/subscribe" className="underline underline-offset-4">
+              Log in
+            </Link>
+            {' '}or{' '}
+            <Link to="/register?next=/subscribe" className="underline underline-offset-4">
+              create an account
+            </Link>
+            {' '}before checkout
+          </p>
+        )}
       </div>
+
+      {press && (
+        <div className="max-w-xl mx-auto mb-10 border border-[#c4a84a]/40 px-6 py-5 text-center">
+          <p className="font-serif text-[#f0e9d8] mb-2">
+            You have press access ({user.membership_status}).
+          </p>
+          {app ? (
+            <a
+              href={unlockUrl}
+              className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] underline underline-offset-4"
+            >
+              Open humanweather.social app →
+            </a>
+          ) : (
+            <p className="font-serif italic text-sm text-[#c8b99a]">
+              Want the PWA too? Upgrade to Member + App below.
+            </p>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="max-w-xl mx-auto mb-8 border border-[#c4a84a]/40 px-4 py-3 text-center font-serif text-sm text-[#f0e9d8]">
