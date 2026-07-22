@@ -5,7 +5,7 @@
  * Home (/) keeps the static og-share.png from index.html.
  */
 
-const SITE = 'https://humanweather.vercel.app';
+const SITE = 'https://www.humanweather.press';
 const APP_ID = '6a57ce138c2f29923fec6bc4';
 const BASE44 = 'https://humanweather.base44.app';
 
@@ -27,8 +27,13 @@ function escapeHtml(value) {
 
 function absoluteUrl(url) {
   if (!url) return `${SITE}/og-share.png`;
-  if (/^https?:\/\//i.test(url)) return url;
-  return `${SITE}${url.startsWith('/') ? '' : '/'}${url}`;
+  // Prefer .press host when assets were previously stored on the Vercel hostname.
+  const normalized = String(url).replace(
+    /^https?:\/\/humanweather\.vercel\.app/i,
+    SITE,
+  );
+  if (/^https?:\/\//i.test(normalized)) return normalized;
+  return `${SITE}${normalized.startsWith('/') ? '' : '/'}${normalized}`;
 }
 
 async function fetchArticleBySlug(slug) {
