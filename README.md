@@ -94,7 +94,7 @@ To recreate products/prices/links in Stripe:
 
 ```bash
 npm install stripe --no-save
-STRIPE_SECRET_KEY=rk_live_... SITE_URL=https://humanweather.vercel.app npm run stripe:setup
+STRIPE_SECRET_KEY=rk_live_... SITE_URL=https://www.humanweather.press npm run stripe:setup
 ```
 
 Webhook (optional, for server-side fulfillment): point Stripe at your own endpoint when API routes are restored. Until then, manage subscriptions in the Stripe Dashboard.

@@ -3,7 +3,8 @@
  * Social crawlers also need the Edge middleware at /journal/:slug.
  */
 
-const SITE = 'https://humanweather.vercel.app';
+import { SITE_URL, absoluteUrl } from '@/lib/site';
+
 const DEFAULTS = {
   title: 'Human Weather — The Emotional Climate of Modern Life',
   description:
@@ -11,9 +12,9 @@ const DEFAULTS = {
   ogTitle: 'Human Weather — Journaling the Climate Within and Around Us',
   ogDescription:
     'Essays on life, faith & culture. Reflections for a more aware life. Slow thought. Real connection.',
-  image: `${SITE}/og-share.png`,
+  image: `${SITE_URL}/og-share.png`,
   imageAlt: 'Human Weather Press — journaling the climate within and around us',
-  url: `${SITE}/`,
+  url: `${SITE_URL}/`,
   type: 'website',
 };
 
@@ -88,13 +89,8 @@ export function setEssayPageMeta(article) {
     article.excerpt ||
     article.subtitle ||
     `An essay from ${series} by ${article.author_name || 'JP Bobo'}.`;
-  const image =
-    article.hero_image_url && /^https?:\/\//i.test(article.hero_image_url)
-      ? article.hero_image_url
-      : article.hero_image_url
-        ? `${SITE}${article.hero_image_url.startsWith('/') ? '' : '/'}${article.hero_image_url}`
-        : DEFAULTS.image;
-  const url = `${SITE}/journal/${article.slug}`;
+  const image = absoluteUrl(article.hero_image_url || '/og-share.png');
+  const url = `${SITE_URL}/journal/${article.slug}`;
 
   setPageMeta({
     title,
