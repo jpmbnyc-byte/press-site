@@ -69,7 +69,7 @@ export default function SeriesDetail() {
           <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#f0e9d8] opacity-40">
             {essays.length} essays published of 7 ·{' '}
             {seriesItem.access_level === 'free_first'
-              ? 'First essay free'
+              ? 'Free & members essays'
               : seriesItem.access_level === 'members_only'
               ? 'Members only'
               : 'All free'}

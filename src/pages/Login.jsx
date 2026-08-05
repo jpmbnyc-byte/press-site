@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,28 @@ import { Label } from "@/components/ui/label";
 import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
+import { startCheckout } from "@/lib/stripeCheckout";
 
 export default function Login() {
+  const [params] = useSearchParams();
+  const next = params.get("next") || "/account";
+  const plan = params.get("plan");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const afterAuth = async () => {
+    if (plan) {
+      try {
+        await startCheckout(plan);
+        return;
+      } catch {
+        /* fall through to next */
+      }
+    }
+    window.location.href = next.startsWith("/") ? next : "/account";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,16 +36,20 @@ export default function Login() {
     setLoading(true);
     try {
       await base44.auth.loginViaEmailPassword(email, password);
-      window.location.href = "/";
+      await afterAuth();
     } catch (err) {
       setError(err.message || "Invalid email or password");
-    } finally {
       setLoading(false);
     }
   };
 
   const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", "/");
+    const dest = plan
+      ? `/subscribe?plan=${encodeURIComponent(plan)}`
+      : next.startsWith("/")
+        ? next
+        : "/account";
+    base44.auth.loginWithProvider("google", dest);
   };
 
   return (
@@ -40,7 +60,10 @@ export default function Login() {
       footer={
         <>
           Don't have an account?{" "}
-          <Link to="/register" className="text-primary font-medium hover:underline">
+          <Link
+            to={`/register?next=${encodeURIComponent(next)}${plan ? `&plan=${encodeURIComponent(plan)}` : ""}`}
+            className="text-primary font-medium hover:underline"
+          >
             Create one
           </Link>
         </>

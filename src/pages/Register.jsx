@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +9,12 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { toast } from "@/components/ui/use-toast";
+import { startCheckout } from "@/lib/stripeCheckout";
 
 export default function Register() {
+  const [params] = useSearchParams();
+  const next = params.get("next") || "/account";
+  const plan = params.get("plan");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -18,6 +22,18 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
+
+  const afterAuth = async () => {
+    if (plan) {
+      try {
+        await startCheckout(plan);
+        return;
+      } catch {
+        /* fall through */
+      }
+    }
+    window.location.href = next.startsWith("/") ? next : "/account";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +61,7 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
-      window.location.href = "/";
+      await afterAuth();
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {
@@ -67,7 +83,12 @@ export default function Register() {
   };
 
   const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", "/");
+    const dest = plan
+      ? `/subscribe?plan=${encodeURIComponent(plan)}`
+      : next.startsWith("/")
+        ? next
+        : "/account";
+    base44.auth.loginWithProvider("google", dest);
   };
 
   if (showOtp) {
@@ -132,7 +153,10 @@ export default function Register() {
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="text-primary font-medium hover:underline">
+          <Link
+            to={`/login?next=${encodeURIComponent(next)}${plan ? `&plan=${encodeURIComponent(plan)}` : ""}`}
+            className="text-primary font-medium hover:underline"
+          >
             Log in
           </Link>
         </>

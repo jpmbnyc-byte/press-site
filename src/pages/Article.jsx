@@ -4,16 +4,21 @@ import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
 import AuthorPortrait from '@/components/AuthorPortrait';
 import { startCheckout } from '@/lib/stripeCheckout';
+import { useAuth } from '@/lib/AuthContext';
+import { hasPressAccess, previewMembersBody } from '@/lib/membership';
 import { setEssayPageMeta, setHomePageMeta } from '@/lib/pageMeta';
 
 export default function Article() {
   const { slug } = useParams();
+  const { user } = useAuth();
   const [article, setArticle] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [checkoutPlan, setCheckoutPlan] = useState(null);
   const [checkoutError, setCheckoutError] = useState('');
+  const canReadMembers = hasPressAccess(user);
+
 
   const handleCheckout = async (planId) => {
     setCheckoutError('');
@@ -157,21 +162,25 @@ export default function Article() {
               ),
             }}
           >
-            {article.body_md}
+            {article.access_level === 'members' && !canReadMembers
+              ? previewMembersBody(article.body_md)
+              : article.body_md}
           </ReactMarkdown>
         </div>
 
-        {/* End mark */}
-        <div className="text-center text-[var(--hw-gold)] text-lg mt-12">✦</div>
+        {/* End mark — only when full essay is unlocked */}
+        {(article.access_level !== 'members' || canReadMembers) && (
+          <div className="text-center text-[var(--hw-gold)] text-lg mt-12">✦</div>
+        )}
 
-        {/* Paywall gate */}
-        {article.access_level === 'members' && (
-          <div className="mt-16 border-t border-b border-[rgba(154,125,46,0.18)] py-12 text-center bg-[var(--hw-surface)]">
+        {/* Real paywall — locked members essays */}
+        {article.access_level === 'members' && !canReadMembers && (
+          <div className="mt-10 border-t border-b border-[rgba(154,125,46,0.18)] py-12 text-center bg-[var(--hw-surface)]">
             <h3 className="font-serif text-3xl font-light text-[var(--hw-ink)] mb-3">
               This essay continues for members.
             </h3>
             <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-8 max-w-md mx-auto">
-              Join to read all 49 essays across seven series.
+              Log in and start a free trial to read the full archive.
             </p>
             {checkoutError && (
               <p className="font-serif text-sm text-[var(--hw-gold)] mb-4">{checkoutError}</p>
@@ -205,11 +214,13 @@ export default function Article() {
                 : '$96 / year — Member + App Bundle'}
             </button>
             <p className="font-serif italic text-sm text-[var(--hw-ink3)] mt-2">
+              <Link to="/login" className="text-[var(--hw-gold)] hover:underline">
+                Log in
+              </Link>
+              {' · '}
               <Link to="/subscribe" className="text-[var(--hw-gold)] hover:underline">
                 Compare plans
               </Link>
-              {' · '}
-              First essay in every series is always free.
             </p>
           </div>
         )}
@@ -269,7 +280,7 @@ export default function Article() {
             to="/subscribe"
             className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-3 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 inline-block"
           >
-            Subscribe Free →
+            Get the Dispatch →
           </Link>
         </div>
       </section>

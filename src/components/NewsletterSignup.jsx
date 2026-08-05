@@ -29,7 +29,7 @@ export default function NewsletterSignup({ source = 'homepage' }) {
           You are in the system.<br />Peace be with you.
         </p>
         <p className="font-mono text-[8px] tracking-[0.15em] uppercase text-[var(--hw-ink3)] mt-8">
-          Join 1,247 readers · Unsubscribe any time
+          Unsubscribe any time
         </p>
       </div>
     );
@@ -63,11 +63,11 @@ export default function NewsletterSignup({ source = 'homepage' }) {
           disabled={loading}
           className="w-full bg-[var(--hw-gold)] text-[var(--hw-bg)] font-mono text-[10px] tracking-[0.25em] uppercase px-8 py-4 hover:bg-[var(--hw-gold-lt)] transition-colors duration-300 disabled:opacity-50"
         >
-          {loading ? 'Subscribing...' : 'Subscribe Free →'}
+          {loading ? 'Subscribing...' : 'Get the Dispatch →'}
         </button>
       </form>
       <p className="font-mono text-[8px] tracking-[0.15em] uppercase text-[var(--hw-ink3)] mt-6">
-        Join 1,247 readers · Unsubscribe any time
+        Free email · Unsubscribe any time
       </p>
     </div>
   );

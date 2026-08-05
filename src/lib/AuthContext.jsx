@@ -80,12 +80,8 @@ export const AuthProvider = ({ children }) => {
         );
         setAppPublicSettings(publicSettings);
 
-        // Press site is public — never hard-block on auth. Optional token only.
-        if (appParams.token) {
-          await checkUserAuth({ clearOnFailure: true });
-        } else {
-          finishAnonymous();
-        }
+        // Optional login — journal stays public; members content gates separately.
+        await checkUserAuth({ clearOnFailure: true });
         setIsLoadingPublicSettings(false);
       } catch (appError) {
         console.error('App state check failed:', appError);
@@ -146,10 +142,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const navigateToLogin = () => {
-    // Intentionally no-op for the public press site so we never leave
-    // humanweather.vercel.app for a Base44 login redirect loop.
-    console.warn('Login redirect suppressed on public press site');
+  const navigateToLogin = (nextPath) => {
+    // Stay on this origin — never bounce to Base44 hosted /login.
+    const next = nextPath || `${window.location.pathname}${window.location.search}`;
+    window.location.href = `/login?next=${encodeURIComponent(next)}`;
+  };
+
+  const refreshUser = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+      setIsAuthenticated(true);
+      return currentUser;
+    } catch {
+      return null;
+    }
   };
 
   return (
@@ -166,6 +173,7 @@ export const AuthProvider = ({ children }) => {
         navigateToLogin,
         checkUserAuth,
         checkAppState,
+        refreshUser,
       }}
     >
       {children}

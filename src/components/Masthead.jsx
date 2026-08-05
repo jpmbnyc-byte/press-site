@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/lib/hwTheme';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function Masthead() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { mode, toggle } = useTheme();
+  const { isAuthenticated } = useAuth();
 
   const navItems = [
     { label: 'Journal', path: '/journal' },
@@ -45,6 +47,12 @@ export default function Masthead() {
           >
             Subscribe
           </Link>
+          <Link
+            to={isAuthenticated ? '/account' : '/login'}
+            className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c8b99a] hover:text-[#c4a84a] transition-colors duration-300"
+          >
+            {isAuthenticated ? 'Account' : 'Log in'}
+          </Link>
           <button
             onClick={toggle}
             className="text-[#c8b99a] hover:text-[#c4a84a] transition-colors duration-300 ml-1"
@@ -75,6 +83,13 @@ export default function Masthead() {
               {item.label}
             </Link>
           ))}
+          <Link
+            to={isAuthenticated ? '/account' : '/login'}
+            onClick={() => setOpen(false)}
+            className="font-serif text-3xl font-light text-[#c4a84a] py-4"
+          >
+            {isAuthenticated ? 'Account' : 'Log in'}
+          </Link>
           <div className="mt-10 text-[#c4a84a] text-xl tracking-[0.3em]">✦</div>
         </div>
       )}

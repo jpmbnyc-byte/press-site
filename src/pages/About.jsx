@@ -153,7 +153,7 @@ export default function About() {
       <section className="py-20 px-6 border-t border-[rgba(154,125,46,0.18)]">
         <div className="max-w-4xl mx-auto text-center">
           <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-4">V — The Series</div>
-          <h2 className="font-serif text-4xl font-light text-[var(--hw-ink)] mb-6">Seven series. Forty-nine essays.</h2>
+          <h2 className="font-serif text-4xl font-light text-[var(--hw-ink)] mb-6">Seven series. A growing archive.</h2>
           <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-8 max-w-xl mx-auto">
             Each series is a sustained meditation on one dimension of the interior life.
           </p>

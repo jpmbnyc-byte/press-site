@@ -1,17 +1,45 @@
 {
+  "name": "User",
+  "type": "object",
+  "required": ["role"],
   "properties": {
     "role": {
       "type": "string",
       "description": "The role of the user in the app",
-      "enum": [
-        "admin",
-        "user"
-      ]
+      "enum": ["admin", "user"]
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "Stripe Customer ID (cus_…)"
+    },
+    "membership_plan": {
+      "type": "string",
+      "description": "Active Human Weather plan id (member_monthly | member_yearly | member_app_yearly)"
+    },
+    "membership_status": {
+      "type": "string",
+      "description": "Stripe subscription status",
+      "enum": ["none", "trialing", "active", "past_due", "canceled", "incomplete", "unpaid"],
+      "default": "none"
+    },
+    "membership_period_end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Current paid/trial period end"
+    },
+    "app_access": {
+      "type": "boolean",
+      "description": "True when Member + App bundle unlocks humanweather.social",
+      "default": false
+    },
+    "app_unlock_token": {
+      "type": "string",
+      "description": "One-time style unlock token for the Human Weather PWA"
+    },
+    "app_access_granted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When PWA app access was granted"
     }
-  },
-  "required": [
-    "role"
-  ],
-  "name": "User",
-  "type": "object"
+  }
 }

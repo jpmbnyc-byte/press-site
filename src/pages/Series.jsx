@@ -60,7 +60,7 @@ export default function Series() {
               <div className="font-mono text-[8px] tracking-[0.15em] uppercase text-[var(--hw-ink3)]">
                 {s.essay_count_published || 0} of 7 essays ·{' '}
                 {s.access_level === 'free_first'
-                  ? 'First essay free'
+                  ? 'Free & members essays'
                   : s.access_level === 'members_only'
                   ? 'Members only'
                   : 'All free'}
