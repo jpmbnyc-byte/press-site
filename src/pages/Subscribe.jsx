@@ -10,10 +10,9 @@ const tiers = [
     price: '—',
     badge: null,
     features: [
-      'First essay in every series',
-      'Weekly editorial dispatch',
+      'Essays marked Free in the journal',
+      'Weekly editorial dispatch (email)',
       'About page and series overview',
-      'Reader profile',
     ],
     planId: null,
     cta: 'Start Reading',
@@ -26,12 +25,9 @@ const tiers = [
     price: '$9/mo or $72/yr',
     badge: 'Most Popular',
     features: [
-      'All 49 essays across seven series',
-      'The Olive Tree — founder voice essays',
-      'Complete archive access',
-      'Reader comments on all articles',
-      'Member-only weekly dispatch',
-      'Early access to new app features',
+      'Full access to members essays',
+      'Growing archive across seven series',
+      'Account & billing self-serve',
       '7-day free trial',
     ],
     planOptions: [
@@ -49,9 +45,7 @@ const tiers = [
     features: [
       'Everything in Member',
       'humanweather.social app premium',
-      'Priority support',
-      'Founding member badge',
-      'First 500 subscribers only',
+      'Unlock link after checkout',
       '7-day free trial',
     ],
     planId: 'member_app_yearly',
@@ -120,7 +114,7 @@ export default function Subscribe() {
           Join Human Weather.
         </h1>
         <p className="font-serif italic text-lg text-[#c8b99a] max-w-md mx-auto">
-          Seven series. Forty-nine essays. One question. And an app that maps what you feel.
+          Seven series. A growing archive. One question. And an app that maps what you feel.
         </p>
         {!isAuthenticated && (
           <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] mt-6">
@@ -254,7 +248,7 @@ export default function Subscribe() {
       <div className="max-w-md mx-auto space-y-3 text-center">
         {[
           'Cancel any time',
-          'First essay in every series always free',
+          'Free essays stay free — members unlock the rest',
           '7-day free trial — no charge until day 8',
           <>
             Questions?{' '}

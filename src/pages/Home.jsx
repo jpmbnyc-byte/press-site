@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import ArticleCard from '@/components/ArticleCard';
 import NewsletterSignup from '@/components/NewsletterSignup';
+import { setHomePageMeta } from '@/lib/pageMeta';
 
 const HERO_IMAGE =
   'https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/5efc2a849_generated_image.png';
@@ -14,11 +15,17 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setHomePageMeta();
+  }, []);
+
+  useEffect(() => {
     (async () => {
       try {
         const allArticles = await base44.entities.Article.list('-published_at', 50);
         const live = allArticles.filter(a => a.status === 'published' || a.status === 'featured');
-        const feat = live.filter(a => a.featured || a.status === 'featured');
+        const feat = live
+          .filter(a => a.featured || a.status === 'featured')
+          .sort((a, b) => (a.featured_order ?? 99) - (b.featured_order ?? 99));
         setFeatured(feat.length ? feat : live.slice(0, 1));
         setLatest(live.slice(0, 4));
 
@@ -40,7 +47,16 @@ export default function Home() {
     );
   }
 
-  const spotlight = featured[1] || latest[0];
+  const spotlight = featured[0] || latest[0];
+  const spotlightTitle = spotlight?.subtitle || spotlight?.title;
+  const spotlightEyebrow = [
+    spotlight?.series_label,
+    spotlight?.series_order
+      ? `Essay ${String(spotlight.series_order).padStart(2, '0')} of 7`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <div className="bg-[var(--hw-bg)]">
@@ -103,18 +119,13 @@ export default function Home() {
             </div>
             <div>
               <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-6">
-                {spotlight.series_label || 'Featured'}
+                {spotlightEyebrow || 'Featured'}
               </div>
               <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-light text-[var(--hw-ink)] leading-[1.05] tracking-[-0.01em] mb-6">
-                {spotlight.title}
+                {spotlightTitle}
               </h2>
-              {spotlight.subtitle && (
-                <p className="font-serif italic text-xl text-[var(--hw-ink2)] mb-6 leading-relaxed">
-                  {spotlight.subtitle}
-                </p>
-              )}
               {spotlight.excerpt && (
-                <p className="font-body text-base text-[var(--hw-ink2)] mb-8 leading-[1.75] max-w-md">
+                <p className="font-serif italic text-xl text-[var(--hw-ink2)] mb-8 leading-relaxed max-w-md">
                   {spotlight.excerpt}
                 </p>
               )}

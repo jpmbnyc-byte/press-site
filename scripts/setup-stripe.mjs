@@ -35,7 +35,7 @@ try {
 const stripe = new Stripe(key, { apiVersion: '2026-06-24.dahlia' });
 const isLive = key.includes('_live_');
 
-const SITE_URL = (process.env.SITE_URL || 'https://humanweather.vercel.app').replace(/\/$/, '');
+const SITE_URL = (process.env.SITE_URL || 'https://www.humanweather.press').replace(/\/$/, '');
 
 const catalog = [
   {

@@ -6,6 +6,7 @@ import AuthorPortrait from '@/components/AuthorPortrait';
 import { startCheckout } from '@/lib/stripeCheckout';
 import { useAuth } from '@/lib/AuthContext';
 import { hasPressAccess, previewMembersBody } from '@/lib/membership';
+import { setEssayPageMeta, setHomePageMeta } from '@/lib/pageMeta';
 
 export default function Article() {
   const { slug } = useParams();
@@ -37,6 +38,7 @@ export default function Article() {
         const found = all.find(a => a.slug === slug);
         if (found) {
           setArticle(found);
+          setEssayPageMeta(found);
           try {
             await base44.entities.Article.update(found.id, {
               view_count: (found.view_count || 0) + 1,
@@ -55,6 +57,7 @@ export default function Article() {
       }
     })();
     window.scrollTo(0, 0);
+    return () => setHomePageMeta();
   }, [slug]);
 
   useEffect(() => {
@@ -277,7 +280,7 @@ export default function Article() {
             to="/subscribe"
             className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-3 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 inline-block"
           >
-            Subscribe Free →
+            Get the Dispatch →
           </Link>
         </div>
       </section>

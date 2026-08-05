@@ -64,7 +64,7 @@ npx base44 functions deploy
 # STRIPE_PRICE_MEMBER_MONTHLY=price_1TvRUwL5xkl5Azg8hpLAksIu
 # STRIPE_PRICE_MEMBER_YEARLY=price_1TvRUxL5xkl5Azg8b4m7xmZh
 # STRIPE_PRICE_MEMBER_APP_YEARLY=price_1TvRUyL5xkl5Azg8afW0Kfau
-# SITE_URL=https://humanweather.vercel.app
+# SITE_URL=https://www.humanweather.press
 # HW_SOCIAL_APP_URL=https://humanweather.social
 ```
 
