@@ -8,9 +8,27 @@ import { setHomePageMeta } from '@/lib/pageMeta';
 const HERO_IMAGE =
   'https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/5efc2a849_generated_image.png';
 
+const FEATURED_PREVIEW_SLUG = 'relational-faith-the-mirror-at-the-waters-edge';
+
+function essayDisplayTitle(essay) {
+  return essay?.subtitle || essay?.title;
+}
+
+function essayEyebrow(essay, fallback = 'Featured') {
+  return [
+    essay?.series_label,
+    essay?.series_order
+      ? `Essay ${String(essay.series_order).padStart(2, '0')} of 7`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' · ') || fallback;
+}
+
 export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [latest, setLatest] = useState([]);
+  const [freeEssays, setFreeEssays] = useState([]);
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,6 +46,17 @@ export default function Home() {
           .sort((a, b) => (a.featured_order ?? 99) - (b.featured_order ?? 99));
         setFeatured(feat.length ? feat : live.slice(0, 1));
         setLatest(live.slice(0, 4));
+        // Prefer the Relational Faith free essay beside the Waters Edge preview.
+        const freeRank = (a) => {
+          if (a.slug === 'relational-faith-the-distance-we-choose') return 0;
+          if (a.series_slug === 'relational-faith') return 1;
+          return 2;
+        };
+        setFreeEssays(
+          live
+            .filter(a => a.access_level === 'free')
+            .sort((a, b) => freeRank(a) - freeRank(b) || (a.series_order || 99) - (b.series_order || 99))
+        );
 
         const allSeries = await base44.entities.Series.list('sort_order', 10);
         setSeries(allSeries.filter(s => s.is_active));
@@ -47,16 +76,16 @@ export default function Home() {
     );
   }
 
-  const spotlight = featured[0] || latest[0];
-  const spotlightTitle = spotlight?.subtitle || spotlight?.title;
-  const spotlightEyebrow = [
-    spotlight?.series_label,
-    spotlight?.series_order
-      ? `Essay ${String(spotlight.series_order).padStart(2, '0')} of 7`
-      : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  const spotlight =
+    featured.find(a => a.slug === FEATURED_PREVIEW_SLUG) ||
+    latest.find(a => a.slug === FEATURED_PREVIEW_SLUG) ||
+    featured[0] ||
+    latest[0];
+
+  const spotlightIsPreview = spotlight?.access_level === 'members';
+  const freeToHighlight = freeEssays.filter(a => a.slug !== spotlight?.slug);
+  const freeLead = freeToHighlight[0];
+  const freeRest = freeToHighlight.slice(1);
 
   return (
     <div className="bg-[var(--hw-bg)]">
@@ -102,11 +131,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured essay spotlight */}
+      {/* Featured preview — Waters Edge */}
       {spotlight && (
         <section className="py-24 md:py-32 px-6">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-            <div>
+            <div className="animate-[hw-rise_0.9s_ease-out_both]">
               {spotlight.hero_image_url ? (
                 <img
                   src={spotlight.hero_image_url}
@@ -117,12 +146,15 @@ export default function Home() {
                 <div className="w-full aspect-[4/5] bg-[var(--hw-surface)]" />
               )}
             </div>
-            <div>
-              <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-6">
-                {spotlightEyebrow || 'Featured'}
+            <div className="animate-[hw-rise_0.9s_ease-out_0.12s_both]">
+              <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-3">
+                Featured Preview
+              </div>
+              <div className="font-mono text-[9px] tracking-[0.22em] uppercase text-[var(--hw-ink3)] mb-6">
+                {essayEyebrow(spotlight)}
               </div>
               <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-light text-[var(--hw-ink)] leading-[1.05] tracking-[-0.01em] mb-6">
-                {spotlightTitle}
+                {essayDisplayTitle(spotlight)}
               </h2>
               {spotlight.excerpt && (
                 <p className="font-serif italic text-xl text-[var(--hw-ink2)] mb-8 leading-relaxed max-w-md">
@@ -133,8 +165,92 @@ export default function Home() {
                 to={`/journal/${spotlight.slug}`}
                 className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-gold)] pb-1 hover:text-[var(--hw-gold)] transition-colors duration-300"
               >
-                Read Essay →
+                {spotlightIsPreview ? 'Begin the preview →' : 'Read free →'}
               </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Free essays — discoverability */}
+      {freeLead && (
+        <section className="py-20 md:py-24 px-6 bg-[var(--hw-surface)]">
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-12 md:mb-16 max-w-2xl animate-[hw-rise_0.8s_ease-out_both]">
+              <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-sage)] mb-3">
+                Read Free
+              </div>
+              <h2 className="font-serif text-[clamp(32px,5vw,44px)] font-light text-[var(--hw-ink)] mb-4">
+                Open essays. No membership required.
+              </h2>
+              <p className="font-serif italic text-lg text-[var(--hw-ink2)] leading-relaxed">
+                Full essays you can finish today.
+                {freeLead.series_label === spotlight?.series_label
+                  ? ` ${essayDisplayTitle(freeLead)} opens the same corridor as the featured preview.`
+                  : ' No account required.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+              <Link
+                to={`/journal/${freeLead.slug}`}
+                className="group lg:col-span-7 block animate-[hw-rise_0.9s_ease-out_0.08s_both]"
+              >
+                {freeLead.hero_image_url && (
+                  <img
+                    src={freeLead.hero_image_url}
+                    alt={freeLead.hero_image_alt || ''}
+                    className="w-full aspect-[16/10] object-cover mb-8"
+                  />
+                )}
+                <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-sage)] mb-3">
+                  Free essay · {essayEyebrow(freeLead, freeLead.series_label)}
+                </div>
+                <h3 className="font-serif text-[clamp(28px,4vw,40px)] font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-500 leading-[1.08] mb-4">
+                  {essayDisplayTitle(freeLead)}
+                </h3>
+                {freeLead.excerpt && (
+                  <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-6 leading-relaxed max-w-xl">
+                    {freeLead.excerpt}
+                  </p>
+                )}
+                <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-sage)] pb-1 group-hover:text-[var(--hw-gold)] group-hover:border-[var(--hw-gold)] transition-colors duration-300">
+                  Read the full essay →
+                </span>
+              </Link>
+
+              {freeRest.length > 0 && (
+                <div className="lg:col-span-5 space-y-10 animate-[hw-rise_0.9s_ease-out_0.16s_both]">
+                  <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-ink3)]">
+                    Also free
+                  </div>
+                  {freeRest.map(essay => (
+                    <Link
+                      key={essay.id}
+                      to={`/journal/${essay.slug}`}
+                      className="group block border-t border-[var(--hw-gold)] pt-5"
+                    >
+                      <div className="font-mono text-[9px] tracking-[0.22em] uppercase text-[var(--hw-sage)] mb-3">
+                        Free · {essay.series_label || 'Human Weather'}
+                      </div>
+                      <h3 className="font-serif text-2xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-500 mb-2 leading-tight">
+                        {essayDisplayTitle(essay)}
+                      </h3>
+                      {essay.excerpt && (
+                        <p className="font-serif italic text-base text-[var(--hw-ink2)] line-clamp-2 leading-relaxed">
+                          {essay.excerpt}
+                        </p>
+                      )}
+                    </Link>
+                  ))}
+                  <Link
+                    to="/journal?access=free"
+                    className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-gold)] pb-1 hover:text-[var(--hw-gold)] transition-colors duration-300"
+                  >
+                    All free essays →
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -166,9 +282,12 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-16">
-            {latest.map(article => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
+            {latest
+              .filter(a => a.slug !== spotlight?.slug)
+              .slice(0, 4)
+              .map(article => (
+                <ArticleCard key={article.id} article={article} />
+              ))}
           </div>
         </div>
       </section>
