@@ -12,6 +12,22 @@ import {
 
 const STAGES = ['threshold', 'chamber', 'practice', 'stillness', 'archive'];
 
+function LatinCue({ latin, command, className = '' }) {
+  return (
+    <div className={className}>
+      <div className="font-mono text-[8px] tracking-[0.3em] uppercase text-[#c4a84a] mb-2">
+        Learning Latin
+      </div>
+      <p className="font-serif italic text-[clamp(22px,3vw,32px)] text-[#c4a84a] leading-snug">
+        {latin}
+      </p>
+      <p className="font-mono text-[9px] tracking-[0.18em] uppercase text-[#c8b99a] mt-2">
+        Latin for &ldquo;{command}&rdquo;
+      </p>
+    </div>
+  );
+}
+
 function BreathRing({ breath, active }) {
   const cycle = Math.max(1, (breath.inhale + breath.hold + breath.exhale) * 1000);
   return (
@@ -44,6 +60,7 @@ export default function Gospels() {
   const [activeId, setActiveId] = useState(null);
   const [received, setReceived] = useState([]);
   const [spoken, setSpoken] = useState(false);
+  const [spokenLatin, setSpokenLatin] = useState(false);
   const [practiceSeconds, setPracticeSeconds] = useState(90);
   const [practicing, setPracticing] = useState(false);
   const [openArchiveN, setOpenArchiveN] = useState(null);
@@ -58,6 +75,7 @@ export default function Gospels() {
 
   useEffect(() => {
     setSpoken(false);
+    setSpokenLatin(false);
     setPracticing(false);
     setPracticeSeconds(90);
     if (timerRef.current) clearInterval(timerRef.current);
@@ -125,9 +143,20 @@ export default function Gospels() {
     setSpoken(true);
   };
 
+  const speakLatin = () => {
+    if (!active?.latin) return;
+    speakText(active.latin, () => setSpokenLatin(true));
+    setSpokenLatin(true);
+  };
+
   const speakArchive = (item) => {
     const chamber = chamberForArchiveNumber(item.n);
     speakText(chamber?.command || item.title);
+  };
+
+  const speakArchiveLatin = (item) => {
+    const chamber = chamberForArchiveNumber(item.n);
+    if (chamber?.latin) speakText(chamber.latin);
   };
 
   const startPractice = () => {
@@ -202,9 +231,10 @@ export default function Gospels() {
             </h1>
             <p className="font-serif italic text-xl text-[#F7F4EE]/75 max-w-xl mx-auto mb-6 leading-relaxed">
               Name a climate from this draw — or receive a command at random from all forty-eight.
+              Each one arrives with its Latin form, so the body and the tongue learn together.
             </p>
             <p className="font-mono text-[9px] tracking-[0.22em] uppercase text-[#c8b99a] mb-10">
-              {GATE_SAMPLE_SIZE} climates drawn · {CHAMBER_COMMANDS.length} live commands
+              {GATE_SAMPLE_SIZE} climates drawn · {CHAMBER_COMMANDS.length} live commands · Latin included
             </p>
           </div>
 
@@ -227,6 +257,9 @@ export default function Gospels() {
                 </div>
                 <div className="font-serif italic text-sm text-[#F7F4EE]/45 mt-3 group-hover:text-[#F7F4EE]/70 transition-colors">
                   {c.command}
+                </div>
+                <div className="font-mono text-[8px] tracking-[0.2em] uppercase text-[#c4a84a]/60 mt-3">
+                  Latin · {c.latin}
                 </div>
               </button>
             ))}
@@ -279,7 +312,8 @@ export default function Gospels() {
               Forty-eight live climates.
             </h1>
             <p className="font-serif italic text-xl text-[#F7F4EE]/75 max-w-xl mb-4 leading-relaxed">
-              Every command is practiced in the chamber. Open any one — or receive one at random.
+              Every command is practiced in the chamber — English and Latin. Open any one, hear both
+              forms, or receive one at random.
             </p>
             <button
               type="button"
@@ -329,16 +363,24 @@ export default function Gospels() {
                         <p className="font-serif italic text-lg text-[#F7F4EE]/80 leading-[1.85] mb-4 max-w-2xl">
                           &ldquo;{item.verse}&rdquo;
                         </p>
-                        <p className="font-serif text-base text-[#c8b99a] mb-6 max-w-xl leading-relaxed">
+                        <p className="font-serif text-base text-[#c8b99a] mb-4 max-w-xl leading-relaxed">
                           {chamber.weather}
                         </p>
+                        <LatinCue latin={chamber.latin} command={chamber.command} className="mb-6" />
                         <div className="flex flex-col sm:flex-row gap-3">
                           <button
                             type="button"
                             onClick={() => speakArchive(item)}
                             className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#0e0d0a] bg-[#c4a84a] px-8 py-3 hover:bg-[#e0c870] transition-colors"
                           >
-                            Hear the command
+                            Hear English
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => speakArchiveLatin(item)}
+                            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#F7F4EE] border border-[#c4a84a] px-8 py-3 hover:bg-[#c4a84a]/10 transition-colors"
+                          >
+                            Hear Latin
                           </button>
                           <button
                             type="button"
@@ -375,14 +417,15 @@ export default function Gospels() {
               >
                 ← Climate gate
               </button>
-              <div className="font-mono text-[10px] tracking-[0.35em] uppercase text-[#c4a84a] mb-4">
-                {active.latin} · {String(active.n).padStart(2, '0')} of 48
+              <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[#c8b99a] mb-3">
+                Command {String(active.n).padStart(2, '0')} of 48 · Climate: {active.climate}
               </div>
               <h2 className="font-serif text-[clamp(44px,9vw,88px)] font-light leading-[0.92] tracking-[-0.03em] mb-6">
                 {active.command}
               </h2>
+              <LatinCue latin={active.latin} command={active.command} className="mb-8" />
               <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#c8b99a] mb-10">
-                {active.source} · Climate: {active.climate}
+                {active.source}
               </div>
               <p className="font-serif italic text-xl md:text-2xl text-[#F7F4EE]/80 leading-relaxed max-w-xl mb-8">
                 {active.weather}
@@ -390,13 +433,20 @@ export default function Gospels() {
               <p className="font-serif text-lg text-[#c8b99a] leading-[1.8] max-w-xl mb-12">
                 {active.practice}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
                 <button
                   type="button"
                   onClick={speak}
                   className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#0e0d0a] bg-[#c4a84a] px-10 py-4 hover:bg-[#e0c870] transition-colors duration-300"
                 >
-                  {spoken ? 'Speak Again' : 'Hear the Command'}
+                  {spoken ? 'Hear English again' : 'Hear English'}
+                </button>
+                <button
+                  type="button"
+                  onClick={speakLatin}
+                  className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#c4a84a] px-10 py-4 hover:bg-[#c4a84a]/10 transition-all duration-500"
+                >
+                  {spokenLatin ? 'Hear Latin again' : 'Hear Latin'}
                 </button>
                 <button
                   type="button"
@@ -409,7 +459,7 @@ export default function Gospels() {
             </div>
 
             <div className="lg:col-span-5 animate-[hw-rise_0.9s_ease-out_0.1s_both]">
-              <BreathRing breath={active.breath} active={spoken || practicing} />
+              <BreathRing breath={active.breath} active={spoken || spokenLatin || practicing} />
               <div className="mt-8 flex gap-3">
                 <button
                   type="button"
@@ -441,7 +491,12 @@ export default function Gospels() {
                     <span className="font-mono text-[8px] tracking-[0.2em] uppercase shrink-0">
                       {String(c.n).padStart(2, '0')}
                     </span>
-                    <span className="font-serif text-lg font-light text-right">{c.command}</span>
+                    <span className="font-serif text-lg font-light text-right leading-tight">
+                      {c.command}
+                      <span className="block font-mono text-[8px] tracking-[0.15em] uppercase text-[#c4a84a]/70 mt-1">
+                        Lat. {c.latin}
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>
@@ -463,9 +518,14 @@ export default function Gospels() {
           <div className="font-mono text-[10px] tracking-[0.4em] uppercase text-[#c4a84a] mb-8 animate-[hw-rise_0.5s_ease-out]">
             Practice in progress
           </div>
-          <h2 className="font-serif text-[clamp(36px,8vw,72px)] font-light leading-[0.95] mb-6 animate-[hw-rise_0.6s_ease-out]">
+          <h2 className="font-serif text-[clamp(36px,8vw,72px)] font-light leading-[0.95] mb-4 animate-[hw-rise_0.6s_ease-out]">
             {active.command}
           </h2>
+          <LatinCue
+            latin={active.latin}
+            command={active.command}
+            className="mb-10 animate-[hw-rise_0.7s_ease-out]"
+          />
           <p className="font-serif italic text-xl text-[#F7F4EE]/70 max-w-md mx-auto mb-12">
             {active.practice}
           </p>
@@ -496,8 +556,8 @@ export default function Gospels() {
               Peace be with you.
             </p>
             <p className="font-serif text-lg text-[#c8b99a] leading-relaxed mb-12 max-w-lg mx-auto">
-              The command has been received. Carry it in the body — not as doctrine, as weather you
-              can return to.
+              The command has been received — in English and in Latin. Carry both in the body: not as
+              doctrine, as weather you can return to.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
