@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import ArticleCard from '@/components/ArticleCard';
 import NewsletterSignup from '@/components/NewsletterSignup';
+import { WATERS_EDGE_PREVIEW_MINUTES, WATERS_EDGE_SLUG } from '@/lib/membership';
 import { setHomePageMeta } from '@/lib/pageMeta';
 
 const HERO_IMAGE =
   'https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/5efc2a849_generated_image.png';
 
-const FEATURED_PREVIEW_SLUG = 'relational-faith-the-mirror-at-the-waters-edge';
+const FEATURED_PREVIEW_SLUG = WATERS_EDGE_SLUG;
 
 function essayDisplayTitle(essay) {
   return essay?.subtitle || essay?.title;
@@ -148,7 +149,7 @@ export default function Home() {
             </div>
             <div className="animate-[hw-rise_0.9s_ease-out_0.12s_both]">
               <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-3">
-                Featured Preview
+                Featured Preview · {WATERS_EDGE_PREVIEW_MINUTES} min free
               </div>
               <div className="font-mono text-[9px] tracking-[0.22em] uppercase text-[var(--hw-ink3)] mb-6">
                 {essayEyebrow(spotlight)}
@@ -165,7 +166,9 @@ export default function Home() {
                 to={`/journal/${spotlight.slug}`}
                 className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-gold)] pb-1 hover:text-[var(--hw-gold)] transition-colors duration-300"
               >
-                {spotlightIsPreview ? 'Begin the preview →' : 'Read free →'}
+                {spotlightIsPreview
+                  ? `Begin ${WATERS_EDGE_PREVIEW_MINUTES}-minute preview →`
+                  : 'Read free →'}
               </Link>
             </div>
           </div>
