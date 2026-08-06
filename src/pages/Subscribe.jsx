@@ -11,7 +11,7 @@ const tiers = [
     badge: null,
     features: [
       'Essays marked Free in the journal',
-      'Weekly editorial dispatch (email)',
+      'Email list for field notes (when we send)',
       'About page and series overview',
     ],
     planId: null,

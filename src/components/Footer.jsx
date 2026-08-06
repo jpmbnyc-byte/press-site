@@ -49,7 +49,14 @@ export default function Footer() {
             >
               humanweather.social
             </a>
-            <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--hw-ink2)] mt-2.5">@pbwyworldwide</p>
+            <a
+              href="https://www.instagram.com/pbwyworldwide"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--hw-ink2)] hover:text-[var(--hw-gold)] transition-colors duration-300 inline-block mt-2.5"
+            >
+              @pbwyworldwide
+            </a>
             <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--hw-ink2)] mt-2.5">PBWY™</p>
           </div>
         </div>

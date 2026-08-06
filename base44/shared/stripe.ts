@@ -15,7 +15,7 @@ export function getStripeSecret(): string {
 }
 
 export function getSiteUrl(): string {
-  return (Deno.env.get("SITE_URL") || "https://humanweather.vercel.app").replace(/\/$/, "");
+  return (Deno.env.get("SITE_URL") || "https://www.humanweather.press").replace(/\/$/, "");
 }
 
 export function getPriceId(planId: string): string {

@@ -19,6 +19,8 @@ import CheckoutSuccess from '@/pages/CheckoutSuccess';
 import Account from '@/pages/Account';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 import Gospels from '@/pages/Gospels';
 
 const AuthenticatedApp = () => {
@@ -56,6 +58,8 @@ const AuthenticatedApp = () => {
         <Route path="/account" element={<Account />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

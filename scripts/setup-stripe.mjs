@@ -8,8 +8,8 @@
  * Usage (test/sandbox):
  *   STRIPE_SECRET_KEY=rk_test_... node scripts/setup-stripe.mjs
  *
- * Writes scripts/.stripe-setup.json and prints Vercel env lines.
- * Never commit secret keys.
+ * Writes scripts/.stripe-setup.json and prints Base44 function secret lines.
+ * Never commit secret keys. Stripe fulfillment runs on Base44 functions, not Vercel.
  */
 import { writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -197,15 +197,16 @@ async function main() {
   writeFileSync(outPath, JSON.stringify(out, null, 2));
   console.log(`\nWrote ${outPath}`);
 
-  console.log('\n--- Add these to Vercel Environment Variables ---\n');
+  console.log('\n--- Add these as Base44 function secrets (NOT Vercel) ---\n');
   console.log(`STRIPE_SECRET_KEY=${isLive ? 'sk_live_...' : 'sk_test_...'}  # your secret/restricted key`);
   for (const r of results) {
     console.log(`${r.envKey}=${r.priceId}`);
   }
   console.log(`SITE_URL=${SITE_URL}`);
   console.log('STRIPE_WEBHOOK_SECRET=whsec_...  # from Stripe webhook endpoint');
-  console.log('\nWebhook endpoint:');
-  console.log(`  ${SITE_URL}/api/stripe/webhook`);
+  console.log('HW_SOCIAL_APP_URL=https://humanweather.social');
+  console.log('\nWebhook endpoint (Base44 function):');
+  console.log('  https://humanweather.base44.app/functions/stripeWebhook');
   console.log('  Events: checkout.session.completed, customer.subscription.updated, customer.subscription.deleted');
   console.log('');
 }

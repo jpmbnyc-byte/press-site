@@ -12,7 +12,7 @@ const DEFAULTS = {
   ogTitle: 'Human Weather — Journaling the Climate Within and Around Us',
   ogDescription:
     'Essays on life, faith & culture. Reflections for a more aware life. Slow thought. Real connection.',
-  image: `${SITE_URL}/og-share.png`,
+  image: `${SITE_URL}/og-share.jpg`,
   imageAlt: 'Human Weather Press — journaling the climate within and around us',
   url: `${SITE_URL}/`,
   type: 'website',
@@ -89,7 +89,7 @@ export function setEssayPageMeta(article) {
     article.excerpt ||
     article.subtitle ||
     `An essay from ${series} by ${article.author_name || 'JP Bobo'}.`;
-  const image = absoluteUrl(article.hero_image_url || '/og-share.png');
+  const image = absoluteUrl(article.hero_image_url || '/og-share.jpg');
   const url = `${SITE_URL}/journal/${article.slug}`;
 
   setPageMeta({

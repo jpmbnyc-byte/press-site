@@ -122,6 +122,16 @@ export default function Account() {
             Log out
           </button>
         </div>
+        {!user.stripe_customer_id && (
+          <p className="font-serif italic text-sm text-[#c8b99a] mt-4 max-w-md">
+            Billing opens after a Stripe checkout completes and the membership webhook links your
+            account. If you just subscribed, wait a moment and refresh — or write{' '}
+            <a href="mailto:hello@humanweather.social" className="text-[#c4a84a] not-italic hover:underline">
+              hello@humanweather.social
+            </a>
+            .
+          </p>
+        )}
       </div>
     </div>
   );
