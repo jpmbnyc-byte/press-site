@@ -13,6 +13,7 @@ export default function Article() {
   const { user } = useAuth();
   const [article, setArticle] = useState(null);
   const [related, setRelated] = useState([]);
+  const [freeCompanion, setFreeCompanion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [checkoutPlan, setCheckoutPlan] = useState(null);
@@ -45,9 +46,28 @@ export default function Article() {
             });
           } catch (e) {}
           if (found.series_label) {
-            setRelated(
-              all.filter(a => a.series_label === found.series_label && a.id !== found.id).slice(0, 2)
+            const sameSeries = all.filter(
+              a =>
+                (a.status === 'published' || a.status === 'featured') &&
+                a.series_label === found.series_label &&
+                a.id !== found.id
             );
+            const freeInSeries = sameSeries
+              .filter(a => a.access_level === 'free')
+              .sort((a, b) => (a.series_order || 99) - (b.series_order || 99));
+            setFreeCompanion(found.access_level === 'members' ? freeInSeries[0] || null : null);
+            setRelated(
+              [...sameSeries]
+                .sort((a, b) => {
+                  if (a.access_level === 'free' && b.access_level !== 'free') return -1;
+                  if (b.access_level === 'free' && a.access_level !== 'free') return 1;
+                  return (a.series_order || 99) - (b.series_order || 99);
+                })
+                .slice(0, 2)
+            );
+          } else {
+            setFreeCompanion(null);
+            setRelated([]);
           }
         }
       } catch (e) {
@@ -103,7 +123,11 @@ export default function Article() {
       <header className="max-w-[740px] mx-auto px-6 pt-12 pb-8">
         <div className="w-12 h-[2px] bg-[var(--hw-gold)] mb-6" />
         <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-rust)] mb-4">
+          {article.slug === 'relational-faith-the-mirror-at-the-waters-edge'
+            ? 'Featured Preview · '
+            : ''}
           {article.series_label || 'Human Weather'} · Essay {article.series_order || 1} of 7
+          {article.access_level === 'free' ? ' · Free' : ''}
         </div>
         <h1 className="font-serif text-[clamp(36px,5vw,56px)] font-light leading-[1.08] tracking-[-0.01em] text-[var(--hw-ink)] mb-4">
           {article.title}
@@ -241,6 +265,28 @@ export default function Article() {
         </div>
       </article>
 
+      {/* Free companion — keep open essays discoverable from members previews */}
+      {freeCompanion && (
+        <section className="max-w-[680px] mx-auto px-6 py-14 border-t border-[rgba(154,125,46,0.18)]">
+          <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-sage)] mb-4">
+            Read free in {article.series_label}
+          </div>
+          <Link to={`/journal/${freeCompanion.slug}`} className="group block">
+            <h3 className="font-serif text-3xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-3 leading-tight">
+              {freeCompanion.subtitle || freeCompanion.title}
+            </h3>
+            {freeCompanion.excerpt && (
+              <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-5 leading-relaxed">
+                {freeCompanion.excerpt}
+              </p>
+            )}
+            <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-sage)] pb-1 group-hover:text-[var(--hw-gold)] group-hover:border-[var(--hw-gold)] transition-colors">
+              Read the full free essay →
+            </span>
+          </Link>
+        </section>
+      )}
+
       {/* Related essays */}
       {related.length > 0 && (
         <section className="max-w-4xl mx-auto px-6 py-16 border-t border-[rgba(154,125,46,0.18)]">
@@ -252,15 +298,20 @@ export default function Article() {
               <Link
                 key={a.id}
                 to={`/journal/${a.slug}`}
-                className="group block border-t-2 border-[var(--hw-gold)] pt-4"
+                className={`group block border-t-2 pt-4 ${
+                  a.access_level === 'free' ? 'border-[var(--hw-sage)]' : 'border-[var(--hw-gold)]'
+                }`}
               >
                 <div className="font-mono text-[8px] tracking-[0.15em] uppercase text-[var(--hw-ink3)] mb-2">
                   Essay {String(a.series_order || 1).padStart(2, '0')} of 7
+                  {a.access_level === 'free' ? ' · Free' : ' · Members'}
                 </div>
                 <h4 className="font-serif text-xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-1">
-                  {a.title}
+                  {a.subtitle || a.title}
                 </h4>
-                <p className="font-serif italic text-sm text-[var(--hw-ink2)]">{a.subtitle}</p>
+                {a.subtitle && (
+                  <p className="font-serif italic text-sm text-[var(--hw-ink2)]">{a.title}</p>
+                )}
               </Link>
             ))}
           </div>

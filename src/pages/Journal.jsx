@@ -1,14 +1,26 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 
 export default function Journal() {
+  const [params] = useSearchParams();
   const [articles, setArticles] = useState([]);
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterSeries, setFilterSeries] = useState('All');
-  const [filterAccess, setFilterAccess] = useState('All');
+  const [filterAccess, setFilterAccess] = useState(() => {
+    const access = (params.get('access') || '').toLowerCase();
+    if (access === 'free') return 'Free';
+    if (access === 'members') return 'Members';
+    return 'All';
+  });
   const [sortBy, setSortBy] = useState('Newest');
+
+  useEffect(() => {
+    const access = (params.get('access') || '').toLowerCase();
+    if (access === 'free') setFilterAccess('Free');
+    else if (access === 'members') setFilterAccess('Members');
+  }, [params]);
 
   useEffect(() => {
     (async () => {
@@ -48,6 +60,18 @@ export default function Journal() {
     </button>
   );
 
+  const freeEssays = useMemo(
+    () =>
+      articles
+        .filter(a => a.access_level === 'free')
+        .sort((a, b) => {
+          if (a.slug === 'relational-faith-the-distance-we-choose') return -1;
+          if (b.slug === 'relational-faith-the-distance-we-choose') return 1;
+          return new Date(b.published_at || 0) - new Date(a.published_at || 0);
+        }),
+    [articles]
+  );
+
   return (
     <div className="px-6 py-16 max-w-5xl mx-auto">
       <div className="font-mono text-[11px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-4">Journal</div>
@@ -55,8 +79,50 @@ export default function Journal() {
         From the Human Weather Archive
       </h1>
       <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-ink3)] mb-10">
-        {articles.length} essays · {series.length} series
+        {articles.length} essays · {series.length} series · {freeEssays.length} free
       </div>
+
+      {/* Free essays — elevated when browsing the full archive */}
+      {!loading && filterAccess === 'All' && filterSeries === 'All' && freeEssays.length > 0 && (
+        <section className="mb-14 pb-12 border-b border-[rgba(154,125,46,0.18)]">
+          <div className="flex items-baseline justify-between gap-4 mb-8">
+            <div>
+              <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-sage)] mb-2">
+                Read Free
+              </div>
+              <h2 className="font-serif text-2xl md:text-3xl font-light text-[var(--hw-ink)]">
+                Open without a membership
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFilterAccess('Free')}
+              className="hidden sm:inline-block font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-sage)] border-b border-[var(--hw-sage)] pb-1 hover:text-[var(--hw-gold)] hover:border-[var(--hw-gold)] transition-colors"
+            >
+              Free only →
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {freeEssays.map(essay => (
+              <Link
+                key={essay.id}
+                to={`/journal/${essay.slug}`}
+                className="group block border-t-2 border-[var(--hw-sage)] pt-5"
+              >
+                <div className="font-mono text-[8px] tracking-[0.2em] uppercase text-[var(--hw-sage)] mb-3">
+                  Free · {essay.series_label || 'Human Weather'}
+                </div>
+                <h3 className="font-serif text-xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-2 leading-tight">
+                  {essay.subtitle || essay.title}
+                </h3>
+                <p className="font-serif italic text-sm text-[var(--hw-ink2)] line-clamp-3 leading-relaxed">
+                  {essay.excerpt}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Filter bar */}
       <div className="space-y-4 mb-12 sticky top-14 bg-[var(--hw-bg)] py-4 z-30 border-b border-[rgba(154,125,46,0.15)]">

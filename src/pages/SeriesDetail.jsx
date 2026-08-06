@@ -93,13 +93,43 @@ export default function SeriesDetail() {
           </div>
         ) : (
           <div className="space-y-0">
+            {essays.some(e => e.access_level === 'free') && (
+              <div className="mb-10 pb-8 border-b border-[rgba(61,92,69,0.25)]">
+                <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-sage)] mb-3">
+                  Start free
+                </div>
+                <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-6">
+                  Begin with the open essay in this series — no membership required.
+                </p>
+                {essays
+                  .filter(e => e.access_level === 'free')
+                  .map(essay => (
+                    <Link
+                      key={`free-${essay.id}`}
+                      to={`/journal/${essay.slug}`}
+                      className="group block border-l-2 border-[var(--hw-sage)] pl-5 -ml-5 py-2"
+                    >
+                      <h2 className="font-serif text-2xl md:text-3xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 leading-tight mb-2">
+                        {essay.subtitle || essay.title}
+                      </h2>
+                      <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-sage)]">
+                        Free essay · Read now →
+                      </span>
+                    </Link>
+                  ))}
+              </div>
+            )}
             {essays.map((essay, i) => {
               const isFree = essay.access_level === 'free';
               return (
                 <Link
                   key={essay.id}
                   to={`/journal/${essay.slug}`}
-                  className="group block border-l-2 border-transparent hover:border-[var(--hw-gold)] pl-5 -ml-5 py-8 border-b border-[rgba(154,125,46,0.18)] transition-all duration-300"
+                  className={`group block border-l-2 pl-5 -ml-5 py-8 border-b border-[rgba(154,125,46,0.18)] transition-all duration-300 ${
+                    isFree
+                      ? 'border-l-[var(--hw-sage)] hover:border-l-[var(--hw-gold)]'
+                      : 'border-transparent hover:border-[var(--hw-gold)]'
+                  }`}
                 >
                   <div className="flex items-baseline gap-5 mb-2">
                     <span className="font-mono text-2xl text-[var(--hw-gold)] opacity-50">
