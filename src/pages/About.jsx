@@ -73,9 +73,10 @@ export default function About() {
             <div>
               <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-sage)] mb-3">Contemplative Wisdom</div>
               <p className="font-serif text-base text-[var(--hw-ink2)] leading-relaxed">
-                The direct commands of Jesus across all four Gospels and Acts — be not afraid, peace be still,
-                take heart — are the oldest compressed somatic map in existence. Two thousand years before
-                polyvagal theory, they were already prescribing regulation.
+                The direct commands of Jesus across the Gospels — forty-eight in the wider map, nine climates
+                in the Chamber — are the oldest compressed somatic map in existence. Be not afraid. Peace, be
+                still. Take heart. Two thousand years before polyvagal theory, they were already prescribing
+                regulation.
               </p>
             </div>
           </div>

@@ -1,89 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import AuthorPortrait from '@/components/AuthorPortrait';
+import {
+  CHAMBER_COMMANDS,
+  GOSPEL_ARCHIVE,
+  chamberForArchiveNumber,
+} from '@/data/gospelCommands';
 
-const COMMANDS = [
-  {
-    id: 'fear-not',
-    climate: 'Bracing',
-    climateHint: 'Threat without arrival',
-    latin: 'Nolite timere',
-    command: 'Be not afraid',
-    source: 'Luke 2:10 · John 14:27',
-    weather: 'When the body braces for threat that has not arrived.',
-    practice:
-      'Place one hand on the sternum. Lengthen the exhale until it outlasts the inhale. Say the command once out loud, once under the breath.',
-    breath: { inhale: 4, hold: 2, exhale: 6 },
-    hue: 'rgba(196,168,74,0.22)',
-  },
-  {
-    id: 'peace-still',
-    climate: 'Storm',
-    climateHint: 'Interior louder than the room',
-    latin: 'Quiesce',
-    command: 'Peace, be still',
-    source: 'Mark 4:39',
-    weather: 'When the interior storm is louder than the room you are in.',
-    practice:
-      'Sit until the jaw softens. Trace one slow circle with the gaze. Speak the command into the weather you are actually in — not the one you fear.',
-    breath: { inhale: 4, hold: 4, exhale: 8 },
-    hue: 'rgba(100,140,160,0.20)',
-  },
-  {
-    id: 'take-heart',
-    climate: 'Thin',
-    climateHint: 'Courage as costume',
-    latin: 'Confidite',
-    command: 'Take heart',
-    source: 'John 16:33 · Matthew 14:27',
-    weather: 'When courage feels like a costume you cannot keep wearing.',
-    practice:
-      'Stand. Feel the weight in both heels. Inhale through the nose for four, hold for two, release for six. Receive the command as permission, not performance.',
-    breath: { inhale: 4, hold: 2, exhale: 6 },
-    hue: 'rgba(196,100,60,0.18)',
-  },
-  {
-    id: 'come-unto-me',
-    climate: 'Heavy',
-    climateHint: 'Load carried alone',
-    latin: 'Venite ad me',
-    command: 'Come unto me',
-    source: 'Matthew 11:28',
-    weather: 'When the load has been carried alone for too long.',
-    practice:
-      'Name one weight you are holding that is not yours to finish today. Set the shoulders down on the exhale. Let the command be an invitation, not a demand.',
-    breath: { inhale: 3, hold: 1, exhale: 7 },
-    hue: 'rgba(120,90,70,0.22)',
-  },
-  {
-    id: 'abide',
-    climate: 'Scattered',
-    climateHint: 'Mind leaving the body',
-    latin: 'Manete',
-    command: 'Abide in me',
-    source: 'John 15:4',
-    weather: 'When the mind keeps leaving the body for tomorrow.',
-    practice:
-      'Return to one sensory fact: temperature, light, contact with the chair. Stay for ninety seconds. Abiding is the opposite of forecasting.',
-    breath: { inhale: 4, hold: 4, exhale: 4 },
-    hue: 'rgba(90,140,110,0.18)',
-  },
-  {
-    id: 'love-one-another',
-    climate: 'Distant',
-    climateHint: 'Nearness has gone quiet',
-    latin: 'Diligite',
-    command: 'Love one another',
-    source: 'John 13:34',
-    weather: 'When distance has become the default between you and another.',
-    practice:
-      'Choose one concrete nearness: a message, a meal, a minute of undivided attention. Love as regulation practiced between nervous systems.',
-    breath: { inhale: 5, hold: 0, exhale: 5 },
-    hue: 'rgba(160,90,100,0.16)',
-  },
-];
-
-const STAGES = ['threshold', 'chamber', 'practice', 'stillness'];
+const STAGES = ['threshold', 'chamber', 'practice', 'stillness', 'archive'];
 
 function BreathRing({ breath, active }) {
   const cycle = Math.max(1, (breath.inhale + breath.hold + breath.exhale) * 1000);
@@ -111,14 +35,21 @@ function BreathRing({ breath, active }) {
 }
 
 export default function Gospels() {
-  const [stage, setStage] = useState('threshold');
+  const [params, setParams] = useSearchParams();
+  const initialArchive = params.get('view') === 'archive';
+  const [stage, setStage] = useState(initialArchive ? 'archive' : 'threshold');
   const [activeId, setActiveId] = useState(null);
   const [received, setReceived] = useState([]);
   const [spoken, setSpoken] = useState(false);
   const [practiceSeconds, setPracticeSeconds] = useState(90);
   const [practicing, setPracticing] = useState(false);
+  const [openArchiveN, setOpenArchiveN] = useState(null);
   const timerRef = useRef(null);
-  const active = COMMANDS.find(c => c.id === activeId) || null;
+  const active = CHAMBER_COMMANDS.find(c => c.id === activeId) || null;
+
+  useEffect(() => {
+    if (params.get('view') === 'archive') setStage('archive');
+  }, [params]);
 
   useEffect(() => {
     setSpoken(false);
@@ -136,25 +67,44 @@ export default function Gospels() {
     };
   }, []);
 
+  const goArchive = () => {
+    setStage('archive');
+    setParams({ view: 'archive' }, { replace: true });
+  };
+
+  const goThreshold = () => {
+    setStage('threshold');
+    setParams({}, { replace: true });
+  };
+
   const enterCommand = (id) => {
     setActiveId(id);
     setStage('chamber');
+    setParams({}, { replace: true });
     setReceived(prev => (prev.includes(id) ? prev : [...prev, id]));
+  };
+
+  const speakText = (text, onEnd) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      onEnd?.();
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.82;
+    utterance.pitch = 0.92;
+    utterance.onend = () => onEnd?.();
+    window.speechSynthesis.speak(utterance);
   };
 
   const speak = () => {
     if (!active) return;
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      setSpoken(true);
-      return;
-    }
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(active.command);
-    utterance.rate = 0.82;
-    utterance.pitch = 0.92;
-    utterance.onend = () => setSpoken(true);
-    window.speechSynthesis.speak(utterance);
+    speakText(active.command, () => setSpoken(true));
     setSpoken(true);
+  };
+
+  const speakArchive = (item) => {
+    speakText(item.title);
   };
 
   const startPractice = () => {
@@ -181,7 +131,6 @@ export default function Gospels() {
 
   return (
     <div className="bg-[#0e0d0a] text-[#F7F4EE] min-h-screen -mt-0">
-      {/* Persistent chamber atmosphere */}
       <div
         className="pointer-events-none fixed inset-0 z-0 transition-[background] duration-1000"
         style={{
@@ -190,30 +139,32 @@ export default function Gospels() {
       />
       <div className="pointer-events-none fixed inset-0 z-0 hw-chamber-grain opacity-[0.07]" />
 
-      {/* Session beads */}
-      <div className="fixed top-16 right-4 md:right-8 z-30 flex flex-col items-end gap-2">
-        <div className="font-mono text-[8px] tracking-[0.25em] uppercase text-[#c4a84a]/70 mb-1">
-          Received {received.length}/{COMMANDS.length}
+      {/* Session beads — chamber only */}
+      {stage !== 'archive' && (
+        <div className="fixed top-16 right-4 md:right-8 z-30 flex flex-col items-end gap-2">
+          <div className="font-mono text-[8px] tracking-[0.25em] uppercase text-[#c4a84a]/70 mb-1">
+            Received {received.length}/{CHAMBER_COMMANDS.length}
+          </div>
+          <div className="flex flex-wrap justify-end gap-1.5 max-w-[7rem]">
+            {CHAMBER_COMMANDS.map(c => (
+              <button
+                key={c.id}
+                type="button"
+                title={c.command}
+                onClick={() => enterCommand(c.id)}
+                className={`w-2 h-2 rounded-full transition-all duration-500 ${
+                  received.includes(c.id)
+                    ? 'bg-[#c4a84a] scale-110'
+                    : 'bg-[#F7F4EE]/20 hover:bg-[#F7F4EE]/40'
+                } ${activeId === c.id ? 'ring-1 ring-[#c4a84a] ring-offset-2 ring-offset-[#0e0d0a]' : ''}`}
+                aria-label={c.command}
+              />
+            ))}
+          </div>
         </div>
-        <div className="flex gap-1.5">
-          {COMMANDS.map(c => (
-            <button
-              key={c.id}
-              type="button"
-              title={c.command}
-              onClick={() => enterCommand(c.id)}
-              className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                received.includes(c.id)
-                  ? 'bg-[#c4a84a] scale-110'
-                  : 'bg-[#F7F4EE]/20 hover:bg-[#F7F4EE]/40'
-              } ${activeId === c.id ? 'ring-1 ring-[#c4a84a] ring-offset-2 ring-offset-[#0e0d0a]' : ''}`}
-              aria-label={c.command}
-            />
-          ))}
-        </div>
-      </div>
+      )}
 
-      {/* THRESHOLD — climate gate */}
+      {/* THRESHOLD */}
       {stage === 'threshold' && (
         <section className="relative z-10 min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-6 py-20">
           <div className="text-center max-w-3xl animate-[hw-rise_1s_ease-out]">
@@ -226,20 +177,22 @@ export default function Gospels() {
             <h1 className="font-serif text-[clamp(40px,8vw,80px)] font-light leading-[0.95] tracking-[-0.02em] mb-6">
               What is your weather?
             </h1>
-            <p className="font-serif italic text-xl text-[#F7F4EE]/75 max-w-xl mx-auto mb-14 leading-relaxed">
-              Name the climate inside you. The chamber will answer with a living command — spoken,
+            <p className="font-serif italic text-xl text-[#F7F4EE]/75 max-w-xl mx-auto mb-6 leading-relaxed">
+              Name the climate inside you. The chamber answers with a living command — spoken,
               breathed, practiced.
+            </p>
+            <p className="font-mono text-[9px] tracking-[0.22em] uppercase text-[#c8b99a] mb-14">
+              {CHAMBER_COMMANDS.length} climates · {GOSPEL_ARCHIVE.length} Gospel commands
             </p>
           </div>
 
           <div className="relative z-10 w-full max-w-4xl grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 animate-[hw-rise_1s_ease-out_0.15s_both]">
-            {COMMANDS.map((c, i) => (
+            {CHAMBER_COMMANDS.map((c, i) => (
               <button
                 key={c.id}
                 type="button"
                 onClick={() => enterCommand(c.id)}
                 className="group text-left border border-[#F7F4EE]/15 hover:border-[#c4a84a] bg-[#0e0d0a]/40 backdrop-blur-sm px-5 py-6 md:px-6 md:py-8 transition-all duration-500 hover:bg-[#c4a84a]/08"
-                style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[#c4a84a] mb-3">
                   {String(i + 1).padStart(2, '0')} · {c.climateHint}
@@ -251,24 +204,129 @@ export default function Gospels() {
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={() => enterCommand(COMMANDS[0].id)}
-            className="relative z-10 mt-14 font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE]/50 hover:text-[#c4a84a] transition-colors duration-300"
-          >
-            Or enter without naming →
-          </button>
+          <div className="relative z-10 mt-14 flex flex-col sm:flex-row items-center gap-5">
+            <button
+              type="button"
+              onClick={() => enterCommand(CHAMBER_COMMANDS[0].id)}
+              className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE]/50 hover:text-[#c4a84a] transition-colors duration-300"
+            >
+              Enter without naming →
+            </button>
+            <span className="hidden sm:inline text-[#F7F4EE]/20">·</span>
+            <button
+              type="button"
+              onClick={goArchive}
+              className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#c4a84a] border-b border-[#c4a84a]/40 pb-1 hover:border-[#c4a84a] transition-colors duration-300"
+            >
+              Browse all {GOSPEL_ARCHIVE.length} commands →
+            </button>
+          </div>
         </section>
       )}
 
-      {/* CHAMBER — command revealed */}
+      {/* ARCHIVE — full map */}
+      {stage === 'archive' && (
+        <section className="relative z-10 min-h-[calc(100vh-3.5rem)] px-6 py-20">
+          <div className="max-w-3xl mx-auto animate-[hw-rise_0.8s_ease-out]">
+            <button
+              type="button"
+              onClick={goThreshold}
+              className="font-mono text-[9px] tracking-[0.25em] uppercase text-[#c8b99a] hover:text-[#c4a84a] mb-10 transition-colors"
+            >
+              ← Back to the Chamber
+            </button>
+            <div className="font-mono text-[10px] tracking-[0.35em] uppercase text-[#c4a84a] mb-4">
+              Gospels Live · The Map
+            </div>
+            <h1 className="font-serif text-[clamp(36px,7vw,64px)] font-light leading-[0.98] tracking-[-0.02em] mb-5">
+              Forty-eight commands.
+            </h1>
+            <p className="font-serif italic text-xl text-[#F7F4EE]/75 max-w-xl mb-4 leading-relaxed">
+              The wider map from the Gospels — KJV. Open any command. Where a climate practice
+              exists, enter the chamber.
+            </p>
+            <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#c8b99a] mb-14">
+              Scripture · Not a substitute for the text itself
+            </p>
+
+            <div className="space-y-0 border-t border-[#F7F4EE]/12">
+              {GOSPEL_ARCHIVE.map((item, i) => {
+                const open = openArchiveN === item.n;
+                const chamber = chamberForArchiveNumber(item.n);
+                return (
+                  <div
+                    key={item.n}
+                    className="border-b border-[#F7F4EE]/12 animate-[hw-rise_0.6s_ease-out_both]"
+                    style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpenArchiveN(open ? null : item.n)}
+                      className="w-full text-left py-5 flex items-baseline gap-4 md:gap-6 group"
+                    >
+                      <span className="font-mono text-[10px] tracking-[0.2em] text-[#c4a84a] w-8 shrink-0">
+                        {String(item.n).padStart(2, '0')}
+                      </span>
+                      <span className="font-serif text-xl md:text-2xl font-light text-[#F7F4EE] group-hover:text-[#c4a84a] transition-colors duration-300 flex-1">
+                        {item.title}
+                      </span>
+                      <span className="font-mono text-[8px] tracking-[0.15em] uppercase text-[#c8b99a] hidden sm:inline">
+                        {item.ref}
+                      </span>
+                    </button>
+                    {open && (
+                      <div className="pb-8 pl-12 md:pl-14 animate-[hw-rise_0.45s_ease-out]">
+                        <div className="font-mono text-[8px] tracking-[0.2em] uppercase text-[#c8b99a] mb-3 sm:hidden">
+                          {item.ref}
+                        </div>
+                        <p className="font-serif italic text-lg text-[#F7F4EE]/80 leading-[1.85] mb-6 max-w-2xl">
+                          &ldquo;{item.verse}&rdquo;
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <button
+                            type="button"
+                            onClick={() => speakArchive(item)}
+                            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#0e0d0a] bg-[#c4a84a] px-8 py-3 hover:bg-[#e0c870] transition-colors"
+                          >
+                            Hear the title
+                          </button>
+                          {chamber ? (
+                            <button
+                              type="button"
+                              onClick={() => enterCommand(chamber.id)}
+                              className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-8 py-3 hover:bg-[#F7F4EE] hover:text-[#0e0d0a] transition-all"
+                            >
+                              Enter chamber · {chamber.climate}
+                            </button>
+                          ) : (
+                            <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#c8b99a] self-center">
+                              Archive only · chamber climates coming
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <p className="mt-16 font-mono text-[8px] tracking-[0.18em] uppercase text-[#c8b99a]/70 leading-relaxed max-w-xl">
+              Command list organized from the Gospels (KJV). Chamber practices are Human Weather
+              framings for the body — not a replacement for reading the text.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* CHAMBER */}
       {stage === 'chamber' && active && (
         <section className="relative z-10 min-h-[calc(100vh-3.5rem)] flex flex-col justify-center px-6 py-20">
           <div className="max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             <div className="lg:col-span-7 animate-[hw-rise_0.7s_ease-out]">
               <button
                 type="button"
-                onClick={() => setStage('threshold')}
+                onClick={goThreshold}
                 className="font-mono text-[9px] tracking-[0.25em] uppercase text-[#c8b99a] hover:text-[#c4a84a] mb-8 transition-colors"
               >
                 ← Climate gate
@@ -308,8 +366,8 @@ export default function Gospels() {
 
             <div className="lg:col-span-5 animate-[hw-rise_0.9s_ease-out_0.1s_both]">
               <BreathRing breath={active.breath} active={spoken || practicing} />
-              <div className="mt-10 space-y-2">
-                {COMMANDS.map((c, i) => (
+              <div className="mt-10 space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+                {CHAMBER_COMMANDS.map((c, i) => (
                   <button
                     key={c.id}
                     type="button"
@@ -327,12 +385,19 @@ export default function Gospels() {
                   </button>
                 ))}
               </div>
+              <button
+                type="button"
+                onClick={goArchive}
+                className="mt-6 font-mono text-[9px] tracking-[0.25em] uppercase text-[#c4a84a] border-b border-[#c4a84a]/40 pb-1 hover:border-[#c4a84a] transition-colors"
+              >
+                Full command map →
+              </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* PRACTICE — timed somatic ritual */}
+      {/* PRACTICE */}
       {stage === 'practice' && active && (
         <section className="relative z-10 min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-6 py-20 text-center">
           <div className="font-mono text-[10px] tracking-[0.4em] uppercase text-[#c4a84a] mb-8 animate-[hw-rise_0.5s_ease-out]">
@@ -362,7 +427,7 @@ export default function Gospels() {
         </section>
       )}
 
-      {/* STILLNESS — closing blessing */}
+      {/* STILLNESS */}
       {stage === 'stillness' && (
         <section className="relative z-10 min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-6 py-20 text-center">
           <div className="animate-[hw-rise_1.1s_ease-out] max-w-2xl">
@@ -377,7 +442,7 @@ export default function Gospels() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 type="button"
-                onClick={() => setStage('threshold')}
+                onClick={goThreshold}
                 className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#0e0d0a] transition-all duration-500"
               >
                 Return to the Gate
@@ -391,25 +456,27 @@ export default function Gospels() {
                   Stay with {active.command}
                 </button>
               )}
-              <Link
-                to="/journal"
+              <button
+                type="button"
+                onClick={goArchive}
                 className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE]/60 hover:text-[#c4a84a] px-6 py-4 transition-colors"
               >
-                Read the Journal →
-              </Link>
+                Browse the map →
+              </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* Stage rail for accessibility */}
       <nav
         className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2 px-3 py-2 rounded-full bg-[#0e0d0a]/70 border border-[#F7F4EE]/10 backdrop-blur-md"
         aria-label="Chamber stages"
       >
         {STAGES.map(s => {
           const canGo =
-            s === 'threshold' || (activeId && (s === 'chamber' || s === 'practice' || s === 'stillness'));
+            s === 'threshold' ||
+            s === 'archive' ||
+            (activeId && (s === 'chamber' || s === 'practice' || s === 'stillness'));
           return (
             <button
               key={s}
@@ -417,8 +484,13 @@ export default function Gospels() {
               disabled={!canGo}
               onClick={() => {
                 if (!canGo) return;
-                if (s === 'practice' && stage !== 'practice') startPractice();
-                else setStage(s);
+                if (s === 'archive') goArchive();
+                else if (s === 'threshold') goThreshold();
+                else if (s === 'practice' && stage !== 'practice') startPractice();
+                else {
+                  setStage(s);
+                  setParams({}, { replace: true });
+                }
               }}
               className={`h-1.5 rounded-full transition-all duration-300 disabled:opacity-30 ${
                 stage === s ? 'bg-[#c4a84a] w-4' : 'bg-[#F7F4EE]/25 w-1.5'
