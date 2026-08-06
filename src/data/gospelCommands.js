@@ -1,139 +1,8 @@
 /**
- * Gospels Live — chamber climates + full command archive (KJV).
- * Archive titles/references follow a traditional 48-command Gospel list;
- * chamber entries are Human Weather somatic framings of living commands.
+ * Gospels Live — all 48 Gospel commands as live chamber climates.
+ * Archive text is KJV; chamber framings are Human Weather somatic practices.
  */
 
-export const CHAMBER_COMMANDS = [
-  {
-    id: 'fear-not',
-    climate: 'Bracing',
-    climateHint: 'Threat without arrival',
-    latin: 'Nolite timere',
-    command: 'Be not afraid',
-    source: 'Luke 2:10 · Matthew 10:28',
-    weather: 'When the body braces for threat that has not arrived.',
-    practice:
-      'Place one hand on the sternum. Lengthen the exhale until it outlasts the inhale. Say the command once out loud, once under the breath.',
-    breath: { inhale: 4, hold: 2, exhale: 6 },
-    hue: 'rgba(196,168,74,0.22)',
-    archiveNumbers: [23],
-  },
-  {
-    id: 'peace-still',
-    climate: 'Storm',
-    climateHint: 'Interior louder than the room',
-    latin: 'Quiesce',
-    command: 'Peace, be still',
-    source: 'Mark 4:39',
-    weather: 'When the interior storm is louder than the room you are in.',
-    practice:
-      'Sit until the jaw softens. Trace one slow circle with the gaze. Speak the command into the weather you are actually in — not the one you fear.',
-    breath: { inhale: 4, hold: 4, exhale: 8 },
-    hue: 'rgba(100,140,160,0.20)',
-    archiveNumbers: [],
-  },
-  {
-    id: 'take-heart',
-    climate: 'Thin',
-    climateHint: 'Courage as costume',
-    latin: 'Confidite',
-    command: 'Take heart',
-    source: 'John 16:33 · Matthew 14:27',
-    weather: 'When courage feels like a costume you cannot keep wearing.',
-    practice:
-      'Stand. Feel the weight in both heels. Inhale through the nose for four, hold for two, release for six. Receive the command as permission, not performance.',
-    breath: { inhale: 4, hold: 2, exhale: 6 },
-    hue: 'rgba(196,100,60,0.18)',
-    archiveNumbers: [],
-  },
-  {
-    id: 'come-unto-me',
-    climate: 'Heavy',
-    climateHint: 'Load carried alone',
-    latin: 'Venite ad me',
-    command: 'Come unto me',
-    source: 'Matthew 11:28-29',
-    weather: 'When the load has been carried alone for too long.',
-    practice:
-      'Name one weight you are holding that is not yours to finish today. Set the shoulders down on the exhale. Let the command be an invitation, not a demand.',
-    breath: { inhale: 3, hold: 1, exhale: 7 },
-    hue: 'rgba(120,90,70,0.22)',
-    archiveNumbers: [25],
-  },
-  {
-    id: 'abide',
-    climate: 'Scattered',
-    climateHint: 'Mind leaving the body',
-    latin: 'Manete',
-    command: 'Abide in me',
-    source: 'John 15:4',
-    weather: 'When the mind keeps leaving the body for tomorrow.',
-    practice:
-      'Return to one sensory fact: temperature, light, contact with the chair. Stay for ninety seconds. Abiding is the opposite of forecasting.',
-    breath: { inhale: 4, hold: 4, exhale: 4 },
-    hue: 'rgba(90,140,110,0.18)',
-    archiveNumbers: [],
-  },
-  {
-    id: 'love-one-another',
-    climate: 'Distant',
-    climateHint: 'Nearness has gone quiet',
-    latin: 'Diligite',
-    command: 'Love one another',
-    source: 'John 13:34 · Matthew 22:39',
-    weather: 'When distance has become the default between you and another.',
-    practice:
-      'Choose one concrete nearness: a message, a meal, a minute of undivided attention. Love as regulation practiced between nervous systems.',
-    breath: { inhale: 5, hold: 0, exhale: 5 },
-    hue: 'rgba(160,90,100,0.16)',
-    archiveNumbers: [40],
-  },
-  {
-    id: 'watch-and-pray',
-    climate: 'Restless',
-    climateHint: 'Spirit willing, flesh thin',
-    latin: 'Vigilate',
-    command: 'Watch and pray',
-    source: 'Matthew 26:41',
-    weather: 'When the night feels longer than your capacity to stay awake inside it.',
-    practice:
-      'Sit upright. Soften the eyes. Match the breath to a slow count. Watch without scanning for threat — pray without performing certainty.',
-    breath: { inhale: 4, hold: 3, exhale: 6 },
-    hue: 'rgba(140,120,80,0.20)',
-    archiveNumbers: [43],
-  },
-  {
-    id: 'ask-seek-knock',
-    climate: 'Searching',
-    climateHint: 'Door not yet opened',
-    latin: 'Petite',
-    command: 'Ask, seek, knock',
-    source: 'Matthew 7:7-8',
-    weather: 'When you keep circling the same closed door and calling it patience.',
-    practice:
-      'Name one true ask in a single sentence. Breathe once. Seek the next honest step only — not the whole answer. Knock by acting once, then wait.',
-    breath: { inhale: 4, hold: 2, exhale: 4 },
-    hue: 'rgba(170,130,70,0.18)',
-    archiveNumbers: [17],
-  },
-  {
-    id: 'love-enemies',
-    climate: 'Opposed',
-    climateHint: 'Heat toward another',
-    latin: 'Diligite inimicos',
-    command: 'Love your enemies',
-    source: 'Matthew 5:44',
-    weather: 'When heat toward another person is running the whole interior climate.',
-    practice:
-      'Do not force warmth. Soften the jaw. Bless once under the breath — not as surrender of truth, as refusal to let contempt own the nervous system.',
-    breath: { inhale: 5, hold: 2, exhale: 7 },
-    hue: 'rgba(150,70,60,0.18)',
-    archiveNumbers: [10],
-  },
-];
-
-/** Full 48-command archive (KJV text). */
 export const GOSPEL_ARCHIVE = [
   {
     n: 1,
@@ -468,6 +337,615 @@ export const GOSPEL_ARCHIVE = [
   },
 ];
 
+const BREATHS = {
+  settle: { inhale: 4, hold: 2, exhale: 6 },
+  storm: { inhale: 4, hold: 4, exhale: 8 },
+  even: { inhale: 4, hold: 4, exhale: 4 },
+  soft: { inhale: 5, hold: 0, exhale: 5 },
+  deep: { inhale: 3, hold: 1, exhale: 7 },
+  watch: { inhale: 4, hold: 3, exhale: 6 },
+  ask: { inhale: 4, hold: 2, exhale: 4 },
+  oppose: { inhale: 5, hold: 2, exhale: 7 },
+  bright: { inhale: 3, hold: 0, exhale: 5 },
+  firm: { inhale: 4, hold: 1, exhale: 5 },
+};
+
+/** Per-command live climate framing (keyed by archive number). */
+const LIVE_META = {
+  1: {
+    climate: 'Turning',
+    climateHint: 'Direction must change',
+    latin: 'Paenitemini',
+    command: 'Repent',
+    weather: 'When the old path is still moving your feet, and you already know it.',
+    practice:
+      'Name one small turn available today. Soften the face. Breathe out longer than in. Turning begins in the body before the calendar.',
+    breath: BREATHS.settle,
+    hue: 'rgba(170,120,60,0.20)',
+  },
+  2: {
+    climate: 'Called',
+    climateHint: 'A step is waiting',
+    latin: 'Venite post me',
+    command: 'Follow me',
+    weather: 'When something ahead is clearer than the story keeping you still.',
+    practice:
+      'Feel both feet. Take one literal step forward. Say the command once. Following is motion, not a mood.',
+    breath: BREATHS.firm,
+    hue: 'rgba(160,130,70,0.18)',
+  },
+  3: {
+    climate: 'Bright',
+    climateHint: 'Joy feels risky',
+    latin: 'Gaudete',
+    command: 'Rejoice',
+    weather: 'When gladness arrives and the body still treats it like danger.',
+    practice:
+      'Lift the sternum slightly. Soften the eyes. Let one honest smile land without explaining it.',
+    breath: BREATHS.bright,
+    hue: 'rgba(196,168,74,0.22)',
+  },
+  4: {
+    climate: 'Visible',
+    climateHint: 'Hiding the good',
+    latin: 'Luceat',
+    command: 'Let your light shine',
+    weather: 'When you keep dimming what is already working through you.',
+    practice:
+      'Name one quiet good you have been hiding. Place a hand on the chest. Exhale as if making room for light, not performance.',
+    breath: BREATHS.soft,
+    hue: 'rgba(190,150,60,0.18)',
+  },
+  5: {
+    climate: 'Rooted',
+    climateHint: 'Continuity under pressure',
+    latin: 'Implete',
+    command: "Honor God's law",
+    weather: 'When novelty is loud and the older wisdom feels inconvenient.',
+    practice:
+      'Sit. Feel the weight of the seat. Ask what continuity wants from you today — not perfection, fidelity.',
+    breath: BREATHS.even,
+    hue: 'rgba(120,100,70,0.20)',
+  },
+  6: {
+    climate: 'Estranged',
+    climateHint: 'A rift unattended',
+    latin: 'Reconciliamini',
+    command: 'Be reconciled',
+    weather: 'When unfinished conflict is occupying more body than the present moment.',
+    practice:
+      'Name the person. Soften the jaw. Imagine one repair sentence — even if you do not send it yet.',
+    breath: BREATHS.settle,
+    hue: 'rgba(150,90,80,0.18)',
+  },
+  7: {
+    climate: 'Hungry',
+    climateHint: 'Desire without consent',
+    latin: 'Custodite',
+    command: 'Guard the gaze',
+    weather: 'When wanting has become a grip instead of a signal.',
+    practice:
+      'Lower the eyes for three breaths. Return attention to the soles of the feet. Desire can be noticed without being fed.',
+    breath: BREATHS.deep,
+    hue: 'rgba(140,70,90,0.16)',
+  },
+  8: {
+    climate: 'Exact',
+    climateHint: 'Words without weight',
+    latin: 'Sit sermo',
+    command: 'Keep your word',
+    weather: 'When speech has gotten ahead of what you can actually carry.',
+    practice:
+      'Speak one true yes or no aloud. Feel whether the body agrees. Let silence hold what is not ready.',
+    breath: BREATHS.firm,
+    hue: 'rgba(130,110,80,0.18)',
+  },
+  9: {
+    climate: 'Pressed',
+    climateHint: 'Asked for more',
+    latin: 'Alterum',
+    command: 'Go the second mile',
+    weather: 'When obligation has already taken a mile and resentment wants the rest.',
+    practice:
+      'Choose one second-mile act that is free, not forced. Do it once. Notice if generosity or martyrdom shows up.',
+    breath: BREATHS.soft,
+    hue: 'rgba(110,120,90,0.18)',
+  },
+  10: {
+    climate: 'Opposed',
+    climateHint: 'Heat toward another',
+    latin: 'Diligite inimicos',
+    command: 'Love your enemies',
+    weather: 'When heat toward another person is running the whole interior climate.',
+    practice:
+      'Do not force warmth. Soften the jaw. Bless once under the breath — not as surrender of truth, as refusal to let contempt own the nervous system.',
+    breath: BREATHS.oppose,
+    hue: 'rgba(150,70,60,0.18)',
+  },
+  11: {
+    climate: 'Whole',
+    climateHint: 'Split against yourself',
+    latin: 'Estote perfecti',
+    command: 'Be whole',
+    weather: 'When you keep negotiating with half of who you are.',
+    practice:
+      'Place both hands open on the thighs. Breathe until the split softens. Wholeness is direction, not a finished product.',
+    breath: BREATHS.even,
+    hue: 'rgba(160,140,90,0.18)',
+  },
+  12: {
+    climate: 'Hidden',
+    climateHint: 'Needing an audience',
+    latin: 'In abscondito',
+    command: 'Practice in secret',
+    weather: 'When goodness only feels real if someone is watching.',
+    practice:
+      'Do one unseen kindness or prayer. Tell no one. Let the body learn that privacy can be holy.',
+    breath: BREATHS.watch,
+    hue: 'rgba(90,100,120,0.18)',
+  },
+  13: {
+    climate: 'Grasping',
+    climateHint: 'Clutching what fades',
+    latin: 'Thesaurizate',
+    command: 'Lay up treasure in heaven',
+    weather: 'When accumulation is being asked to soothe a fear it cannot touch.',
+    practice:
+      'Open both hands. Name one thing you are gripping. Exhale as if releasing moth and rust from the chest.',
+    breath: BREATHS.deep,
+    hue: 'rgba(170,130,50,0.16)',
+  },
+  14: {
+    climate: 'First',
+    climateHint: 'Secondary things ruling',
+    latin: 'Quaerite primum',
+    command: "Seek God's kingdom",
+    weather: 'When urgent noise has demoted what actually orders your life.',
+    practice:
+      'Ask: what is first today? Write one line. Breathe. Let secondary things wait one full breath cycle.',
+    breath: BREATHS.ask,
+    hue: 'rgba(180,140,60,0.18)',
+  },
+  15: {
+    climate: 'Hard',
+    climateHint: 'Verdict already formed',
+    latin: 'Nolite iudicare',
+    command: 'Judge not',
+    weather: 'When the mind has already sentenced someone and the body is still holding the gavel.',
+    practice:
+      'Unclench the hands. Soften the brow. Replace the verdict with one curious question about their weather.',
+    breath: BREATHS.settle,
+    hue: 'rgba(100,90,110,0.18)',
+  },
+  16: {
+    climate: 'Guarded',
+    climateHint: 'Sacred things exposed',
+    latin: 'Nolite dare',
+    command: 'Guard what is holy',
+    weather: 'When you keep offering the tender parts to rooms that cannot hold them.',
+    practice:
+      'Name one pearl you have been casting. Bring it back to the chest. Discernment is love with a boundary.',
+    breath: BREATHS.firm,
+    hue: 'rgba(110,90,70,0.20)',
+  },
+  17: {
+    climate: 'Searching',
+    climateHint: 'Door not yet opened',
+    latin: 'Petite',
+    command: 'Ask, seek, knock',
+    weather: 'When you keep circling the same closed door and calling it patience.',
+    practice:
+      'Name one true ask in a single sentence. Breathe once. Seek the next honest step only — not the whole answer. Knock by acting once, then wait.',
+    breath: BREATHS.ask,
+    hue: 'rgba(170,130,70,0.18)',
+  },
+  18: {
+    climate: 'Mirrored',
+    climateHint: 'Empathy has thinned',
+    latin: 'Facite',
+    command: 'Do unto others',
+    weather: 'When you want from others what you are not offering.',
+    practice:
+      'Imagine one person in your day. Ask what you would want if the roles reversed. Do that one thing if you can.',
+    breath: BREATHS.soft,
+    hue: 'rgba(140,110,100,0.16)',
+  },
+  19: {
+    climate: 'Narrow',
+    climateHint: 'Easy path pulling',
+    latin: 'Intrate',
+    command: 'Choose the narrow way',
+    weather: 'When the wide road is offering relief that costs too much later.',
+    practice:
+      'Feel the constriction of a harder, truer choice. Breathe into it. Narrowness can be precision, not punishment.',
+    breath: BREATHS.watch,
+    hue: 'rgba(100,80,60,0.20)',
+  },
+  20: {
+    climate: 'Discerning',
+    climateHint: 'Sweet voice, wrong fruit',
+    latin: 'Attendite',
+    command: 'Beware of false prophets',
+    weather: 'When charm is trying to bypass your capacity to test fruit.',
+    practice:
+      'Ask: what fruit has this voice produced in my body? Stay with the answer for three breaths before believing more.',
+    breath: BREATHS.firm,
+    hue: 'rgba(120,80,90,0.18)',
+  },
+  21: {
+    climate: 'Harvest',
+    climateHint: 'Work too large alone',
+    latin: 'Rogate',
+    command: 'Pray for laborers',
+    weather: 'When the field is real and your hands are not enough.',
+    practice:
+      'Open the palms. Pray once for help without scripting who it must be. Notice if isolation softens.',
+    breath: BREATHS.ask,
+    hue: 'rgba(150,130,70,0.18)',
+  },
+  22: {
+    climate: 'Alert',
+    climateHint: 'Naive or armored',
+    latin: 'Prudentes',
+    command: 'Be wise as serpents',
+    weather: 'When you are either too soft for the room or too hard for your own heart.',
+    practice:
+      'Lengthen the spine. Soften the eyes. Practice wisdom without venom — alert, not attacking.',
+    breath: BREATHS.watch,
+    hue: 'rgba(90,120,100,0.18)',
+  },
+  23: {
+    climate: 'Bracing',
+    climateHint: 'Threat without arrival',
+    latin: 'Nolite timere',
+    command: 'Be not afraid',
+    weather: 'When the body braces for threat that has not arrived.',
+    practice:
+      'Place one hand on the sternum. Lengthen the exhale until it outlasts the inhale. Say the command once out loud, once under the breath.',
+    breath: BREATHS.settle,
+    hue: 'rgba(196,168,74,0.22)',
+  },
+  24: {
+    climate: 'Listening',
+    climateHint: 'Ears open, heart busy',
+    latin: 'Qui habet aures',
+    command: "Hear God's voice",
+    weather: 'When noise is constant and listening has become optional.',
+    practice:
+      'Close the eyes. Hear the farthest sound, then the nearest. Stay until a quieter signal can arrive.',
+    breath: BREATHS.even,
+    hue: 'rgba(100,120,140,0.18)',
+  },
+  25: {
+    climate: 'Heavy',
+    climateHint: 'Load carried alone',
+    latin: 'Tollite iugum',
+    command: 'Take my yoke',
+    weather: 'When the load has been carried alone for too long.',
+    practice:
+      'Name one weight you are holding that is not yours to finish today. Set the shoulders down on the exhale. Let the yoke be shared, not performed.',
+    breath: BREATHS.deep,
+    hue: 'rgba(120,90,70,0.22)',
+  },
+  26: {
+    climate: 'Ancestral',
+    climateHint: 'Lineage unfinished',
+    latin: 'Honora',
+    command: 'Honor your parents',
+    weather: 'When the family weather is still writing on the body.',
+    practice:
+      'Breathe into the belly. Honor what can be honored without rewriting the truth. Boundaries can be part of honor.',
+    breath: BREATHS.settle,
+    hue: 'rgba(130,100,80,0.18)',
+  },
+  27: {
+    climate: 'Soured',
+    climateHint: 'Hidden influence',
+    latin: 'Cavete fermentum',
+    command: 'Beware of leaven',
+    weather: 'When a small bitterness is quietly expanding the whole loaf of the day.',
+    practice:
+      'Name the leaven. Smell for it in speech and scroll. Choose one clean ingredient for the next hour.',
+    breath: BREATHS.firm,
+    hue: 'rgba(140,110,60,0.16)',
+  },
+  28: {
+    climate: 'Crossed',
+    climateHint: 'Self as obstacle',
+    latin: 'Abneget',
+    command: 'Deny yourself',
+    weather: 'When the smaller self is insisting on the steering wheel.',
+    practice:
+      'Ask what love requires that ego resists. Make that smaller move. Denial here is redirection, not erasure.',
+    breath: BREATHS.watch,
+    hue: 'rgba(110,70,70,0.18)',
+  },
+  29: {
+    climate: 'Tender',
+    climateHint: 'Small ones overlooked',
+    latin: 'Ne contemnatis',
+    command: 'Do not despise little ones',
+    weather: 'When impatience has made someone smaller than they are.',
+    practice:
+      'Lower your voice. Soften the gaze. Treat the next vulnerable person — including yourself — as seen.',
+    breath: BREATHS.soft,
+    hue: 'rgba(150,120,110,0.16)',
+  },
+  30: {
+    climate: 'Direct',
+    climateHint: 'Conflict avoided',
+    latin: 'Vade',
+    command: 'Go to offenders',
+    weather: 'When silence is pretending to be peace.',
+    practice:
+      'Write the private truth in one sentence. Decide whether today is the day to speak it alone with them.',
+    breath: BREATHS.firm,
+    hue: 'rgba(160,100,70,0.18)',
+  },
+  31: {
+    climate: 'Wanting',
+    climateHint: 'More as medicine',
+    latin: 'Cavete avaritiam',
+    command: 'Beware of covetousness',
+    weather: 'When more is being asked to fix a climate it cannot regulate.',
+    practice:
+      'Look at one desired thing. Ask what weather it is promising to change. Breathe until wanting loosens its grip.',
+    breath: BREATHS.deep,
+    hue: 'rgba(170,120,50,0.16)',
+  },
+  32: {
+    climate: 'Stuck',
+    climateHint: 'Ledger unfinished',
+    latin: 'Dimitte',
+    command: 'Forgive',
+    weather: 'When the old account is still charging interest in the body.',
+    practice:
+      'Place a hand on the heart. Say: I release the need to collect today. Forgiveness can be incremental.',
+    breath: BREATHS.oppose,
+    hue: 'rgba(140,100,120,0.16)',
+  },
+  33: {
+    climate: 'Joined',
+    climateHint: 'Bond under strain',
+    latin: 'Non separet',
+    command: 'Honor marriage',
+    weather: 'When partnership feels like two weathers fighting for the same sky.',
+    practice:
+      'If paired: one minute of undivided attention. If not: honor the covenant of integrity in your closest bond.',
+    breath: BREATHS.soft,
+    hue: 'rgba(160,90,100,0.16)',
+  },
+  34: {
+    climate: 'Serving',
+    climateHint: 'Status hungry',
+    latin: 'Sit minister',
+    command: 'Be a servant',
+    weather: 'When greatness is being measured by who waits on whom.',
+    practice:
+      'Do one unnoticed service in the next hour. Let usefulness rewrite the nervous system’s status story.',
+    breath: BREATHS.even,
+    hue: 'rgba(110,120,90,0.18)',
+  },
+  35: {
+    climate: 'Housed',
+    climateHint: 'Noise in the sanctuary',
+    latin: 'Domus orationis',
+    command: 'Be a house of prayer',
+    weather: 'When the inner temple has become a marketplace of urgency.',
+    practice:
+      'Clear one minute. No inputs. Let the body become a quieter room. Prayer can start as atmosphere.',
+    breath: BREATHS.watch,
+    hue: 'rgba(100,110,130,0.18)',
+  },
+  36: {
+    climate: 'Believing',
+    climateHint: 'Doubt in the ask',
+    latin: 'Si habueritis fidem',
+    command: 'Ask in faith',
+    weather: 'When prayer is being hedged with disbelief before it leaves the mouth.',
+    practice:
+      'Ask once without apology. Hold the breath briefly. Release as if the asking itself is an act of trust.',
+    breath: BREATHS.ask,
+    hue: 'rgba(180,150,70,0.18)',
+  },
+  37: {
+    climate: 'Open table',
+    climateHint: 'Only the convenient invited',
+    latin: 'Voca pauperes',
+    command: 'Bring in the poor',
+    weather: 'When hospitality has shrunk to people who can repay you.',
+    practice:
+      'Widen the circle in one concrete way today — a message, a meal, a seat, a gift without return.',
+    breath: BREATHS.soft,
+    hue: 'rgba(130,110,80,0.18)',
+  },
+  38: {
+    climate: 'Ordered',
+    climateHint: 'Mixed allegiances',
+    latin: 'Reddite',
+    command: 'Render to Caesar',
+    weather: 'When civic duty and holy duty are tangled into one anxious knot.',
+    practice:
+      'Sort one obligation into its proper realm. Pay what is owed without giving the soul to it.',
+    breath: BREATHS.firm,
+    hue: 'rgba(120,100,90,0.18)',
+  },
+  39: {
+    climate: 'Devoted',
+    climateHint: 'Love diluted',
+    latin: 'Diliges Dominum',
+    command: 'Love the Lord',
+    weather: 'When attention is scattered across a hundred lesser loves.',
+    practice:
+      'Gather attention to one point: breath, light, or silence. Stay ninety seconds as an act of undivided love.',
+    breath: BREATHS.even,
+    hue: 'rgba(196,168,74,0.20)',
+  },
+  40: {
+    climate: 'Distant',
+    climateHint: 'Nearness has gone quiet',
+    latin: 'Diliges proximum',
+    command: 'Love your neighbor',
+    weather: 'When distance has become the default between you and another.',
+    practice:
+      'Choose one concrete nearness: a message, a meal, a minute of undivided attention. Love as regulation practiced between nervous systems.',
+    breath: BREATHS.soft,
+    hue: 'rgba(160,90,100,0.16)',
+  },
+  41: {
+    climate: 'Awaiting',
+    climateHint: 'Sleepy vigilance',
+    latin: 'Vigilate',
+    command: 'Await my return',
+    weather: 'When readiness has collapsed into either panic or numbness.',
+    practice:
+      'Sit upright. Soften the eyes. Stay present for one full minute without forecasting the hour.',
+    breath: BREATHS.watch,
+    hue: 'rgba(130,120,90,0.18)',
+  },
+  42: {
+    climate: 'Remembering',
+    climateHint: 'Body forgetting belonging',
+    latin: 'Hoc facite',
+    command: 'Remember me',
+    weather: 'When communion has become concept instead of shared bread.',
+    practice:
+      'Touch something ordinary — bread, water, a cup. Receive it slowly. Memory can live in the mouth and hands.',
+    breath: BREATHS.even,
+    hue: 'rgba(150,110,80,0.18)',
+  },
+  43: {
+    climate: 'Restless',
+    climateHint: 'Spirit willing, flesh thin',
+    latin: 'Orate',
+    command: 'Watch and pray',
+    weather: 'When the night feels longer than your capacity to stay awake inside it.',
+    practice:
+      'Sit upright. Soften the eyes. Match the breath to a slow count. Watch without scanning for threat — pray without performing certainty.',
+    breath: BREATHS.watch,
+    hue: 'rgba(140,120,80,0.20)',
+  },
+  44: {
+    climate: 'Shepherding',
+    climateHint: 'Care postponed',
+    latin: 'Pasce',
+    command: 'Feed my sheep',
+    weather: 'When love is professed but the flock in front of you is still hungry.',
+    practice:
+      'Name one person who needs feeding — attention, food, advocacy. Do the smallest nourishing act now.',
+    breath: BREATHS.soft,
+    hue: 'rgba(120,130,90,0.18)',
+  },
+  45: {
+    climate: 'Initiating',
+    climateHint: 'Beginning unused',
+    latin: 'Baptizantes',
+    command: 'Baptize my disciples',
+    weather: 'When new life is waiting for a threshold you keep delaying.',
+    practice:
+      'Touch cool water if you can. Mark a beginning with breath. Initiation can be a private yes before a public rite.',
+    breath: BREATHS.settle,
+    hue: 'rgba(90,130,150,0.18)',
+  },
+  46: {
+    climate: 'Teaching',
+    climateHint: 'Knowledge without practice',
+    latin: 'Docentes',
+    command: 'Teach them to obey',
+    weather: 'When information is plentiful and embodied obedience is rare.',
+    practice:
+      'Choose one command you already know. Practice it for ninety seconds. Teaching starts as living.',
+    breath: BREATHS.firm,
+    hue: 'rgba(140,120,70,0.18)',
+  },
+  47: {
+    climate: 'Waiting power',
+    climateHint: 'Rushing the gift',
+    latin: 'Accipietis',
+    command: "Receive God's power",
+    weather: 'When you want force before you have stayed long enough to receive.',
+    practice:
+      'Stay seated. Hands open. Do not force energy. Reception is different from striving.',
+    breath: BREATHS.deep,
+    hue: 'rgba(170,140,80,0.18)',
+  },
+  48: {
+    climate: 'Sending',
+    climateHint: 'Faith kept private',
+    latin: 'Euntes',
+    command: 'Make disciples',
+    weather: 'When the good news has stayed indoor weather only.',
+    practice:
+      'Name one person you can walk with, not impress. Send one honest invitation into the world.',
+    breath: BREATHS.ask,
+    hue: 'rgba(160,120,60,0.18)',
+  },
+};
+
+function slugify(title) {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+/** All 48 commands as live chamber climates. */
+export const CHAMBER_COMMANDS = GOSPEL_ARCHIVE.map((item) => {
+  const meta = LIVE_META[item.n];
+  return {
+    id: `cmd-${item.n}-${slugify(item.title)}`,
+    n: item.n,
+    climate: meta.climate,
+    climateHint: meta.climateHint,
+    latin: meta.latin,
+    command: meta.command,
+    source: item.ref,
+    weather: meta.weather,
+    practice: meta.practice,
+    breath: meta.breath,
+    hue: meta.hue,
+    verse: item.verse,
+    title: item.title,
+    archiveNumbers: [item.n],
+  };
+});
+
+export const GATE_SAMPLE_SIZE = 9;
+
+export function shuffleArray(items) {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/** Random gate: N climates drawn from the full live set. */
+export function sampleGateClimates(climates = CHAMBER_COMMANDS, count = GATE_SAMPLE_SIZE) {
+  return shuffleArray(climates).slice(0, Math.min(count, climates.length));
+}
+
+/**
+ * Random command for the chamber.
+ * Prefers climates not yet received this session; falls back to full set.
+ */
+export function pickRandomClimate(climates = CHAMBER_COMMANDS, { excludeIds = [], preferUnreceived = true } = {}) {
+  const pool = climates.filter(c => !excludeIds.includes(c.id));
+  const preferred =
+    preferUnreceived && pool.length
+      ? pool
+      : climates.length
+        ? climates
+        : [];
+  if (!preferred.length) return climates[0] || null;
+  return preferred[Math.floor(Math.random() * preferred.length)];
+}
+
 export function chamberForArchiveNumber(n) {
-  return CHAMBER_COMMANDS.find(c => (c.archiveNumbers || []).includes(n)) || null;
+  return CHAMBER_COMMANDS.find(c => c.n === n) || null;
+}
+
+export function chamberById(id) {
+  return CHAMBER_COMMANDS.find(c => c.id === id) || null;
 }
