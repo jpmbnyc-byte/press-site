@@ -339,16 +339,27 @@ export default function Home() {
           <h2 className="font-serif text-[clamp(28px,4vw,44px)] font-light text-[#f0e9d8] mb-6 leading-tight">
             The oldest somatic map, spoken aloud.
           </h2>
-          <p className="font-serif italic text-lg text-[#c8b99a] mb-10 max-w-xl mx-auto leading-relaxed">
-            Be not afraid. Peace, be still. Take heart. Living commands from the Gospels — regulation
-            protocols older than polyvagal theory.
+          <p className="font-serif italic text-lg text-[#c8b99a] mb-4 max-w-xl mx-auto leading-relaxed">
+            Nine climates. Forty-eight Gospel commands. Be not afraid. Peace, be still. Take heart —
+            regulation older than polyvagal theory.
           </p>
-          <Link
-            to="/gospels"
-            className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#1C1C1C] transition-all duration-500"
-          >
-            Enter the Chamber →
-          </Link>
+          <p className="font-mono text-[9px] tracking-[0.22em] uppercase text-[#c8b99a]/70 mb-10">
+            Chamber practice · Full command map
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/gospels"
+              className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[#0e0d0a] bg-[#c4a84a] px-10 py-4 hover:bg-[#e0c870] transition-all duration-500"
+            >
+              Enter the Chamber →
+            </Link>
+            <Link
+              to="/gospels?view=archive"
+              className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#1C1C1C] transition-all duration-500"
+            >
+              Browse 48 Commands →
+            </Link>
+          </div>
         </div>
       </section>
 
