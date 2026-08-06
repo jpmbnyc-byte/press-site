@@ -340,11 +340,11 @@ export default function Home() {
             The oldest somatic map, spoken aloud.
           </h2>
           <p className="font-serif italic text-lg text-[#c8b99a] mb-4 max-w-xl mx-auto leading-relaxed">
-            Forty-eight live climates. Be not afraid. Love your enemies. Watch and pray — regulation
+            Forty-eight live climates — English and Latin. Be not afraid / Nolite timere. Regulation
             older than polyvagal theory. Draw a climate, or receive a command at random.
           </p>
           <p className="font-mono text-[9px] tracking-[0.22em] uppercase text-[#c8b99a]/70 mb-10">
-            Chamber practice · Random draw · Full map
+            Chamber practice · Learn Latin · Random draw
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
