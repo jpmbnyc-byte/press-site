@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
 import AuthorPortrait from '@/components/AuthorPortrait';
+import NewsletterSignup from '@/components/NewsletterSignup';
 import { startCheckout } from '@/lib/stripeCheckout';
 import { useAuth } from '@/lib/AuthContext';
 import {
@@ -42,7 +43,11 @@ export default function Article() {
     (async () => {
       try {
         const all = await base44.entities.Article.list('-published_at', 100);
-        const found = all.find(a => a.slug === slug);
+        const found = all.find(
+          a =>
+            a.slug === slug &&
+            (a.status === 'published' || a.status === 'featured')
+        );
         if (found) {
           setArticle(found);
           setEssayPageMeta(found);
@@ -253,7 +258,10 @@ export default function Article() {
                 : '$96 / year — Member + App Bundle'}
             </button>
             <p className="font-serif italic text-sm text-[var(--hw-ink3)] mt-2">
-              <Link to="/login" className="text-[var(--hw-gold)] hover:underline">
+              <Link
+                to={`/login?next=${encodeURIComponent(`/journal/${article.slug}`)}`}
+                className="text-[var(--hw-gold)] hover:underline"
+              >
                 Log in
               </Link>
               {' · '}
@@ -335,20 +343,7 @@ export default function Article() {
 
       {/* Newsletter */}
       <section className="py-20 px-6 border-t border-[rgba(154,125,46,0.18)]">
-        <div className="max-w-md mx-auto text-center">
-          <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-4">
-            The Weekly Dispatch
-          </div>
-          <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-6">
-            Editorial. No noise. The interior forecast for modern life.
-          </p>
-          <Link
-            to="/subscribe"
-            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-3 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 inline-block"
-          >
-            Get the Dispatch →
-          </Link>
-        </div>
+        <NewsletterSignup source="article_footer" />
       </section>
     </div>
   );

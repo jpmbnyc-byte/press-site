@@ -2,7 +2,7 @@
  * Edge middleware: social crawlers hitting /journal/:slug get HTML with
  * essay-specific Open Graph tags (hero image + title/excerpt).
  * Humans still receive the SPA via vercel.json rewrites.
- * Home (/) keeps the static og-share.png from index.html.
+ * Home (/) keeps the static og-share.jpg from index.html.
  */
 
 const SITE = 'https://www.humanweather.press';
@@ -26,7 +26,7 @@ function escapeHtml(value) {
 }
 
 function absoluteUrl(url) {
-  if (!url) return `${SITE}/og-share.png`;
+  if (!url) return `${SITE}/og-share.jpg`;
   // Prefer .press host when assets were previously stored on the Vercel hostname.
   const normalized = String(url).replace(
     /^https?:\/\/humanweather\.vercel\.app/i,

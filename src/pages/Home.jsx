@@ -83,6 +83,7 @@ export default function Home() {
     featured[0] ||
     latest[0];
 
+  const spotlightIsWatersEdge = spotlight?.slug === FEATURED_PREVIEW_SLUG;
   const spotlightIsPreview = spotlight?.access_level === 'members';
   const freeToHighlight = freeEssays.filter(a => a.slug !== spotlight?.slug);
   const freeLead = freeToHighlight[0];
@@ -149,7 +150,11 @@ export default function Home() {
             </div>
             <div className="animate-[hw-rise_0.9s_ease-out_0.12s_both]">
               <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-3">
-                Featured Preview · {WATERS_EDGE_PREVIEW_MINUTES} min free
+                {spotlightIsWatersEdge
+                  ? `Featured Preview · ${WATERS_EDGE_PREVIEW_MINUTES} min free`
+                  : spotlightIsPreview
+                    ? 'Featured Preview'
+                    : 'Featured'}
               </div>
               <div className="font-mono text-[9px] tracking-[0.22em] uppercase text-[var(--hw-ink3)] mb-6">
                 {essayEyebrow(spotlight)}
@@ -166,9 +171,11 @@ export default function Home() {
                 to={`/journal/${spotlight.slug}`}
                 className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-gold)] pb-1 hover:text-[var(--hw-gold)] transition-colors duration-300"
               >
-                {spotlightIsPreview
+                {spotlightIsWatersEdge
                   ? `Begin ${WATERS_EDGE_PREVIEW_MINUTES}-minute preview →`
-                  : 'Read free →'}
+                  : spotlightIsPreview
+                    ? 'Begin the preview →'
+                    : 'Read free →'}
               </Link>
             </div>
           </div>
