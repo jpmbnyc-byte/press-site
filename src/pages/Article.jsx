@@ -5,7 +5,13 @@ import { base44 } from '@/api/base44Client';
 import AuthorPortrait from '@/components/AuthorPortrait';
 import { startCheckout } from '@/lib/stripeCheckout';
 import { useAuth } from '@/lib/AuthContext';
-import { hasPressAccess, previewMembersBody } from '@/lib/membership';
+import {
+  hasPressAccess,
+  previewMembersBody,
+  previewMembersBodyByMinutes,
+  WATERS_EDGE_PREVIEW_MINUTES,
+  WATERS_EDGE_SLUG,
+} from '@/lib/membership';
 import { setEssayPageMeta, setHomePageMeta } from '@/lib/pageMeta';
 
 export default function Article() {
@@ -187,7 +193,12 @@ export default function Article() {
             }}
           >
             {article.access_level === 'members' && !canReadMembers
-              ? previewMembersBody(article.body_md)
+              ? article.slug === WATERS_EDGE_SLUG
+                ? previewMembersBodyByMinutes(article.body_md, {
+                    minutes: WATERS_EDGE_PREVIEW_MINUTES,
+                    readingTimeMins: article.reading_time_mins,
+                  })
+                : previewMembersBody(article.body_md)
               : article.body_md}
           </ReactMarkdown>
         </div>
@@ -201,10 +212,14 @@ export default function Article() {
         {article.access_level === 'members' && !canReadMembers && (
           <div className="mt-10 border-t border-b border-[rgba(154,125,46,0.18)] py-12 text-center bg-[var(--hw-surface)]">
             <h3 className="font-serif text-3xl font-light text-[var(--hw-ink)] mb-3">
-              This essay continues for members.
+              {article.slug === WATERS_EDGE_SLUG
+                ? 'The preview ends here.'
+                : 'This essay continues for members.'}
             </h3>
             <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-8 max-w-md mx-auto">
-              Log in and start a free trial to read the full archive.
+              {article.slug === WATERS_EDGE_SLUG
+                ? `You've reached about ${WATERS_EDGE_PREVIEW_MINUTES} minutes of reading. Log in and start a free trial for the full essay.`
+                : 'Log in and start a free trial to read the full archive.'}
             </p>
             {checkoutError && (
               <p className="font-serif text-sm text-[var(--hw-gold)] mb-4">{checkoutError}</p>
