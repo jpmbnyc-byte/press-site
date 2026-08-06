@@ -38,16 +38,16 @@ This repo is a Vite SPA. Content stays on Base44 at `https://humanweather.base44
 ### Flow
 
 1. Reader **creates an account / logs in** (`/register`, `/login`).
-2. Chooses a plan on `/subscribe` → Base44 function `createCheckout` opens Stripe Checkout (7-day trial) with `client_reference_id = user.id`.
+2. Chooses a plan on `/subscribe` → Base44 function `createCheckout` opens Stripe Checkout (7-day trial) with `client_reference_id = user.id` (requires backend functions capability).
 3. Stripe webhook → Base44 function `stripeWebhook` sets User membership fields.
-4. **Members essays** are loaded via Base44 function `getPressArticle`, which returns a **preview-only** `body_md` until `membership_status` is `trialing` or `active`. Full essay markdown is **not** exposed on the public entity API (`body_md` is admin-only via field-level security).
+4. **Members essays** load via `fetchPressArticle()`: prefers `getPressArticle` when functions work; otherwise uses the public entity API and **client-gates** members `body_md` to a preview.
 5. **Member + App bundle** (`member_app_yearly`) also sets `app_access` + `app_unlock_token` for **humanweather.social**.
 
 ### Members body gating
 
-- Entity FLS: `Article.body_md` readable/writable by **admin** only (service role bypasses for backend).
-- Function: `POST /functions/getPressArticle` `{ "slug": "…" }` → `{ article, related }` with `body_gated` / `can_read_full`.
-- Frontend essay pages must use `fetchPressArticle()` — never rely on `entities.Article.list` for full members bodies.
+- Frontend always uses `fetchPressArticle(slug, user)` on essay pages.
+- When Base44 backend functions are available: `getPressArticle` returns gated `body_md` (`body_gated` / `can_read_full`).
+- **Current live plan:** Base44 returns `402 Functions are blocked - app owner lacks backend functions capability`, so the site falls back to `entities.Article` + client-side preview gating. Do **not** push admin-only FLS on `body_md` until functions are enabled — that would blank every essay.
 
 ### Bundle → PWA
 
@@ -56,14 +56,13 @@ This repo is a Vite SPA. Content stays on Base44 at `https://humanweather.base44
   `POST https://humanweather.base44.app/functions/verifyAppAccess`  
   body: `{ "email": "…", "token": "…" }` → `{ access: true|false, … }`
 
-### Deploy backend (required once)
+### Deploy backend (when functions are unlocked)
 
 From repo root (must be logged into Base44 CLI):
 
 ```bash
 npx base44 login
-npx base44 entities push   # deploys Article body_md FLS
-npx base44 functions deploy  # deploys getPressArticle + Stripe functions
+npx base44 functions deploy  # getPressArticle + Stripe functions
 # Set secrets in Base44 dashboard or via CLI if available:
 # STRIPE_SECRET_KEY
 # STRIPE_WEBHOOK_SECRET
@@ -74,7 +73,7 @@ npx base44 functions deploy  # deploys getPressArticle + Stripe functions
 # HW_SOCIAL_APP_URL=https://humanweather.social
 ```
 
-**Important:** Until `entities push` + `functions deploy` run, the live Base44 backend will not enforce FLS / `getPressArticle`. The Vercel frontend can ship sooner, but integrity requires the Base44 deploy.
+Only after functions work, consider locking `Article.body_md` with FLS and pushing entities.
 
 Point the Stripe webhook (live) to:
 

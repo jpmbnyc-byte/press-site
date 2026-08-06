@@ -41,7 +41,7 @@ export default function Article() {
     (async () => {
       setLoading(true);
       try {
-        const data = await fetchPressArticle(slug);
+        const data = await fetchPressArticle(slug, user);
         if (cancelled) return;
         const found = data.article;
         setArticle(found);
@@ -77,7 +77,7 @@ export default function Article() {
       cancelled = true;
       setHomePageMeta();
     };
-  }, [slug, canReadMembers]);
+  }, [slug, canReadMembers, user]);
 
   useEffect(() => {
     const handleScroll = () => {

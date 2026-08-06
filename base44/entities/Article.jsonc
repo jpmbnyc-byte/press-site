@@ -32,19 +32,7 @@
     },
     "body_md": {
       "type": "string",
-      "description": "Full essay markdown. Field-level security: not readable via public entity API — use getPressArticle.",
-      "rls": {
-        "read": {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        "write": {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      }
+      "description": "Full essay markdown. Prefer getPressArticle for gated reads when backend functions are enabled; until then the public entity API + client gate is used."
     },
     "excerpt": {
       "type": "string"
