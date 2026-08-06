@@ -184,8 +184,10 @@ export default function Home() {
                 Open essays. No membership required.
               </h2>
               <p className="font-serif italic text-lg text-[var(--hw-ink2)] leading-relaxed">
-                Full essays you can finish today. The Distance We Choose opens Relational Faith —
-                the same corridor as the featured preview.
+                Full essays you can finish today.
+                {freeLead.series_label === spotlight?.series_label
+                  ? ` ${essayDisplayTitle(freeLead)} opens the same corridor as the featured preview.`
+                  : ' No account required.'}
               </p>
             </div>
 
