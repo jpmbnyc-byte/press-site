@@ -31,7 +31,20 @@
       "type": "string"
     },
     "body_md": {
-      "type": "string"
+      "type": "string",
+      "description": "Full essay markdown. Field-level security: not readable via public entity API — use getPressArticle.",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        "write": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     },
     "excerpt": {
       "type": "string"

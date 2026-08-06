@@ -1,18 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { base44 } from '@/api/base44Client';
 import AuthorPortrait from '@/components/AuthorPortrait';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import { startCheckout } from '@/lib/stripeCheckout';
 import { useAuth } from '@/lib/AuthContext';
-import {
-  hasPressAccess,
-  previewMembersBody,
-  previewMembersBodyByMinutes,
-  WATERS_EDGE_PREVIEW_MINUTES,
-  WATERS_EDGE_SLUG,
-} from '@/lib/membership';
+import { hasPressAccess } from '@/lib/membership';
+import { fetchPressArticle } from '@/lib/pressArticles';
 import { setEssayPageMeta, setHomePageMeta } from '@/lib/pageMeta';
 
 export default function Article() {
@@ -26,7 +20,10 @@ export default function Article() {
   const [checkoutPlan, setCheckoutPlan] = useState(null);
   const [checkoutError, setCheckoutError] = useState('');
   const canReadMembers = hasPressAccess(user);
-
+  // Prefer server flag when present; fall back to client entitlement for UX chrome.
+  const bodyLocked =
+    article?.body_gated === true ||
+    (article?.access_level === 'members' && !canReadMembers && article?.can_read_full !== true);
 
   const handleCheckout = async (planId) => {
     setCheckoutError('');
@@ -40,56 +37,47 @@ export default function Article() {
   };
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
+      setLoading(true);
       try {
-        const all = await base44.entities.Article.list('-published_at', 100);
-        const found = all.find(
-          a =>
-            a.slug === slug &&
-            (a.status === 'published' || a.status === 'featured')
+        const data = await fetchPressArticle(slug);
+        if (cancelled) return;
+        const found = data.article;
+        setArticle(found);
+        setEssayPageMeta(found);
+
+        const sameSeries = Array.isArray(data.related) ? data.related : [];
+        const freeInSeries = sameSeries
+          .filter(a => a.access_level === 'free')
+          .sort((a, b) => (a.series_order || 99) - (b.series_order || 99));
+        setFreeCompanion(found.access_level === 'members' ? freeInSeries[0] || null : null);
+        setRelated(
+          [...sameSeries]
+            .sort((a, b) => {
+              if (a.access_level === 'free' && b.access_level !== 'free') return -1;
+              if (b.access_level === 'free' && a.access_level !== 'free') return 1;
+              return (a.series_order || 99) - (b.series_order || 99);
+            })
+            .slice(0, 2)
         );
-        if (found) {
-          setArticle(found);
-          setEssayPageMeta(found);
-          try {
-            await base44.entities.Article.update(found.id, {
-              view_count: (found.view_count || 0) + 1,
-            });
-          } catch (e) {}
-          if (found.series_label) {
-            const sameSeries = all.filter(
-              a =>
-                (a.status === 'published' || a.status === 'featured') &&
-                a.series_label === found.series_label &&
-                a.id !== found.id
-            );
-            const freeInSeries = sameSeries
-              .filter(a => a.access_level === 'free')
-              .sort((a, b) => (a.series_order || 99) - (b.series_order || 99));
-            setFreeCompanion(found.access_level === 'members' ? freeInSeries[0] || null : null);
-            setRelated(
-              [...sameSeries]
-                .sort((a, b) => {
-                  if (a.access_level === 'free' && b.access_level !== 'free') return -1;
-                  if (b.access_level === 'free' && a.access_level !== 'free') return 1;
-                  return (a.series_order || 99) - (b.series_order || 99);
-                })
-                .slice(0, 2)
-            );
-          } else {
-            setFreeCompanion(null);
-            setRelated([]);
-          }
-        }
       } catch (e) {
         console.error(e);
+        if (!cancelled) {
+          setArticle(null);
+          setRelated([]);
+          setFreeCompanion(null);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
     window.scrollTo(0, 0);
-    return () => setHomePageMeta();
-  }, [slug]);
+    return () => {
+      cancelled = true;
+      setHomePageMeta();
+    };
+  }, [slug, canReadMembers]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -105,7 +93,7 @@ export default function Article() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[var(--hw-gold)] border-t-transparent rounded-none animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-[var(--hw-gold)] border-t-transparent rounded-none animate-spin" />
       </div>
     );
   }
@@ -115,7 +103,10 @@ export default function Article() {
       <div className="min-h-[60vh] flex items-center justify-center px-6 text-center">
         <div>
           <p className="font-serif text-2xl text-[var(--hw-ink3)] mb-6">Essay not found.</p>
-          <Link to="/journal" className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-6 py-3 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 inline-block">
+          <Link
+            to="/journal"
+            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-6 py-3 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 inline-block"
+          >
             ← Back to Journal
           </Link>
         </div>
@@ -125,12 +116,13 @@ export default function Article() {
 
   return (
     <div>
-      {/* Reading progress bar */}
       <div className="fixed top-0 left-0 right-0 h-[2px] z-[200] bg-transparent">
-        <div className="h-full bg-[var(--hw-gold)] transition-all duration-150" style={{ width: `${progress}%` }} />
+        <div
+          className="h-full bg-[var(--hw-gold)] transition-all duration-150"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
-      {/* Article header */}
       <header className="max-w-[740px] mx-auto px-6 pt-12 pb-8">
         <div className="w-12 h-[2px] bg-[var(--hw-gold)] mb-6" />
         <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-rust)] mb-4">
@@ -147,7 +139,9 @@ export default function Article() {
           <p className="font-serif italic text-2xl text-[var(--hw-rust)] mb-6">{article.subtitle}</p>
         )}
         {article.excerpt && (
-          <p className="font-serif italic text-lg text-[var(--hw-ink2)] max-w-[540px] mb-8">{article.excerpt}</p>
+          <p className="font-serif italic text-lg text-[var(--hw-ink2)] max-w-[540px] mb-8">
+            {article.excerpt}
+          </p>
         )}
         <div className="flex items-center gap-4 pb-8 border-b border-[rgba(154,125,46,0.22)]">
           <AuthorPortrait size="md" />
@@ -162,7 +156,6 @@ export default function Article() {
         </div>
       </header>
 
-      {/* Hero image */}
       {article.hero_image_url && (
         <div className="w-full mb-12">
           <img
@@ -178,18 +171,17 @@ export default function Article() {
         </div>
       )}
 
-      {/* Article body */}
       <article className="max-w-[680px] mx-auto px-6 pb-16">
         <div className="article-body">
           <ReactMarkdown
             components={{
               hr: () => <div className="hw-ornament">✦ · ✦ · ✦</div>,
-              blockquote: ({ children }) => (
-                <blockquote>{children}</blockquote>
-              ),
+              blockquote: ({ children }) => <blockquote>{children}</blockquote>,
               p: ({ children }) => <p>{children}</p>,
               h2: ({ children }) => (
-                <h2 className="font-serif text-3xl font-light mt-12 mb-6 text-[var(--hw-ink)]">{children}</h2>
+                <h2 className="font-serif text-3xl font-light mt-12 mb-6 text-[var(--hw-ink)]">
+                  {children}
+                </h2>
               ),
               em: ({ children }) => <em className="italic">{children}</em>,
               strong: ({ children }) => (
@@ -197,33 +189,24 @@ export default function Article() {
               ),
             }}
           >
-            {article.access_level === 'members' && !canReadMembers
-              ? article.slug === WATERS_EDGE_SLUG
-                ? previewMembersBodyByMinutes(article.body_md, {
-                    minutes: WATERS_EDGE_PREVIEW_MINUTES,
-                    readingTimeMins: article.reading_time_mins,
-                  })
-                : previewMembersBody(article.body_md)
-              : article.body_md}
+            {article.body_md}
           </ReactMarkdown>
         </div>
 
-        {/* End mark — only when full essay is unlocked */}
-        {(article.access_level !== 'members' || canReadMembers) && (
+        {!bodyLocked && (
           <div className="text-center text-[var(--hw-gold)] text-lg mt-12">✦</div>
         )}
 
-        {/* Real paywall — locked members essays */}
-        {article.access_level === 'members' && !canReadMembers && (
+        {bodyLocked && (
           <div className="mt-10 border-t border-b border-[rgba(154,125,46,0.18)] py-12 text-center bg-[var(--hw-surface)]">
             <h3 className="font-serif text-3xl font-light text-[var(--hw-ink)] mb-3">
-              {article.slug === WATERS_EDGE_SLUG
+              {article.slug === 'relational-faith-the-mirror-at-the-waters-edge'
                 ? 'The preview ends here.'
                 : 'This essay continues for members.'}
             </h3>
             <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-8 max-w-md mx-auto">
-              {article.slug === WATERS_EDGE_SLUG
-                ? `You've reached about ${WATERS_EDGE_PREVIEW_MINUTES} minutes of reading. Log in and start a free trial for the full essay.`
+              {article.slug === 'relational-faith-the-mirror-at-the-waters-edge'
+                ? "You've reached about 3 minutes of reading. Log in and start a free trial for the full essay."
                 : 'Log in and start a free trial to read the full archive.'}
             </p>
             {checkoutError && (
@@ -272,7 +255,6 @@ export default function Article() {
           </div>
         )}
 
-        {/* App CTA */}
         <div className="mt-16 bg-[#0e0d0a] py-12 px-6 text-center">
           <p className="font-serif text-2xl font-light text-[#f0e9d8] mb-2">
             What is your climate right now?
@@ -288,7 +270,6 @@ export default function Article() {
         </div>
       </article>
 
-      {/* Free companion — keep open essays discoverable from members previews */}
       {freeCompanion && (
         <section className="max-w-[680px] mx-auto px-6 py-14 border-t border-[rgba(154,125,46,0.18)]">
           <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-sage)] mb-4">
@@ -310,7 +291,6 @@ export default function Article() {
         </section>
       )}
 
-      {/* Related essays */}
       {related.length > 0 && (
         <section className="max-w-4xl mx-auto px-6 py-16 border-t border-[rgba(154,125,46,0.18)]">
           <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-6">
@@ -341,7 +321,6 @@ export default function Article() {
         </section>
       )}
 
-      {/* Newsletter */}
       <section className="py-20 px-6 border-t border-[rgba(154,125,46,0.18)]">
         <NewsletterSignup source="article_footer" />
       </section>
