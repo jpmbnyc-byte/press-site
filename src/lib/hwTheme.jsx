@@ -18,7 +18,7 @@ function syncDocumentChrome(mode) {
   }
   iconLink.href = faviconHref;
 
-  const themeColor = mode === 'night' ? '#0e0d0a' : '#F7F4EE';
+  const themeColor = mode === 'night' ? '#000000' : '#F7F4EE';
   let themeMeta = document.querySelector('meta[name="theme-color"][data-hw-theme="true"]');
   if (!themeMeta) {
     themeMeta = document.createElement('meta');
