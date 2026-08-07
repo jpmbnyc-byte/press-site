@@ -6,14 +6,14 @@
 import { SITE_URL, absoluteUrl } from '@/lib/site';
 
 const DEFAULTS = {
-  title: 'Human Weather — The Emotional Climate of Modern Life',
+  title: 'Human Weather',
   description:
-    'A premium editorial platform on emotional climate, faith, bliss, diaspora, and the interior life. Philosophical personal essays by JP Bobo.',
-  ogTitle: 'Human Weather — Journaling the Climate Within and Around Us',
+    'Journaling the climate within and around us. Essays on emotional climate, faith, bliss, diaspora, and the interior life by JP Bobo.',
+  ogTitle: 'Human Weather',
   ogDescription:
-    'Essays on life, faith & culture. Reflections for a more aware life. Slow thought. Real connection.',
+    'Journaling the climate within and around us. Essays on life, faith & culture. Reflections for a more aware life.',
   image: `${SITE_URL}/og-share.jpg`,
-  imageAlt: 'Human Weather Press — journaling the climate within and around us',
+  imageAlt: 'Human Weather — journaling the climate within and around us',
   url: `${SITE_URL}/`,
   type: 'website',
 };
@@ -61,7 +61,7 @@ export function setPageMeta({
   setMeta('name', 'description', d);
 
   setMeta('property', 'og:type', type);
-  setMeta('property', 'og:site_name', 'Human Weather Press');
+  setMeta('property', 'og:site_name', 'Human Weather');
   setMeta('property', 'og:url', u);
   setMeta('property', 'og:title', ot);
   setMeta('property', 'og:description', od);

@@ -69,7 +69,7 @@ function essayShareHtml(article, slug) {
   <link rel="canonical" href="${e(url)}" />
 
   <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Human Weather Press" />
+  <meta property="og:site_name" content="Human Weather" />
   <meta property="og:url" content="${e(url)}" />
   <meta property="og:title" content="${e(title)}" />
   <meta property="og:description" content="${e(description)}" />
