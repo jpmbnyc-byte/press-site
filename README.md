@@ -33,6 +33,18 @@ This repo is a Vite SPA. Content stays on Base44 at `https://humanweather.base44
 2. Production env is in `.env.production`.
 3. Deploy. `vercel.json` rewrites `/api/*` → Base44 and SPA routes → `index.html`.
 
+### Google sign-in (Vercel + Base44)
+
+Base44 sets Google OAuth `state.domain` from the **Referer** of the login request. Starting Google from `www.humanweather.press` makes `domain=press`, and the callback fails with `Domain is not valid`.
+
+Login/Register hop to the Base44-hosted origin first:
+
+1. Press → `https://humanweather.base44.app/auth/bridge?start_google=1&next=<press destination>`
+2. Bridge starts Google with Referer = Base44 host (allowed)
+3. After Google, bridge forwards `access_token` back to the press site
+
+Publish this repo to **both** Vercel and the Base44-hosted app so `/auth/bridge` exists on `humanweather.base44.app` (Dashboard → Publish, or `npx base44 site deploy`).
+
 ## Membership closed loop (auth + Stripe + paywall + app)
 
 ### Flow

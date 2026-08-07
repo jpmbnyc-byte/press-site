@@ -8,6 +8,7 @@ import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { startCheckout } from "@/lib/stripeCheckout";
+import { startGoogleSignIn } from "@/lib/authRedirect";
 
 export default function Login() {
   const [params] = useSearchParams();
@@ -55,7 +56,13 @@ export default function Login() {
       : next.startsWith("/")
         ? next
         : "/account";
-    base44.auth.loginWithProvider("google", dest);
+    // Must start Google from the Base44-hosted origin (see authRedirect.js).
+    const start = startGoogleSignIn(dest);
+    if (start.mode === 'navigate') {
+      window.location.href = start.href;
+      return;
+    }
+    base44.auth.loginWithProvider("google", start.fromUrl);
   };
 
   return (

@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -22,9 +22,16 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Gospels from '@/pages/Gospels';
+import AuthBridge from '@/pages/AuthBridge';
 
 const AuthenticatedApp = () => {
+  const location = useLocation();
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
+
+  // OAuth bridge must not wait on auth boot — token forward needs to be immediate.
+  if (location.pathname === '/auth/bridge') {
+    return <AuthBridge />;
+  }
 
   // Brief boot state only — never redirect away from the public press site.
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -61,6 +68,7 @@ const AuthenticatedApp = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
+      <Route path="/auth/bridge" element={<AuthBridge />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

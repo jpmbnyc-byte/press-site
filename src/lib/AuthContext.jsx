@@ -2,6 +2,8 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import { SITE_URL } from '@/lib/site';
+import { isSafeReturnUrl } from '@/lib/authRedirect';
 
 const AuthContext = createContext();
 
@@ -58,6 +60,35 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
+
+      // Google OAuth must start on the Base44-hosted origin (Referer → state.domain).
+      // Handle hop + token forward here so it works even before route components mount.
+      if (typeof window !== 'undefined') {
+        const host = window.location.hostname;
+        const onBase44Host = host === 'humanweather.base44.app' || host.endsWith('.base44.app');
+        if (onBase44Host) {
+          const params = new URLSearchParams(window.location.search);
+          const next = params.get('next') || `${SITE_URL}/account`;
+          if (params.get('start_google') === '1' && isSafeReturnUrl(next)) {
+            const returnTo = new URL('/auth/bridge', window.location.origin);
+            returnTo.searchParams.set('next', next);
+            base44.auth.loginWithProvider('google', returnTo.toString());
+            return;
+          }
+          const token =
+            params.get('access_token') ||
+            (typeof window.localStorage !== 'undefined'
+              ? window.localStorage.getItem('base44_access_token') ||
+                window.localStorage.getItem('token')
+              : null);
+          if (token && params.get('next') && isSafeReturnUrl(next)) {
+            const dest = new URL(next);
+            dest.searchParams.set('access_token', token);
+            window.location.replace(dest.toString());
+            return;
+          }
+        }
+      }
 
       const publicApiBase = appParams.appBaseUrl
         ? `${String(appParams.appBaseUrl).replace(/\/$/, '')}/api/apps/public`
