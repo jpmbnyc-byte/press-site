@@ -37,11 +37,21 @@ This repo is a Vite SPA. Content stays on Base44 at `https://humanweather.base44
 
 ### Flow
 
-1. Reader **creates an account / logs in** (`/register`, `/login`).
-2. Chooses a plan on `/subscribe` → Base44 function `createCheckout` opens Stripe Checkout (7-day trial) with `client_reference_id = user.id` (requires backend functions capability).
-3. Stripe webhook → Base44 function `stripeWebhook` sets User membership fields.
+1. Reader chooses a plan on `/subscribe` (login optional but recommended to link membership).
+2. Checkout opens a **live Stripe Payment Link** (7-day trial). If Base44 `createCheckout` is available, a Checkout Session is used instead.
+3. Stripe webhook → Base44 function `stripeWebhook` sets User membership fields (requires backend functions capability).
 4. **Members essays** load via `fetchPressArticle()`: prefers `getPressArticle` when functions work; otherwise uses the public entity API and **client-gates** members `body_md` to a preview.
 5. **Member + App bundle** (`member_app_yearly`) also sets `app_access` + `app_unlock_token` for **humanweather.social**.
+
+### Live Payment Links
+
+| Plan | Amount | URL |
+|------|--------|-----|
+| Member monthly | $9/mo | https://buy.stripe.com/fZuaEYbbh4UabB94kt8N204 |
+| Member yearly | $72/yr | https://buy.stripe.com/cNi4gAdjpeuKgVt8AJ8N205 |
+| Member + App | $96/yr | https://buy.stripe.com/bJeeVe1AHfyO5cL18h8N206 |
+
+These are live-mode links on the Human Weather Stripe account. `startCheckout()` uses them when Base44 functions are blocked (`402`).
 
 ### Members body gating
 

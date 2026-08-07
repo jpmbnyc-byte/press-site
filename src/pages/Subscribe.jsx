@@ -64,12 +64,12 @@ export default function Subscribe() {
 
   useEffect(() => {
     const plan = params.get('plan');
-    if (plan && isAuthenticated) {
-      startCheckout(plan).catch((err) => {
-        setError(err.message || 'Checkout failed');
-      });
-    }
-  }, [params, isAuthenticated]);
+    if (!plan) return;
+    // Payment Links work logged-out; pass user when present for email / reference id.
+    startCheckout(plan, { user }).catch((err) => {
+      setError(err.message || 'Checkout failed');
+    });
+  }, [params, user]);
 
   useEffect(() => {
     refreshUser?.();
@@ -80,7 +80,7 @@ export default function Subscribe() {
     setError('');
     setLoadingPlan(planId);
     try {
-      await startCheckout(planId);
+      await startCheckout(planId, { user });
     } catch (err) {
       setError(err.message || 'Checkout failed. Please try again.');
       setLoadingPlan(null);
@@ -118,14 +118,15 @@ export default function Subscribe() {
         </p>
         {!isAuthenticated && (
           <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] mt-6">
+            Checkout is open —{' '}
             <Link to="/login?next=/subscribe" className="underline underline-offset-4">
-              Log in
+              log in
             </Link>
             {' '}or{' '}
             <Link to="/register?next=/subscribe" className="underline underline-offset-4">
               create an account
             </Link>
-            {' '}before checkout
+            {' '}to link membership to your press login
           </p>
         )}
       </div>

@@ -21,7 +21,13 @@ export default function Login() {
   const afterAuth = async () => {
     if (plan) {
       try {
-        await startCheckout(plan);
+        let user = null;
+        try {
+          user = await base44.auth.me();
+        } catch {
+          user = { email };
+        }
+        await startCheckout(plan, { user, email: user?.email || email });
         return;
       } catch {
         /* fall through to next */

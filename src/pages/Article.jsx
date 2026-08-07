@@ -29,7 +29,7 @@ export default function Article() {
     setCheckoutError('');
     setCheckoutPlan(planId);
     try {
-      await startCheckout(planId);
+      await startCheckout(planId, { user });
     } catch (err) {
       setCheckoutError(err.message || 'Checkout failed. Please try again.');
       setCheckoutPlan(null);
