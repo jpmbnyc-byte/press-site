@@ -37,13 +37,13 @@ This repo is a Vite SPA. Content stays on Base44 at `https://humanweather.base44
 
 Base44 sets Google OAuth `state.domain` from the **Referer** of the login request. Starting Google from `www.humanweather.press` makes `domain=press`, and the callback fails with `Domain is not valid`.
 
-Login/Register hop to the Base44-hosted origin first:
+**Workaround (Vercel-only, no Base44 publish required):**
 
-1. Press → `https://humanweather.base44.app/auth/bridge?start_google=1&next=<press destination>`
-2. Bridge starts Google with Referer = Base44 host (allowed)
-3. After Google, bridge forwards `access_token` back to the press site
+1. Continue with Google → `/auth/google-start.html?next=<press destination>`
+2. That page sends `Referrer-Policy: no-referrer`, then navigates to Base44 Google login
+3. Base44 falls back to `state.domain=https://app.base44.com` (allowed) and returns to the press `from_url` with `access_token`
 
-Publish this repo to **both** Vercel and the Base44-hosted app so `/auth/bridge` exists on `humanweather.base44.app` (Dashboard → Publish, or `npx base44 site deploy`).
+Optional: publishing the same build to `humanweather.base44.app` still enables the `/auth/bridge` path, but it is no longer required for Google sign-in on the press site.
 
 ## Membership closed loop (auth + Stripe + paywall + app)
 

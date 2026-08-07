@@ -23,14 +23,18 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Gospels from '@/pages/Gospels';
 import AuthBridge from '@/pages/AuthBridge';
+import AuthGoogleStart from '@/pages/AuthGoogleStart';
 
 const AuthenticatedApp = () => {
   const location = useLocation();
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
 
-  // OAuth bridge must not wait on auth boot — token forward needs to be immediate.
+  // OAuth hops must not wait on auth boot.
   if (location.pathname === '/auth/bridge') {
     return <AuthBridge />;
+  }
+  if (location.pathname === '/auth/google-start') {
+    return <AuthGoogleStart />;
   }
 
   // Brief boot state only — never redirect away from the public press site.
@@ -69,6 +73,7 @@ const AuthenticatedApp = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
       <Route path="/auth/bridge" element={<AuthBridge />} />
+      <Route path="/auth/google-start" element={<AuthGoogleStart />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

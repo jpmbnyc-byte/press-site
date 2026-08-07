@@ -1,4 +1,5 @@
 import { SITE_URL } from '@/lib/site';
+import { appParams } from '@/lib/app-params';
 
 /** Base44-hosted app origin — allowed for OAuth return callbacks. */
 export const BASE44_HOSTED_ORIGIN = 'https://humanweather.base44.app';
@@ -48,26 +49,25 @@ export function isSafeReturnUrl(value) {
 /**
  * Start Google OAuth in a way Base44 accepts.
  *
- * Base44 sets OAuth state.domain from the Referer of the login request.
- * Starting Google from www.humanweather.press makes domain=press and the
- * callback fails with "Domain is not valid". Navigate to the Base44-hosted
- * bridge first so Referer is humanweather.base44.app, then start Google there.
+ * Base44 sets OAuth state.domain from the Referer. The press origin is rejected
+ * ("Domain is not valid"). Workaround (no Base44 publish required):
+ * navigate to a same-origin noreferrer hop, then to Base44's Google login so
+ * domain falls back to app.base44.com.
  */
 export function startGoogleSignIn(destPath = '/account') {
   const finalReturn = pressReturnUrl(destPath);
   const origin = typeof window !== 'undefined' ? window.location.origin : SITE_URL;
 
-  // Already on Base44 hosting — start provider login directly.
+  // Already on Base44 hosting — start provider login directly (Referer is allowed).
   if (origin === BASE44_HOSTED_ORIGIN || origin.endsWith('.base44.app')) {
     const returnTo = new URL('/auth/bridge', origin);
     returnTo.searchParams.set('next', finalReturn);
-    // Dynamic import avoided — callers pass base44.auth
     return { mode: 'provider', fromUrl: returnTo.toString() };
   }
 
-  // External front (press / Vercel / localhost): hop to Base44 host first.
-  const starter = new URL('/auth/bridge', BASE44_HOSTED_ORIGIN);
-  starter.searchParams.set('start_google', '1');
-  starter.searchParams.set('next', finalReturn);
-  return { mode: 'navigate', href: starter.toString() };
+  // Prefer static HTML hop (always shipped with Vercel dist, no SPA boot).
+  const hop = new URL('/auth/google-start.html', origin);
+  hop.searchParams.set('next', finalReturn);
+  if (appParams.appId) hop.searchParams.set('app_id', appParams.appId);
+  return { mode: 'navigate', href: hop.toString() };
 }
