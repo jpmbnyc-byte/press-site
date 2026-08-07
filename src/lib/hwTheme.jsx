@@ -7,7 +7,8 @@ function syncDocumentChrome(mode) {
 
   document.documentElement.setAttribute('data-mode', mode);
 
-  const faviconHref = mode === 'night' ? '/favicon-night.png' : '/favicon-day.png';
+  // Versioned /icons/h-* paths — browsers cache favicons aggressively by URL.
+  const faviconHref = mode === 'night' ? '/icons/h-night-32.png' : '/icons/h-day-32.png';
   let iconLink = document.querySelector('link[rel="icon"][data-hw-theme="true"]');
   if (!iconLink) {
     iconLink = document.createElement('link');
@@ -16,7 +17,9 @@ function syncDocumentChrome(mode) {
     iconLink.setAttribute('data-hw-theme', 'true');
     document.head.appendChild(iconLink);
   }
-  iconLink.href = faviconHref;
+  if (iconLink.href !== new URL(faviconHref, window.location.origin).href) {
+    iconLink.href = faviconHref;
+  }
 
   const themeColor = mode === 'night' ? '#000000' : '#F7F4EE';
   let themeMeta = document.querySelector('meta[name="theme-color"][data-hw-theme="true"]');

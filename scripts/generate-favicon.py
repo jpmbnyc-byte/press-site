@@ -112,28 +112,62 @@ def save(img: Image.Image, name: str) -> None:
 
 
 def main() -> None:
-    save(make_icon(32, bg=WHITE, rounded=True, radius_ratio=0.22), "favicon-day.png")
-    save(make_icon(32, bg=BLACK, rounded=True, radius_ratio=0.22), "favicon-night.png")
-    save(make_icon(16, bg=WHITE, rounded=False), "favicon-16-day.png")
-    save(make_icon(16, bg=BLACK, rounded=False), "favicon-16-night.png")
+    icons = PUBLIC / "icons"
+    icons.mkdir(parents=True, exist_ok=True)
 
-    save(make_icon(32, bg=WHITE, rounded=True, radius_ratio=0.22), "icon-light-32x32.png")
-    save(make_icon(32, bg=BLACK, rounded=True, radius_ratio=0.22), "icon-dark-32x32.png")
+    # Canonical cache-busted paths under /icons/
+    pairs = [
+        ("icons/h-day-32.png", make_icon(32, bg=WHITE, rounded=True, radius_ratio=0.22)),
+        ("icons/h-night-32.png", make_icon(32, bg=BLACK, rounded=True, radius_ratio=0.22)),
+        ("icons/h-day-16.png", make_icon(16, bg=WHITE, rounded=False)),
+        ("icons/h-night-16.png", make_icon(16, bg=BLACK, rounded=False)),
+        (
+            "icons/h-apple-180.png",
+            make_icon(180, bg=BLACK, rounded=True, radius_ratio=0.223, inset=0.20, pixel=False),
+        ),
+        (
+            "icons/h-192.png",
+            make_icon(192, bg=BLACK, rounded=True, radius_ratio=0.22, inset=0.20, pixel=False),
+        ),
+        (
+            "icons/h-512.png",
+            make_icon(512, bg=BLACK, rounded=True, radius_ratio=0.22, inset=0.20, pixel=False),
+        ),
+        (
+            "icons/h-192-light.png",
+            make_icon(192, bg=WHITE, rounded=True, radius_ratio=0.22, inset=0.20, pixel=False),
+        ),
+        (
+            "icons/h-512-light.png",
+            make_icon(512, bg=WHITE, rounded=True, radius_ratio=0.22, inset=0.20, pixel=False),
+        ),
+    ]
+    for name, img in pairs:
+        save(img, name)
 
-    save(
-        make_icon(180, bg=BLACK, rounded=True, radius_ratio=0.223, inset=0.20, pixel=False),
-        "apple-icon.png",
-    )
-    save(make_icon(192, bg=BLACK, rounded=True, radius_ratio=0.22, inset=0.20, pixel=False), "icon-192.png")
-    save(make_icon(512, bg=BLACK, rounded=True, radius_ratio=0.22, inset=0.20, pixel=False), "icon-512.png")
-    save(
-        make_icon(192, bg=WHITE, rounded=True, radius_ratio=0.22, inset=0.20, pixel=False),
-        "icon-192-light.png",
-    )
-    save(
-        make_icon(512, bg=WHITE, rounded=True, radius_ratio=0.22, inset=0.20, pixel=False),
-        "icon-512-light.png",
-    )
+    # Root aliases + real favicon.ico (prevents SPA rewrite of /favicon.ico → index.html)
+    aliases = {
+        "favicon-day.png": "icons/h-day-32.png",
+        "favicon-night.png": "icons/h-night-32.png",
+        "favicon-16-day.png": "icons/h-day-16.png",
+        "favicon-16-night.png": "icons/h-night-16.png",
+        "apple-icon.png": "icons/h-apple-180.png",
+        "icon-192.png": "icons/h-192.png",
+        "icon-512.png": "icons/h-512.png",
+        "icon-192-light.png": "icons/h-192-light.png",
+        "icon-512-light.png": "icons/h-512-light.png",
+        "icon-light-32x32.png": "icons/h-day-32.png",
+        "icon-dark-32x32.png": "icons/h-night-32.png",
+    }
+    for dest, src in aliases.items():
+        data = (PUBLIC / src).read_bytes()
+        (PUBLIC / dest).write_bytes(data)
+        print(f"wrote public/{dest} (alias)")
+
+    i16 = make_icon(16, bg=BLACK, rounded=False).convert("RGBA")
+    i32 = make_icon(32, bg=BLACK, rounded=True, radius_ratio=0.22).convert("RGBA")
+    i32.save(PUBLIC / "favicon.ico", format="ICO", sizes=[(32, 32), (16, 16)], append_images=[i16])
+    print("wrote public/favicon.ico")
 
 
 if __name__ == "__main__":
