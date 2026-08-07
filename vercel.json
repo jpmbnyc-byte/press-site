@@ -55,6 +55,19 @@
           "value": "no-store"
         }
       ]
+    },
+    {
+      "source": "/auth/google-start",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     }
   ]
 }

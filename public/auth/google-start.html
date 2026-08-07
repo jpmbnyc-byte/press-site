@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Critical: Base44 binds OAuth state.domain to Referer. Suppress it. -->
+    <!--
+      Critical: Base44 binds OAuth state.domain to Referer.
+      Press origin (humanweather.press) is rejected with "Domain is not valid".
+      Strip Referer so Base44 falls back to https://app.base44.com (allowed).
+    -->
     <meta name="referrer" content="no-referrer" />
     <title>Continuing to Google…</title>
     <style>
@@ -46,6 +50,12 @@
         font-size: 14px;
         line-height: 1.5;
       }
+      a.retry {
+        color: #c4a84a;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
     </style>
   </head>
   <body>
@@ -75,30 +85,83 @@
           }
         }
 
+        function fail(msg) {
+          var status = document.getElementById('status');
+          status.className = 'err';
+          status.textContent = msg;
+          var a = document.createElement('a');
+          a.className = 'retry';
+          a.href = '/login';
+          a.textContent = 'Back to log in';
+          document.body.appendChild(a);
+        }
+
         var params = new URLSearchParams(window.location.search);
         var next = params.get('next') || DEFAULT_NEXT;
         var appId = params.get('app_id') || DEFAULT_APP_ID;
-        var status = document.getElementById('status');
+        var popupOrigin = params.get('popup_origin') || '';
 
         if (!isSafeNext(next)) {
-          status.className = 'err';
-          status.textContent = 'Invalid return URL.';
+          fail('Invalid return URL.');
           return;
         }
+        if (popupOrigin) {
+          try {
+            var po = new URL(popupOrigin);
+            if (!ALLOWED_HOSTS[po.hostname] && po.hostname.slice(-11) !== '.base44.app') {
+              fail('Invalid popup origin.');
+              return;
+            }
+          } catch (e) {
+            fail('Invalid popup origin.');
+            return;
+          }
+        }
 
-        var login =
-          'https://humanweather.base44.app/api/apps/auth/login?app_id=' +
-          encodeURIComponent(appId) +
-          '&from_url=' +
-          encodeURIComponent(next);
+        // Hit app.base44.com directly (skip humanweather.base44.app → 307).
+        // A redirect hop can re-attach Referer in some browsers and recreate Domain is not valid.
+        var action = 'https://app.base44.com/api/apps/auth/login';
 
-        // Anchor + noreferrer avoids sending the press origin as Referer.
-        var a = document.createElement('a');
-        a.href = login;
-        a.rel = 'noreferrer noopener';
-        a.referrerPolicy = 'no-referrer';
-        document.body.appendChild(a);
-        a.click();
+        var form = document.createElement('form');
+        form.method = 'GET';
+        form.action = action;
+        form.setAttribute('referrerpolicy', 'no-referrer');
+        form.referrerPolicy = 'no-referrer';
+
+        function add(name, value) {
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.value = value;
+          form.appendChild(input);
+        }
+
+        add('app_id', appId);
+        add('from_url', next);
+        if (popupOrigin) add('popup_origin', popupOrigin);
+
+        document.body.appendChild(form);
+
+        // Meta referrer is already no-referrer; brief delay helps some WebKit builds apply it.
+        setTimeout(function () {
+          try {
+            form.submit();
+          } catch (err) {
+            // Last resort: noreferrer anchor
+            var a = document.createElement('a');
+            a.href =
+              action +
+              '?app_id=' +
+              encodeURIComponent(appId) +
+              '&from_url=' +
+              encodeURIComponent(next) +
+              (popupOrigin ? '&popup_origin=' + encodeURIComponent(popupOrigin) : '');
+            a.rel = 'noreferrer noopener';
+            a.referrerPolicy = 'no-referrer';
+            document.body.appendChild(a);
+            a.click();
+          }
+        }, 30);
       })();
     </script>
   </body>

@@ -51,21 +51,24 @@ export function isSafeReturnUrl(value) {
  *
  * Base44 sets OAuth state.domain from the Referer. The press origin is rejected
  * ("Domain is not valid"). Workaround (no Base44 publish required):
- * navigate to a same-origin noreferrer hop, then to Base44's Google login so
- * domain falls back to app.base44.com.
+ * navigate to a same-origin noreferrer hop, which form-submits to
+ * app.base44.com/api/apps/auth/login with referrerpolicy=no-referrer so
+ * domain falls back to https://app.base44.com (allowed).
  */
 export function startGoogleSignIn(destPath = '/account') {
   const finalReturn = pressReturnUrl(destPath);
   const origin = typeof window !== 'undefined' ? window.location.origin : SITE_URL;
 
   // Already on Base44 hosting — start provider login directly (Referer is allowed).
+  // Return through /auth/bridge so the token can be forwarded to the press site.
   if (origin === BASE44_HOSTED_ORIGIN || origin.endsWith('.base44.app')) {
     const returnTo = new URL('/auth/bridge', origin);
     returnTo.searchParams.set('next', finalReturn);
     return { mode: 'provider', fromUrl: returnTo.toString() };
   }
 
-  // Prefer static HTML hop (always shipped with Vercel dist, no SPA boot).
+  // Static HTML hop (always in Vercel dist). Uses form referrerpolicy=no-referrer
+  // and targets app.base44.com directly (avoids a 307 that can re-attach Referer).
   const hop = new URL('/auth/google-start.html', origin);
   hop.searchParams.set('next', finalReturn);
   if (appParams.appId) hop.searchParams.set('app_id', appParams.appId);

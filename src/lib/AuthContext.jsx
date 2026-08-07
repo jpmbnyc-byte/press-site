@@ -4,20 +4,16 @@ import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { SITE_URL } from '@/lib/site';
 import { isSafeReturnUrl } from '@/lib/authRedirect';
+import {
+  clearStoredAuthTokens,
+  hasStoredAuthToken,
+  storeAuthToken,
+  buildAuthPath,
+} from '@/lib/authSession';
 
 const AuthContext = createContext();
 
 const PUBLIC_SETTINGS_TIMEOUT_MS = 8000;
-
-function clearStoredAuthTokens() {
-  if (typeof window === 'undefined' || !window.localStorage) return;
-  try {
-    window.localStorage.removeItem('base44_access_token');
-    window.localStorage.removeItem('token');
-  } catch {
-    /* ignore */
-  }
-}
 
 function withTimeout(promise, ms, label = 'Request timed out') {
   return new Promise((resolve, reject) => {
@@ -30,7 +26,7 @@ function withTimeout(promise, ms, label = 'Request timed out') {
       (err) => {
         clearTimeout(timer);
         reject(err);
-      }
+      },
     );
   });
 }
@@ -61,8 +57,8 @@ export const AuthProvider = ({ children }) => {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
 
-      // Google OAuth must start on the Base44-hosted origin (Referer → state.domain).
-      // Handle hop + token forward here so it works even before route components mount.
+      // Base44-hosted OAuth bridge: only forward a token present in the URL
+      // (never a stale localStorage session — that breaks alternate accounts).
       if (typeof window !== 'undefined') {
         const host = window.location.hostname;
         const onBase44Host = host === 'humanweather.base44.app' || host.endsWith('.base44.app');
@@ -75,15 +71,10 @@ export const AuthProvider = ({ children }) => {
             base44.auth.loginWithProvider('google', returnTo.toString());
             return;
           }
-          const token =
-            params.get('access_token') ||
-            (typeof window.localStorage !== 'undefined'
-              ? window.localStorage.getItem('base44_access_token') ||
-                window.localStorage.getItem('token')
-              : null);
-          if (token && params.get('next') && isSafeReturnUrl(next)) {
+          const urlToken = params.get('access_token');
+          if (urlToken && params.get('next') && isSafeReturnUrl(next)) {
             const dest = new URL(next);
-            dest.searchParams.set('access_token', token);
+            dest.searchParams.set('access_token', urlToken);
             window.location.replace(dest.toString());
             return;
           }
@@ -107,28 +98,23 @@ export const AuthProvider = ({ children }) => {
         const publicSettings = await withTimeout(
           appClient.get(`/prod/public-settings/by-id/${appParams.appId}`),
           PUBLIC_SETTINGS_TIMEOUT_MS,
-          'Public settings timed out'
+          'Public settings timed out',
         );
         setAppPublicSettings(publicSettings);
-
-        // Optional login — journal stays public; members content gates separately.
         await checkUserAuth({ clearOnFailure: true });
         setIsLoadingPublicSettings(false);
       } catch (appError) {
         console.error('App state check failed:', appError);
-
-        // Public press site: never redirect into Base44 login from Vercel.
-        // Clear bad tokens and continue rendering the journal.
-        clearStoredAuthTokens();
+        // Do not wipe a valid session when public-settings alone fails.
         setAuthError({
           type: 'unknown',
           message: appError.message || 'Failed to load app settings',
         });
-        finishAnonymous();
+        await checkUserAuth({ clearOnFailure: false });
+        setIsLoadingPublicSettings(false);
       }
     } catch (error) {
       console.error('Unexpected error:', error);
-      clearStoredAuthTokens();
       setAuthError({
         type: 'unknown',
         message: error.message || 'An unexpected error occurred',
@@ -140,10 +126,17 @@ export const AuthProvider = ({ children }) => {
   const checkUserAuth = async ({ clearOnFailure = true } = {}) => {
     try {
       setIsLoadingAuth(true);
+      if (!hasStoredAuthToken() && !appParams.token) {
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsLoadingAuth(false);
+        setAuthChecked(true);
+        return;
+      }
       const currentUser = await withTimeout(
         base44.auth.me(),
         PUBLIC_SETTINGS_TIMEOUT_MS,
-        'Auth check timed out'
+        'Auth check timed out',
       );
       setUser(currentUser);
       setIsAuthenticated(true);
@@ -153,9 +146,8 @@ export const AuthProvider = ({ children }) => {
       console.error('User auth check failed:', error);
       if (clearOnFailure) {
         clearStoredAuthTokens();
+        if (typeof window !== 'undefined') window.__hw_auth_cleared = true;
       }
-      // Do not set auth_required — that previously triggered an infinite
-      // login redirect loop and a blank page on Vercel.
       setUser(null);
       setIsAuthenticated(false);
       setIsLoadingAuth(false);
@@ -163,29 +155,64 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = (shouldRedirect = false) => {
-    setUser(null);
-    setIsAuthenticated(false);
-    clearStoredAuthTokens();
-
-    if (shouldRedirect) {
-      base44.auth.logout(window.location.href);
+  const login = (nextUser, token) => {
+    if (token) storeAuthToken(token);
+    if (nextUser) {
+      setUser(nextUser);
+      setIsAuthenticated(true);
+      setIsLoadingAuth(false);
+      setAuthChecked(true);
     }
   };
 
+  /**
+   * @param {object|boolean} [opts]
+   * @param {boolean} [opts.serverLogout] — also clear Base44 cookies (needed to switch Google accounts)
+   * @param {string} [opts.next] — path to return to after logging in again
+   */
+  const logout = (opts = {}) => {
+    const options = typeof opts === 'boolean' ? { serverLogout: opts } : opts || {};
+    const next = options.next || '/account';
+
+    setUser(null);
+    setIsAuthenticated(false);
+    clearStoredAuthTokens();
+    if (typeof window !== 'undefined') window.__hw_auth_cleared = true;
+
+    const loginPath = buildAuthPath('login', { next });
+    const loginUrl = `${SITE_URL}${loginPath}`;
+
+    if (options.serverLogout) {
+      // Full Base44 logout clears HTTP-only cookies so Google can pick another account.
+      base44.auth.logout(loginUrl);
+      return;
+    }
+
+    // Full reload so the SDK re-inits without a Bearer token in memory.
+    window.location.replace(loginPath);
+  };
+
   const navigateToLogin = (nextPath) => {
-    // Stay on this origin — never bounce to Base44 hosted /login.
     const next = nextPath || `${window.location.pathname}${window.location.search}`;
-    window.location.href = `/login?next=${encodeURIComponent(next)}`;
+    window.location.href = buildAuthPath('login', { next });
   };
 
   const refreshUser = async () => {
+    if (!hasStoredAuthToken() && !appParams.token) {
+      setUser(null);
+      setIsAuthenticated(false);
+      return null;
+    }
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       setIsAuthenticated(true);
       return currentUser;
     } catch {
+      setUser(null);
+      setIsAuthenticated(false);
+      clearStoredAuthTokens();
+      if (typeof window !== 'undefined') window.__hw_auth_cleared = true;
       return null;
     }
   };
@@ -200,6 +227,7 @@ export const AuthProvider = ({ children }) => {
         authError,
         appPublicSettings,
         authChecked,
+        login,
         logout,
         navigateToLogin,
         checkUserAuth,

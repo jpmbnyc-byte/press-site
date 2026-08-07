@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { startCheckout, openBillingPortal } from '@/lib/stripeCheckout';
 import { useAuth } from '@/lib/AuthContext';
 import { getAppUnlockUrl, hasAppAccess, hasPressAccess } from '@/lib/membership';
+import { buildAuthPath } from '@/lib/authSession';
 
 const tiers = [
   {
@@ -119,11 +120,23 @@ export default function Subscribe() {
         {!isAuthenticated && (
           <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] mt-6">
             Checkout is open —{' '}
-            <Link to="/login?next=/subscribe" className="underline underline-offset-4">
+            <Link
+              to={buildAuthPath('login', {
+                next: '/subscribe',
+                plan: params.get('plan') || undefined,
+              })}
+              className="underline underline-offset-4"
+            >
               log in
             </Link>
             {' '}or{' '}
-            <Link to="/register?next=/subscribe" className="underline underline-offset-4">
+            <Link
+              to={buildAuthPath('register', {
+                next: '/subscribe',
+                plan: params.get('plan') || undefined,
+              })}
+              className="underline underline-offset-4"
+            >
               create an account
             </Link>
             {' '}to link membership to your press login

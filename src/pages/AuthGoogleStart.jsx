@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { appParams } from '@/lib/app-params';
 import { SITE_URL } from '@/lib/site';
 import { isSafeReturnUrl } from '@/lib/authRedirect';
 
 /**
- * Vercel-only Google OAuth hop.
- *
- * Base44 sets state.domain from Referer. Starting Google from the press origin
- * yields Domain is not valid. This page sets referrer=no-referrer, then navigates
- * to Base44's Google login so domain falls back to app.base44.com (allowed).
- * Does not require a Base44 site publish.
+ * SPA fallback for /auth/google-start (prefer static google-start.html).
+ * Strips Referer so Base44 OAuth state.domain falls back to app.base44.com.
  */
 export default function AuthGoogleStart() {
   const [params] = useSearchParams();
@@ -22,6 +18,15 @@ export default function AuthGoogleStart() {
     meta.content = 'no-referrer';
     document.head.appendChild(meta);
 
+    // Also set document policy when supported
+    try {
+      if (document.head && !document.querySelector('meta[name="referrer"][content="no-referrer"]')) {
+        /* already added */
+      }
+    } catch {
+      /* ignore */
+    }
+
     const next = params.get('next') || `${SITE_URL}/account`;
     if (!isSafeReturnUrl(next)) {
       setError('Invalid return URL.');
@@ -29,29 +34,58 @@ export default function AuthGoogleStart() {
     }
 
     const appId = appParams.appId || '6a57ce138c2f29923fec6bc4';
-    const login =
-      `https://humanweather.base44.app/api/apps/auth/login?app_id=${encodeURIComponent(appId)}` +
-      `&from_url=${encodeURIComponent(next)}`;
+    const popupOrigin = params.get('popup_origin') || '';
 
-    const a = document.createElement('a');
-    a.href = login;
-    a.rel = 'noreferrer noopener';
-    a.referrerPolicy = 'no-referrer';
-    document.body.appendChild(a);
-    a.click();
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = 'https://app.base44.com/api/apps/auth/login';
+    form.setAttribute('referrerpolicy', 'no-referrer');
+    form.referrerPolicy = 'no-referrer';
+
+    const add = (name, value) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    };
+
+    add('app_id', appId);
+    add('from_url', next);
+    if (popupOrigin) add('popup_origin', popupOrigin);
+
+    document.body.appendChild(form);
+    const t = window.setTimeout(() => {
+      try {
+        form.submit();
+      } catch {
+        setError('Could not start Google sign-in.');
+      }
+    }, 30);
 
     return () => {
+      window.clearTimeout(t);
       meta.remove();
-      a.remove();
+      form.remove();
     };
   }, [params]);
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0e0d0a] gap-4 px-6 text-center">
-      <div className="w-8 h-8 border-2 border-[#c4a84a] border-t-transparent animate-spin" />
+      {!error ? (
+        <div className="w-8 h-8 border-2 border-[#c4a84a] border-t-transparent animate-spin" />
+      ) : null}
       <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a]/70">
         {error || 'Continuing to Google…'}
       </div>
+      {error ? (
+        <Link
+          to="/login"
+          className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] underline underline-offset-4"
+        >
+          Back to log in
+        </Link>
+      ) : null}
     </div>
   );
 }
