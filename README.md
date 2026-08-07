@@ -40,10 +40,10 @@ Base44 sets Google OAuth `state.domain` from the **Referer** of the login reques
 **Workaround (Vercel-only, no Base44 publish required):**
 
 1. Continue with Google → `/auth/google-start.html?next=<press destination>`
-2. That page sends `Referrer-Policy: no-referrer`, then navigates to Base44 Google login
+2. That page sets `Referrer-Policy: no-referrer` and **form-submits** (not a plain link) to `https://app.base44.com/api/apps/auth/login` — skipping the `humanweather.base44.app` 307 that can re-attach a press Referer in some browsers
 3. Base44 falls back to `state.domain=https://app.base44.com` (allowed) and returns to the press `from_url` with `access_token`
 
-Optional: publishing the same build to `humanweather.base44.app` still enables the `/auth/bridge` path, but it is no longer required for Google sign-in on the press site.
+If you still see `Domain is not valid`, hard-refresh `/login` (cached JS) and confirm the network hop goes to `app.base44.com` with no `Referer`. Optional: `npx base44 site deploy --build` publishes `/auth/bridge` on `humanweather.base44.app` as a second return path.
 
 ## Membership closed loop (auth + Stripe + paywall + app)
 
