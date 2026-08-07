@@ -39,3 +39,4 @@ scripts/.vercel-stripe-env.txt
 
 .agents/
 skills-lock.json
+scripts/__pycache__/
