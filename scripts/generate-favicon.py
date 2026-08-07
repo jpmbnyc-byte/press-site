@@ -169,6 +169,19 @@ def main() -> None:
     i32.save(PUBLIC / "favicon.ico", format="ICO", sizes=[(32, 32), (16, 16)], append_images=[i16])
     print("wrote public/favicon.ico")
 
+    # iOS Safari probes these root filenames (must be real PNGs, not SPA HTML)
+    for name, size in [
+        ("apple-touch-icon.png", 180),
+        ("apple-touch-icon-precomposed.png", 180),
+        ("apple-touch-icon-180x180.png", 180),
+        ("apple-touch-icon-167x167.png", 167),
+        ("apple-touch-icon-152x152.png", 152),
+    ]:
+        make_icon(
+            size, bg=BLACK, rounded=True, radius_ratio=0.223, inset=0.20, pixel=False
+        ).save(PUBLIC / name, format="PNG", optimize=True)
+        print(f"wrote public/{name}")
+
 
 if __name__ == "__main__":
     main()
