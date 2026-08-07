@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import AuthorPortrait from '@/components/AuthorPortrait';
+import EssayShareLinks from '@/components/EssayShareLinks';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import { startCheckout } from '@/lib/stripeCheckout';
 import { useAuth } from '@/lib/AuthContext';
@@ -195,6 +196,10 @@ export default function Article() {
 
         {!bodyLocked && (
           <div className="text-center text-[var(--hw-gold)] text-lg mt-12">✦</div>
+        )}
+
+        {article.access_level === 'free' && !bodyLocked && (
+          <EssayShareLinks article={article} />
         )}
 
         {bodyLocked && (

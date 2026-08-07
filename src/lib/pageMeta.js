@@ -72,6 +72,7 @@ export function setPageMeta({
   setMeta('name', 'twitter:title', ot);
   setMeta('name', 'twitter:description', od);
   setMeta('name', 'twitter:image', img);
+  setMeta('name', 'twitter:image:alt', alt);
 
   setCanonical(u);
 }

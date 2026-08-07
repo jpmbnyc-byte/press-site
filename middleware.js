@@ -67,6 +67,8 @@ function essayShareHtml(article, slug) {
   <title>${e(title)}</title>
   <meta name="description" content="${e(description)}" />
   <link rel="canonical" href="${e(url)}" />
+  <link rel="icon" type="image/svg+xml" href="${SITE}/favicon.svg" />
+  <link rel="apple-touch-icon" href="${SITE}/apple-icon.png" />
 
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Human Weather Press" />
@@ -80,6 +82,7 @@ function essayShareHtml(article, slug) {
   <meta name="twitter:title" content="${e(title)}" />
   <meta name="twitter:description" content="${e(description)}" />
   <meta name="twitter:image" content="${e(image)}" />
+  <meta name="twitter:image:alt" content="${e(imageAlt)}" />
 </head>
 <body>
   <article>

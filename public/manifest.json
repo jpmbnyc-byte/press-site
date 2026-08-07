@@ -5,25 +5,39 @@
   "icons": [
     {
       "src": "/favicon-day.png",
-      "sizes": "1024x1024",
+      "sizes": "32x32",
       "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "/favicon-night.png",
-      "sizes": "1024x1024",
+      "sizes": "32x32",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-light-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-dark-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/favicon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
       "src": "/apple-icon.png",
       "sizes": "180x180",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "start_url": "/",

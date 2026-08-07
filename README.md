@@ -33,6 +33,13 @@ This repo is a Vite SPA. Content stays on Base44 at `https://humanweather.base44
 2. Production env is in `.env.production`.
 3. Deploy. `vercel.json` rewrites `/api/*` → Base44 and SPA routes → `index.html`.
 
+## Favicon & social share
+
+- **Favicon:** day/night PNGs + SVG in `public/` (`favicon.svg`, `favicon-day.png`, `favicon-night.png`, `apple-icon.png`). Wired in `index.html` and theme-swapped in `src/lib/hwTheme.jsx`.
+- **Default OG image:** `public/og-share.jpg` (1200×630) — home defaults in `index.html`.
+- **Essay OG for crawlers:** Vercel Edge `middleware.js` serves essay-specific Open Graph HTML for bots on `/journal/:slug`. Browsers get client meta via `src/lib/pageMeta.js`.
+- **Share links:** free essays show Copy / X / LinkedIn / Facebook / Email (plus native Share when available) via `EssayShareLinks` on the article page.
+
 ## Membership closed loop (auth + Stripe + paywall + app)
 
 ### Flow
