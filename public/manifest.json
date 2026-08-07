@@ -4,42 +4,42 @@
   "description": "Journaling the climate within and around us. Essays on life, faith & culture.",
   "icons": [
     {
-      "src": "/favicon-day.png",
+      "src": "/icons/h-day-32.png",
       "sizes": "32x32",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192-light.png",
+      "src": "/icons/h-192-light.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512-light.png",
+      "src": "/icons/h-512-light.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192.png",
+      "src": "/icons/h-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icons/h-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/favicon.svg",
+      "src": "/icons/h.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     },
     {
-      "src": "/apple-icon.png",
+      "src": "/icons/h-apple-180.png",
       "sizes": "180x180",
       "type": "image/png"
     }

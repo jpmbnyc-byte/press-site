@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Human Weather">
+  <!-- 8-bar H — IBM-inspired; gold #F1C14D. unit=2 → 8 bars + 7 gaps = 30, pad=1 -->
+  <style>
+    .bg { fill: #FFFFFF; }
+    .bar { fill: #F1C14D; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #000000; }
+    }
+  </style>
+  <rect class="bg" width="32" height="32" rx="7"/>
+  <g class="bar">
+    <!-- bars 0–2: pillars -->
+    <rect x="1" y="1" width="8" height="2"/>
+    <rect x="23" y="1" width="8" height="2"/>
+    <rect x="1" y="5" width="8" height="2"/>
+    <rect x="23" y="5" width="8" height="2"/>
+    <rect x="1" y="9" width="8" height="2"/>
+    <rect x="23" y="9" width="8" height="2"/>
+    <!-- bars 3–4: crossbar bridge -->
+    <rect x="1" y="13" width="30" height="2"/>
+    <rect x="1" y="17" width="30" height="2"/>
+    <!-- bars 5–7: pillars -->
+    <rect x="1" y="21" width="8" height="2"/>
+    <rect x="23" y="21" width="8" height="2"/>
+    <rect x="1" y="25" width="8" height="2"/>
+    <rect x="23" y="25" width="8" height="2"/>
+    <rect x="1" y="29" width="8" height="2"/>
+    <rect x="23" y="29" width="8" height="2"/>
+  </g>
+</svg>
