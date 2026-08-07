@@ -1,161 +1,178 @@
-import React, { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
-import AuthLayout from "@/components/AuthLayout";
-import GoogleIcon from "@/components/GoogleIcon";
-import { startCheckout } from "@/lib/stripeCheckout";
-import { startGoogleSignIn } from "@/lib/authRedirect";
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { loginWithEmailPassword, buildAuthPath, safeNextPath } from '@/lib/authSession';
+import { startGoogleSignIn } from '@/lib/authRedirect';
+import { startCheckout } from '@/lib/stripeCheckout';
+import AuthLayout from '@/components/AuthLayout';
+import { Loader2 } from 'lucide-react';
 
 export default function Login() {
-  const [params] = useSearchParams();
-  const next = params.get("next") || "/account";
-  const plan = params.get("plan");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { isAuthenticated, isLoadingAuth, login } = useAuth();
+  const next = safeNextPath(searchParams.get('next'));
+  const plan = searchParams.get('plan');
 
-  const afterAuth = async () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Log in — HUMAN Weather.';
+  }, []);
+
+  if (!isLoadingAuth && isAuthenticated) {
+    if (plan) {
+      // Let after-auth checkout run only from submit/Google; already-authed → subscribe.
+      return <Navigate to={`/subscribe?plan=${encodeURIComponent(plan)}`} replace />;
+    }
+    return <Navigate to={next} replace />;
+  }
+
+  const afterAuth = async (user, fallbackEmail) => {
     if (plan) {
       try {
-        let user = null;
-        try {
-          user = await base44.auth.me();
-        } catch {
-          user = { email };
-        }
-        await startCheckout(plan, { user, email: user?.email || email });
+        await startCheckout(plan, {
+          user: user || { email: fallbackEmail },
+          email: user?.email || fallbackEmail,
+        });
         return;
       } catch {
         /* fall through to next */
       }
     }
-    window.location.href = next.startsWith("/") ? next : "/account";
+    navigate(next, { replace: true });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setLoading(true);
     try {
-      await base44.auth.loginViaEmailPassword(email, password);
-      await afterAuth();
+      const { access_token, user } = await loginWithEmailPassword(email, password);
+      login(user, access_token);
+      await afterAuth(user, email);
     } catch (err) {
-      setError(err.message || "Invalid email or password");
+      setError(err?.message || 'Could not log in. Check your email and password.');
       setLoading(false);
     }
   };
 
   const handleGoogle = () => {
+    setError('');
+    setGoogleBusy(true);
     const dest = plan
       ? `/subscribe?plan=${encodeURIComponent(plan)}`
-      : next.startsWith("/")
-        ? next
-        : "/account";
-    // Must start Google from the Base44-hosted origin (see authRedirect.js).
+      : next;
     const start = startGoogleSignIn(dest);
     if (start.mode === 'navigate') {
       window.location.href = start.href;
       return;
     }
-    base44.auth.loginWithProvider("google", start.fromUrl);
+    try {
+      base44.auth.loginWithProvider('google', start.fromUrl);
+    } catch {
+      setGoogleBusy(false);
+      setError('Could not start Google sign-in. Please try again.');
+    }
   };
 
   return (
     <AuthLayout
-      icon={LogIn}
       title="Welcome back"
-      subtitle="Log in to your account"
-      footer={
-        <>
-          Don't have an account?{" "}
-          <Link
-            to={`/register?next=${encodeURIComponent(next)}${plan ? `&plan=${encodeURIComponent(plan)}` : ""}`}
-            className="text-primary font-medium hover:underline"
-          >
-            Create one
-          </Link>
-        </>
-      }
+      subtitle="Log in to read members essays and manage your subscription."
     >
-      <Button
-        variant="outline"
-        className="w-full h-12 text-sm font-medium mb-6"
-        onClick={handleGoogle}
-      >
-        <GoogleIcon className="w-5 h-5 mr-2" />
-        Continue with Google
-      </Button>
+      {error ? (
+        <p
+          className="mb-4 border border-[rgba(196,98,58,0.35)] bg-[rgba(196,98,58,0.08)] px-3 py-2 font-serif text-sm text-[var(--hw-rust)]"
+          role="alert"
+        >
+          {error}
+        </p>
+      ) : null}
 
-      <div className="relative mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-3 text-muted-foreground">or</span>
-        </div>
+      <button
+        type="button"
+        onClick={handleGoogle}
+        disabled={loading || googleBusy}
+        className="mb-5 flex w-full items-center justify-center gap-2 border border-[rgba(154,125,46,0.35)] bg-[var(--hw-surface)] px-4 py-2.5 font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--hw-ink)] transition hover:border-[var(--hw-gold)] disabled:opacity-60"
+      >
+        {googleBusy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
+        Continue with Google
+      </button>
+
+      <div className="mb-5 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--hw-ink3)]">
+        <span className="h-px flex-1 bg-[rgba(154,125,46,0.25)]" />
+        or email
+        <span className="h-px flex-1 bg-[rgba(154,125,46,0.25)]" />
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-          {error}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              autoFocus
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
+        <label className="block">
+          <span className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--hw-ink3)]">
+            Email
+          </span>
+          <input
+            type="email"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border border-[rgba(154,125,46,0.3)] bg-[var(--hw-bg)] px-3 py-2.5 font-serif text-sm text-[var(--hw-ink)] outline-none focus:border-[var(--hw-gold)]"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--hw-ink3)]">
+            Password
+          </span>
+          <input
+            type="password"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border border-[rgba(154,125,46,0.3)] bg-[var(--hw-bg)] px-3 py-2.5 font-serif text-sm text-[var(--hw-ink)] outline-none focus:border-[var(--hw-gold)]"
+          />
+        </label>
+        <div className="flex justify-end">
+          <Link
+            to={buildAuthPath('/forgot-password', { next, plan })}
+            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[var(--hw-ink3)] underline-offset-2 hover:text-[var(--hw-gold)] hover:underline"
+          >
+            Forgot password?
+          </Link>
         </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link to="/forgot-password" className="text-xs text-primary hover:underline">
-              Forgot password?
-            </Link>
-          </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Logging in...
-            </>
-          ) : (
-            "Log in"
-          )}
-        </Button>
+        <button
+          type="submit"
+          disabled={loading || googleBusy}
+          className="flex w-full items-center justify-center gap-2 bg-[var(--hw-gold)] px-4 py-2.5 font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--hw-dark-bg)] transition hover:bg-[var(--hw-gold-lt)] disabled:opacity-60"
+        >
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
+          Log in
+        </button>
       </form>
+
+      <p className="mt-6 text-center font-serif text-sm text-[var(--hw-ink2)]">
+        New here?{' '}
+        <Link
+          to={buildAuthPath('register', { next, plan })}
+          className="text-[var(--hw-gold)] underline-offset-2 hover:underline"
+        >
+          Create an account
+        </Link>
+      </p>
+      <p className="mt-3 text-center">
+        <Link
+          to="/"
+          className="font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--hw-ink3)] underline-offset-2 hover:underline"
+        >
+          ← Back to the press
+        </Link>
+      </p>
     </AuthLayout>
   );
 }

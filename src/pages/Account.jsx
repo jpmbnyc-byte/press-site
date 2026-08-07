@@ -116,12 +116,26 @@ export default function Account() {
           </button>
           <button
             type="button"
-            onClick={() => logout(false)}
+            onClick={() => logout({ next: '/account' })}
             className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#c8b99a] border-b border-[#c8b99a]/30 pb-1 self-start"
           >
             Log out
           </button>
         </div>
+
+        <div className="mt-8 pt-6 border-t border-[#c4a84a]/20">
+          <p className="font-serif italic text-sm text-[#c8b99a] mb-3">
+            Using a different email or Google account?
+          </p>
+          <button
+            type="button"
+            onClick={() => logout({ serverLogout: true, next: '/account' })}
+            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] underline underline-offset-4"
+          >
+            Switch account
+          </button>
+        </div>
+
         {!user.stripe_customer_id && (
           <p className="font-serif italic text-sm text-[#c8b99a] mt-4 max-w-md">
             Billing opens after a Stripe checkout completes and the membership webhook links your

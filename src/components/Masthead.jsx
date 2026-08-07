@@ -18,6 +18,10 @@ export default function Masthead() {
     { label: 'Subscribe', path: '/subscribe' },
   ];
 
+  const authHref = isAuthenticated
+    ? '/account'
+    : `/login?next=${encodeURIComponent(`${location.pathname}${location.search}` || '/')}`;
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#0e0d0a] border-b border-[rgba(196,168,74,0.15)] flex items-center justify-between px-5 md:px-8"
@@ -48,7 +52,7 @@ export default function Masthead() {
             Subscribe
           </Link>
           <Link
-            to={isAuthenticated ? '/account' : '/login'}
+            to={authHref}
             className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c8b99a] hover:text-[#c4a84a] transition-colors duration-300"
           >
             {isAuthenticated ? 'Account' : 'Log in'}
@@ -84,7 +88,7 @@ export default function Masthead() {
             </Link>
           ))}
           <Link
-            to={isAuthenticated ? '/account' : '/login'}
+            to={authHref}
             onClick={() => setOpen(false)}
             className="font-serif text-3xl font-light text-[#c4a84a] py-4"
           >
