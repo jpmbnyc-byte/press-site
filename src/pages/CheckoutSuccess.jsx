@@ -15,11 +15,14 @@ export default function CheckoutSuccess() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // Webhook may land a moment after redirect — refresh a few times.
       for (let i = 0; i < 5; i++) {
-        await refreshUser?.();
+        const refreshed = await refreshUser?.();
         if (cancelled) return;
-        await new Promise((r) => setTimeout(r, 1200));
+        if (hasPressAccess(refreshed)) {
+          setReady(true);
+          return;
+        }
+        if (i < 4) await new Promise((resolve) => setTimeout(resolve, 1200));
       }
       if (!cancelled) setReady(true);
     })();
@@ -42,6 +45,13 @@ export default function CheckoutSuccess() {
   const press = hasPressAccess(user);
   const app = hasAppAccess(user);
   const unlockUrl = getAppUnlockUrl(user);
+  const confirmation = press
+    ? user?.membership_status === 'trialing'
+      ? 'Your free trial is active. The archive is open.'
+      : 'Your membership is active. The archive is open.'
+    : ready
+      ? 'Payment received. Stripe is still linking access to your account; refresh the account page if the archive remains locked.'
+      : 'Confirming your membership…';
 
   return (
     <div className="bg-[#0e0d0a] min-h-[70vh] flex items-center justify-center px-6 py-20">
@@ -53,11 +63,7 @@ export default function CheckoutSuccess() {
           Peace be with you.
         </h1>
         <p className="font-serif italic text-xl text-[#c8b99a] mb-6 leading-relaxed">
-          {press
-            ? 'Your trial is active. The archive is open.'
-            : ready
-              ? 'Payment received. If the archive is still locked, wait a moment and refresh — access activates when Stripe confirms.'
-              : 'Confirming your membership…'}
+          {confirmation}
         </p>
 
         {app && (
@@ -66,7 +72,7 @@ export default function CheckoutSuccess() {
               Bundle unlocked
             </div>
             <p className="font-serif text-[#f0e9d8] mb-4">
-              Member + App includes humanweather.social premium. Open the app with your unlock link:
+              Member + App includes humanweather.social premium. Open the app with your secure unlock link.
             </p>
             <a
               href={unlockUrl}
@@ -77,9 +83,7 @@ export default function CheckoutSuccess() {
           </div>
         )}
 
-        {error && (
-          <p className="font-serif text-sm text-[#c4a84a] mb-6">{error}</p>
-        )}
+        {error && <p className="font-serif text-sm text-[#c4a84a] mb-6">{error}</p>}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             to="/journal"

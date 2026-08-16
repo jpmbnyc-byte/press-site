@@ -3,6 +3,34 @@ import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { openBillingPortal } from '@/lib/stripeCheckout';
 import { getAppUnlockUrl, hasAppAccess, hasPressAccess } from '@/lib/membership';
+import { STRIPE_PLANS } from '@/lib/stripePlans';
+
+function membershipLabel(user) {
+  const plan = STRIPE_PLANS[user?.membership_plan];
+  if (!plan) return 'Human Weather member';
+  return `${plan.name} · ${plan.amountLabel}`;
+}
+
+function accessStatusLabel(status) {
+  if (status === 'trialing') return 'Trial active';
+  if (status === 'active') return 'Active';
+  if (status === 'past_due') return 'Payment issue';
+  if (status === 'canceled') return 'Canceled';
+  if (status === 'unpaid') return 'Payment required';
+  if (status === 'incomplete') return 'Checkout incomplete';
+  return 'Not active';
+}
+
+function formatPeriodEnd(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}
 
 export default function Account() {
   const { user, isAuthenticated, isLoadingAuth, logout, refreshUser } = useAuth();
@@ -11,7 +39,7 @@ export default function Account() {
 
   useEffect(() => {
     refreshUser?.();
-  }, []);
+  }, [refreshUser]);
 
   if (isLoadingAuth) {
     return (
@@ -28,6 +56,8 @@ export default function Account() {
   const press = hasPressAccess(user);
   const app = hasAppAccess(user);
   const unlockUrl = getAppUnlockUrl(user);
+  const appPlan = STRIPE_PLANS.member_app_yearly;
+  const periodEnd = formatPeriodEnd(user.membership_period_end);
 
   const openPortal = async () => {
     setError('');
@@ -53,12 +83,14 @@ export default function Account() {
 
         <div className="border border-[#c4a84a]/30 p-6 mb-6 space-y-3">
           <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a]">
-            Press access
+            Press membership
           </div>
           <p className="font-serif text-lg text-[#f0e9d8]">
-            {press
-              ? `Active (${user.membership_status}) — ${user.membership_plan || 'member'}`
-              : 'Not active — subscribe to unlock the archive'}
+            {press ? membershipLabel(user) : 'No active membership'}
+          </p>
+          <p className="font-serif italic text-sm text-[#c8b99a]">
+            {accessStatusLabel(user.membership_status)}
+            {periodEnd ? ` · Current period through ${periodEnd}` : ''}
           </p>
           {!press && (
             <Link
@@ -72,12 +104,12 @@ export default function Account() {
 
         <div className="border border-[#c4a84a]/30 p-6 mb-8 space-y-3">
           <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a]">
-            App access (Member + App)
+            Human Weather app
           </div>
           {app ? (
             <>
               <p className="font-serif text-lg text-[#f0e9d8]">
-                Unlocked — humanweather.social premium is included with your bundle.
+                Included with your Member + App membership.
               </p>
               <a
                 href={unlockUrl}
@@ -89,21 +121,19 @@ export default function Account() {
           ) : (
             <>
               <p className="font-serif text-lg text-[#c8b99a]">
-                Bundle purchasers get the PWA at humanweather.social. Upgrade to Member + App ($96/yr).
+                Add humanweather.social premium with {appPlan.name} at {appPlan.amountLabel}.
               </p>
               <Link
-                to="/subscribe"
+                to={`/subscribe?plan=${encodeURIComponent(appPlan.id)}`}
                 className="inline-block font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border border-[#c4a84a] px-6 py-3 mt-2"
               >
-                Get the bundle
+                View app bundle
               </Link>
             </>
           )}
         </div>
 
-        {error && (
-          <p className="font-serif text-sm text-[#c4a84a] mb-4">{error}</p>
-        )}
+        {error && <p className="font-serif text-sm text-[#c4a84a] mb-4">{error}</p>}
 
         <div className="flex flex-col sm:flex-row gap-4">
           <button
@@ -138,8 +168,8 @@ export default function Account() {
 
         {!user.stripe_customer_id && (
           <p className="font-serif italic text-sm text-[#c8b99a] mt-4 max-w-md">
-            Billing opens after a Stripe checkout completes and the membership webhook links your
-            account. If you just subscribed, wait a moment and refresh — or write{' '}
+            Billing becomes available after Stripe links the checkout to this account. If you just joined,
+            refresh shortly or contact{' '}
             <a href="mailto:hello@humanweather.social" className="text-[#c4a84a] not-italic hover:underline">
               hello@humanweather.social
             </a>
