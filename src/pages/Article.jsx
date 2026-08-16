@@ -76,12 +76,21 @@ export default function Article() {
         if (!cancelled) setLoading(false);
       }
     })();
-    window.scrollTo(0, 0);
     return () => {
       cancelled = true;
       setHomePageMeta();
     };
   }, [slug, canReadMembers, user]);
+
+  useEffect(() => {
+    if (loading || !article || article.slug !== slug) return undefined;
+
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [loading, article, slug]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -150,7 +159,7 @@ export default function Article() {
           {article.series_label || 'Human Weather'} · Essay {String(article.series_order || 1).padStart(2, '0')}
           {article.access_level === 'free' ? ' · Free' : ''}
         </div>
-        <h1 className="font-serif text-[clamp(36px,5vw,56px)] font-light leading-[1.08] tracking-[-0.01em] text-[var(--hw-ink)] mb-4">
+        <h1 className="scroll-mt-20 font-serif text-[clamp(36px,5vw,56px)] font-light leading-[1.08] tracking-[-0.01em] text-[var(--hw-ink)] mb-4">
           {article.title}
         </h1>
         {article.subtitle && (
@@ -197,7 +206,7 @@ export default function Article() {
               blockquote: ({ children }) => <blockquote>{children}</blockquote>,
               p: ({ children }) => <p>{children}</p>,
               h2: ({ children }) => (
-                <h2 className="font-serif text-3xl font-light mt-12 mb-6 text-[var(--hw-ink)]">
+                <h2 className="scroll-mt-20 font-serif text-3xl font-light mt-12 mb-6 text-[var(--hw-ink)]">
                   {children}
                 </h2>
               ),
