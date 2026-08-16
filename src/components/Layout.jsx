@@ -1,18 +1,23 @@
 import { Outlet } from 'react-router-dom';
 import Masthead from './Masthead';
 import Footer from './Footer';
+import { RegisterProvider } from './Register';
 import { ThemeProvider } from '@/lib/hwTheme';
 
 export default function Layout() {
   return (
     <ThemeProvider>
-      <div className="min-h-screen flex flex-col bg-[var(--hw-bg)] text-[var(--hw-ink)] transition-colors duration-500">
-        <Masthead />
-        <main className="flex-1 pt-14">
-          <Outlet />
-        </main>
-        <Footer />
-      </div>
+      <RegisterProvider>
+        <div className="min-h-screen flex flex-col bg-[var(--hw-paper)] text-[var(--hw-ink)]">
+          <Masthead />
+          <div className="flex-1 lg:pl-14">
+            <main className="pt-[5.5rem] lg:pt-14">
+              <Outlet />
+            </main>
+            <Footer />
+          </div>
+        </div>
+      </RegisterProvider>
     </ThemeProvider>
   );
 }
