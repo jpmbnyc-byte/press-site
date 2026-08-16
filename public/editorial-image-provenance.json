@@ -1,0 +1,78 @@
+{
+  "generated_at": "2026-08-16",
+  "policy": "Authentic archival documentary photography. Cropped and tonally processed from public-domain archival source photography; no synthetic documentary imagery, generative fill, colorization, or invented provenance.",
+  "images": [
+    {
+      "usage": "home-hero",
+      "asset": "/home/human-weather-hero-collier-1941.webp",
+      "photographer": "John Collier Jr.",
+      "title": "Leaving Hudson on ferry, New York",
+      "location": "Hudson River Valley, New York",
+      "date": "October 1941",
+      "collection": "Farm Security Administration/Office of War Information Photograph Collection, Library of Congress",
+      "source": "https://www.loc.gov/item/2017821446/",
+      "rights": "Public domain; no known restrictions",
+      "processing": "Cropped, converted to grayscale, tonal contrast adjusted, resized for web. No generative alteration."
+    },
+    {
+      "usage": "no-parade-the-fallow-ground",
+      "asset": "/essays/no-parade-the-fallow-ground.webp",
+      "photographer": "Dorothea Lange",
+      "title": "Harrowing a 2,000 acre wheat field which is allowed to fallow alternate years. Antelope Valley, Los Angeles County, California",
+      "location": "Antelope Valley, Los Angeles County, California",
+      "date": "May 1937",
+      "collection": "Farm Security Administration/Office of War Information Photograph Collection, Library of Congress",
+      "source": "https://www.loc.gov/pictures/item/2017769947/",
+      "rights": "No known restrictions",
+      "processing": "Cropped, converted to grayscale, tonal contrast adjusted, resized for web. No generative alteration."
+    },
+    {
+      "usage": "no-parade-the-work-without-applause",
+      "asset": "/essays/no-parade-the-work-without-applause.webp",
+      "photographer": "Dorothea Lange",
+      "title": "Men at work under SERA (State Emergency Relief Administration). Outskirts of Los Angeles, California",
+      "location": "Outskirts of Los Angeles, California",
+      "date": "March 1935",
+      "collection": "Farm Security Administration/Office of War Information Photograph Collection, Library of Congress",
+      "source": "https://www.loc.gov/pictures/collection/fsa/item/2017759125/",
+      "rights": "No known restrictions",
+      "processing": "Cropped, converted to grayscale, tonal contrast adjusted, resized for web. No generative alteration."
+    },
+    {
+      "usage": "the-procession-temporary-kin",
+      "asset": "/essays/the-procession-temporary-kin.webp",
+      "photographer": "Dorothea Lange",
+      "title": "Calipatria, Imperial Valley. Farm Security Administration (FSA) migratory labor camp (emergency). Migratory workers, in camp for pea harvest, scan the bulletin board at entrance",
+      "location": "Calipatria, Imperial Valley, California",
+      "date": "February 1939",
+      "collection": "Farm Security Administration/Office of War Information Photograph Collection, Library of Congress",
+      "source": "https://www.loc.gov/pictures/item/2017771487/",
+      "rights": "No known restrictions",
+      "processing": "Cropped, converted to grayscale, tonal contrast adjusted, resized for web. No generative alteration."
+    },
+    {
+      "usage": "the-procession-the-weight-we-carry",
+      "asset": "/essays/the-procession-the-weight-we-carry.webp",
+      "photographer": "Russell Lee",
+      "title": "Migrant family loading truck preparatory to departure for California. Near Muskogee, Oklahoma",
+      "location": "Near Muskogee, Oklahoma",
+      "date": "July 1939",
+      "collection": "Farm Security Administration/Office of War Information Photograph Collection, Library of Congress",
+      "source": "https://www.loc.gov/pictures/item/2017783834/",
+      "rights": "No known restrictions",
+      "processing": "Cropped, converted to grayscale, tonal contrast adjusted, resized for web. No generative alteration."
+    },
+    {
+      "usage": "the-procession-what-the-hands-kept",
+      "asset": "/essays/the-procession-what-the-hands-kept.webp",
+      "photographer": "Russell Lee",
+      "title": "Closeup of cutter's hands (cutting cloth), Jersey Homesteads, Hightstown, New Jersey",
+      "location": "Jersey Homesteads, Hightstown, New Jersey",
+      "date": "November 1936",
+      "collection": "Farm Security Administration/Office of War Information Photograph Collection, Library of Congress",
+      "source": "https://www.loc.gov/pictures/item/2017734991/",
+      "rights": "No known restrictions",
+      "processing": "Cropped, converted to grayscale, tonal contrast adjusted, resized for web. No generative alteration."
+    }
+  ]
+}
