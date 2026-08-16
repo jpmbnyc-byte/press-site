@@ -16,6 +16,7 @@ const DEFAULTS = {
   imageAlt: 'Human Weather — journaling the climate within and around us',
   url: `${SITE_URL}/`,
   type: 'website',
+  robots: 'index,follow',
 };
 
 function setMeta(attr, key, content) {
@@ -48,6 +49,7 @@ export function setPageMeta({
   imageAlt,
   url,
   type = 'website',
+  robots = 'index,follow',
 } = {}) {
   const t = title || DEFAULTS.title;
   const d = description || DEFAULTS.description;
@@ -59,6 +61,7 @@ export function setPageMeta({
 
   document.title = t;
   setMeta('name', 'description', d);
+  setMeta('name', 'robots', robots);
 
   setMeta('property', 'og:type', type);
   setMeta('property', 'og:site_name', 'Human Weather');
@@ -101,6 +104,37 @@ export function setEssayPageMeta(article) {
     imageAlt: article.hero_image_alt || essayName,
     url,
     type: 'article',
+  });
+}
+
+export function setSeriesIndexMeta() {
+  setPageMeta({
+    title: 'Series | Human Weather',
+    description:
+      'Explore the Human Weather series: connected essays on emotional climate, faith, culture, diaspora, bliss, and the interior life.',
+    url: `${SITE_URL}/series`,
+  });
+}
+
+export function setSeriesPageMeta(seriesItem) {
+  if (!seriesItem) return;
+  const title = `${seriesItem.name} — Series | Human Weather`;
+  const description = seriesItem.description || seriesItem.tagline || `Read ${seriesItem.name} on Human Weather.`;
+  setPageMeta({
+    title,
+    description,
+    ogTitle: title,
+    ogDescription: description,
+    url: `${SITE_URL}/series/${seriesItem.slug}`,
+  });
+}
+
+export function setNotFoundPageMeta(pathname = '') {
+  setPageMeta({
+    title: 'Page Not Found | Human Weather',
+    description: 'The requested Human Weather page could not be found.',
+    url: `${SITE_URL}${pathname || '/'}`,
+    robots: 'noindex,follow',
   });
 }
 
