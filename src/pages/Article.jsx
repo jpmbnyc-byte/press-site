@@ -12,6 +12,7 @@ import { setEssayPageMeta, setHomePageMeta } from '@/lib/pageMeta';
 import { formatPublicationDate } from '@/lib/editorial';
 import { getSeriesMeta, publicationYear } from '@/lib/editorialSystem';
 import { STRIPE_PLANS } from '@/lib/stripePlans';
+import { getEditorialImage } from '@/lib/editorialImages';
 
 const monthlyPlan = STRIPE_PLANS.member_monthly;
 const yearlyPlan = STRIPE_PLANS.member_yearly;
@@ -148,9 +149,22 @@ export default function Article() {
   const returnPath = `/journal/${article.slug}`;
   const loginForYearly = `/login?next=${encodeURIComponent(returnPath)}&plan=${encodeURIComponent(yearlyPlan.id)}`;
   const seriesMeta = getSeriesMeta(article.series_label || 'Human Weather');
+  const editorialImage = getEditorialImage(article);
 
   return (
     <div style={{ '--series-ink': seriesMeta.color }}>
+      {editorialImage && (
+        <figure className="hw-essay-figure">
+          <img
+            src={editorialImage.src}
+            alt={editorialImage.alt}
+            loading="eager"
+            decoding="async"
+          />
+          <figcaption className="hw-media-caption">{editorialImage.caption}</figcaption>
+        </figure>
+      )}
+
       <header className="max-w-[740px] mx-auto px-6 pt-12 pb-8">
         <div className="w-12 h-px bg-[var(--series-ink)] mb-6" />
         <div className="hw-label text-[var(--series-ink)] mb-4">
@@ -180,20 +194,6 @@ export default function Article() {
         </div>
       </header>
 
-      {article.hero_image_url && (
-        <div className="w-full mb-12">
-          <img
-            src={article.hero_image_url}
-            alt={article.hero_image_alt || ''}
-            className="w-full max-h-[520px] object-cover object-[center_30%]"
-          />
-          {article.hero_image_caption && (
-            <div className="hw-media-caption mt-2 text-center max-w-[740px] mx-auto px-6">
-              {article.hero_image_caption}
-            </div>
-          )}
-        </div>
-      )}
 
       <article className="max-w-[68ch] mx-auto px-6 pb-16">
         <div className="article-body">

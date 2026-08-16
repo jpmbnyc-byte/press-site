@@ -3,12 +3,11 @@ export default function EditorialFigure({
   alt,
   kind = 'document',
   caption = '',
-  year = new Date().getFullYear(),
   className = '',
 }) {
   const generated = kind === 'generated';
   const provenance = generated
-    ? `Generated field. Human Weather, ${year}.${caption ? ` ${caption}` : ''}`
+    ? 'Generated'
     : caption;
 
   return (

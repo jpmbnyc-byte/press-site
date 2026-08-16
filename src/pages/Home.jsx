@@ -6,8 +6,9 @@ import NewsletterSignup from '@/components/NewsletterSignup';
 import { WATERS_EDGE_PREVIEW_MINUTES, WATERS_EDGE_SLUG } from '@/lib/membership';
 import { setHomePageMeta } from '@/lib/pageMeta';
 
-const HERO_IMAGE =
-  'https://media.base44.com/images/public/6a57ce138c2f29923fec6bc4/5efc2a849_generated_image.png';
+const HERO_IMAGE = '/home/human-weather-hero-collier-1941.webp';
+const HERO_CAPTION =
+  'John Collier Jr. Hudson River Valley, New York, October 1941. Farm Security Administration/Office of War Information Photograph Collection, Library of Congress.';
 
 const FEATURED_PREVIEW_SLUG = WATERS_EDGE_SLUG;
 
@@ -82,43 +83,43 @@ export default function Home() {
 
   return (
     <div className="bg-[var(--hw-bg)]">
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
-        <img
-          src={HERO_IMAGE}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover animate-[hw-hero-in_1.2s_ease-out]"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to bottom, rgba(28,28,28,0.20) 0%, rgba(28,28,28,0.60) 100%)',
-          }}
-        />
-        <div className="relative z-10 text-center px-6 max-w-2xl animate-[hw-rise_0.9s_ease-out_0.15s_both]">
-          <div className="font-mono text-[10px] tracking-[0.4em] uppercase text-[#F7F4EE] opacity-70 mb-8">
-            A Field Journal
-          </div>
-          <h1 className="font-serif text-[clamp(48px,9vw,96px)] font-light text-[#F7F4EE] leading-[0.95] tracking-[-0.02em] mb-8">
-            Human Weather
-          </h1>
-          <p className="font-serif italic text-xl md:text-2xl text-[#F7F4EE] opacity-80 leading-relaxed max-w-lg mx-auto mb-10">
-            The emotional climate of modern life. A field journal exploring the seasons, storms, and
-            patterns within us.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/subscribe"
-              className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#1C1C1C] transition-all duration-500"
-            >
-              Enter the Field Station
-            </Link>
-            <Link
-              to="/journal"
-              className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F7F4EE] border border-[#F7F4EE] px-10 py-4 hover:bg-[#F7F4EE] hover:text-[#1C1C1C] transition-all duration-500"
-            >
-              Read the Journal
-            </Link>
+      <section className="bg-[var(--hw-bg)]">
+        <figure className="m-0">
+          <img
+            src={HERO_IMAGE}
+            alt="Passengers leaving Hudson on a ferry in New York, October 1941"
+            className="block w-full h-[58vh] min-h-[380px] md:h-[72vh] md:min-h-[560px] max-h-[860px] object-cover object-center"
+            loading="eager"
+            decoding="async"
+          />
+          <figcaption className="hw-media-caption px-6 pt-3">
+            <span className="block max-w-6xl mx-auto">{HERO_CAPTION}</span>
+          </figcaption>
+        </figure>
+
+        <div className="px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+          <div className="max-w-4xl mx-auto">
+            <div className="hw-label text-[var(--hw-muted)] mb-8">A Field Journal</div>
+            <h1 className="font-heading text-[clamp(48px,9vw,112px)] font-medium text-[var(--hw-ink)] leading-[0.9] tracking-[-0.05em] mb-10">
+              Human Weather
+            </h1>
+            <p className="font-serif text-2xl md:text-[32px] text-[var(--hw-ink2)] leading-[1.25] max-w-[26ch] mb-12">
+              The emotional climate of modern life. A field journal exploring the seasons, storms, and patterns within us.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                to="/subscribe"
+                className="hw-label text-center text-[var(--hw-paper)] bg-[var(--hw-ink)] border border-[var(--hw-ink)] px-8 py-4"
+              >
+                Enter the Field Station
+              </Link>
+              <Link
+                to="/journal"
+                className="hw-label text-center text-[var(--hw-ink)] border border-[var(--hw-ink)] px-8 py-4"
+              >
+                Read the Journal
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -131,19 +132,8 @@ export default function Home() {
 
       {spotlight && (
         <section className="py-24 md:py-32 px-6">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-            <div className="animate-[hw-rise_0.9s_ease-out_both]">
-              {spotlight.hero_image_url ? (
-                <img
-                  src={spotlight.hero_image_url}
-                  alt={spotlight.hero_image_alt || ''}
-                  className="w-full aspect-[4/5] object-cover"
-                />
-              ) : (
-                <div className="w-full aspect-[4/5] bg-[var(--hw-surface)]" />
-              )}
-            </div>
-            <div className="animate-[hw-rise_0.9s_ease-out_0.12s_both]">
+          <div className="max-w-4xl mx-auto">
+            <div>
               <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-3">
                 {spotlightIsWatersEdge
                   ? `Featured Preview · ${WATERS_EDGE_PREVIEW_MINUTES} min free`
@@ -205,13 +195,6 @@ export default function Home() {
                 to={`/journal/${freeLead.slug}`}
                 className="group lg:col-span-7 block animate-[hw-rise_0.9s_ease-out_0.08s_both]"
               >
-                {freeLead.hero_image_url && (
-                  <img
-                    src={freeLead.hero_image_url}
-                    alt={freeLead.hero_image_alt || ''}
-                    className="w-full aspect-[16/10] object-cover mb-8"
-                  />
-                )}
                 <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-sage)] mb-3">
                   Free essay · {essayEyebrow(freeLead, freeLead.series_label)}
                 </div>
