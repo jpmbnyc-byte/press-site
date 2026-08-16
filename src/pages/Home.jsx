@@ -84,18 +84,23 @@ export default function Home() {
   return (
     <div className="bg-[var(--hw-bg)]">
       <section className="bg-[var(--hw-bg)]">
-        <figure className="m-0">
-          <img
-            src={HERO_IMAGE}
-            alt="Passengers leaving Hudson on a ferry in New York, October 1941"
-            className="block w-full h-[58vh] min-h-[380px] md:h-[72vh] md:min-h-[560px] max-h-[860px] object-cover object-center"
-            loading="eager"
-            decoding="async"
-          />
-          <figcaption className="hw-media-caption px-6 pt-3">
-            <span className="block max-w-6xl mx-auto">{HERO_CAPTION}</span>
-          </figcaption>
-        </figure>
+        <div className="hw-gallery-wall px-5 py-14 md:px-10 md:py-24">
+          <figure className="hw-gallery-installation max-w-[1280px] mx-auto m-0">
+            <div className="hw-gallery-canvas">
+              <img
+                src={HERO_IMAGE}
+                alt="Passengers leaving Hudson on a ferry in New York, October 1941"
+                className="block w-full aspect-[16/9] object-cover object-center"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+            <figcaption className="hw-gallery-label">
+              <span className="hw-gallery-label-index">Field Study 001</span>
+              <span className="block">{HERO_CAPTION}</span>
+            </figcaption>
+          </figure>
+        </div>
 
         <div className="px-6 pt-20 pb-24 md:pt-28 md:pb-32">
           <div className="max-w-4xl mx-auto">
