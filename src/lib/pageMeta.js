@@ -3,7 +3,7 @@
  * Vercel Routing Middleware supplies the initial essay head to crawlers.
  */
 
-import { SITE_URL, absoluteUrl } from '@/lib/site';
+import { SITE_URL } from '@/lib/site';
 
 const SITE_DESCRIPTION =
   'Journaling the climate within and around us. Essays on emotional climate, faith, bliss, diaspora, and the interior life by JP Bobo.';
@@ -93,7 +93,7 @@ export function setEssayPageMeta(article) {
     article.excerpt ||
     article.subtitle ||
     `An essay from ${series} by ${article.author_name || 'JP Bobo'}.`;
-  const image = absoluteUrl(article.hero_image_url || '/og-share.jpg');
+  const image = `${SITE_URL}/og/${encodeURIComponent(article.slug)}`;
   const url = `${SITE_URL}/journal/${article.slug}`;
 
   setPageMeta({
@@ -102,7 +102,7 @@ export function setEssayPageMeta(article) {
     ogTitle: title,
     ogDescription: description,
     image,
-    imageAlt: article.hero_image_alt || essayName,
+    imageAlt: `${essayName} — ${series}`,
     url,
     type: 'article',
   });
