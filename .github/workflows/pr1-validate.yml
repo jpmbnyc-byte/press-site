@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - codex/pr1-editorial-foundation
+  pull_request:
+    branches:
+      - main
 
 jobs:
   validate:
