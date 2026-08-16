@@ -5,13 +5,18 @@ import AuthorPortrait from '@/components/AuthorPortrait';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import { startCheckout } from '@/lib/stripeCheckout';
 import { useAuth } from '@/lib/AuthContext';
-import { hasPressAccess } from '@/lib/membership';
+import { hasPressAccess, WATERS_EDGE_PREVIEW_MINUTES, WATERS_EDGE_SLUG } from '@/lib/membership';
 import { fetchPressArticle } from '@/lib/pressArticles';
 import { setEssayPageMeta, setHomePageMeta } from '@/lib/pageMeta';
+import { formatPublicationDate } from '@/lib/editorial';
+import { STRIPE_PLANS } from '@/lib/stripePlans';
+
+const monthlyPlan = STRIPE_PLANS.member_monthly;
+const yearlyPlan = STRIPE_PLANS.member_yearly;
 
 export default function Article() {
   const { slug } = useParams();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [article, setArticle] = useState(null);
   const [related, setRelated] = useState([]);
   const [freeCompanion, setFreeCompanion] = useState(null);
@@ -20,7 +25,6 @@ export default function Article() {
   const [checkoutPlan, setCheckoutPlan] = useState(null);
   const [checkoutError, setCheckoutError] = useState('');
   const canReadMembers = hasPressAccess(user);
-  // Prefer server flag when present; fall back to client entitlement for UX chrome.
   const bodyLocked =
     article?.body_gated === true ||
     (article?.access_level === 'members' && !canReadMembers && article?.can_read_full !== true);
@@ -92,8 +96,19 @@ export default function Article() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[var(--hw-gold)] border-t-transparent rounded-none animate-spin" />
+      <div className="max-w-[740px] mx-auto px-6 pt-12 pb-24" aria-busy="true">
+        <div className="w-12 h-[2px] bg-[var(--hw-gold)] mb-8" />
+        <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-ink3)] mb-6">
+          Opening essay…
+        </div>
+        <div className="h-12 max-w-[620px] bg-[var(--hw-surface)] mb-4" />
+        <div className="h-7 max-w-[520px] bg-[var(--hw-surface)] mb-8 opacity-80" />
+        <div className="h-px bg-[rgba(154,125,46,0.18)] mb-10" />
+        <div className="space-y-4 max-w-[680px]">
+          <div className="h-4 bg-[var(--hw-surface)]" />
+          <div className="h-4 bg-[var(--hw-surface)]" />
+          <div className="h-4 w-4/5 bg-[var(--hw-surface)]" />
+        </div>
       </div>
     );
   }
@@ -114,6 +129,11 @@ export default function Article() {
     );
   }
 
+  const published = formatPublicationDate(article.published_at);
+  const isWatersEdge = article.slug === WATERS_EDGE_SLUG;
+  const returnPath = `/journal/${article.slug}`;
+  const loginForYearly = `/login?next=${encodeURIComponent(returnPath)}&plan=${encodeURIComponent(yearlyPlan.id)}`;
+
   return (
     <div>
       <div className="fixed top-0 left-0 right-0 h-[2px] z-[200] bg-transparent">
@@ -126,10 +146,8 @@ export default function Article() {
       <header className="max-w-[740px] mx-auto px-6 pt-12 pb-8">
         <div className="w-12 h-[2px] bg-[var(--hw-gold)] mb-6" />
         <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-rust)] mb-4">
-          {article.slug === 'relational-faith-the-mirror-at-the-waters-edge'
-            ? 'Featured Preview · '
-            : ''}
-          {article.series_label || 'Human Weather'} · Essay {article.series_order || 1} of 7
+          {isWatersEdge ? 'Featured Preview · ' : ''}
+          {article.series_label || 'Human Weather'} · Essay {String(article.series_order || 1).padStart(2, '0')}
           {article.access_level === 'free' ? ' · Free' : ''}
         </div>
         <h1 className="font-serif text-[clamp(36px,5vw,56px)] font-light leading-[1.08] tracking-[-0.01em] text-[var(--hw-ink)] mb-4">
@@ -139,7 +157,7 @@ export default function Article() {
           <p className="font-serif italic text-2xl text-[var(--hw-rust)] mb-6">{article.subtitle}</p>
         )}
         {article.excerpt && (
-          <p className="font-serif italic text-lg text-[var(--hw-ink2)] max-w-[540px] mb-8">
+          <p className="font-serif text-lg text-[var(--hw-ink2)] max-w-[540px] mb-8 leading-relaxed">
             {article.excerpt}
           </p>
         )}
@@ -150,7 +168,7 @@ export default function Article() {
               {article.author_name || 'JP Bobo'}
             </div>
             <div className="font-mono text-[9px] tracking-[0.15em] uppercase text-[var(--hw-ink3)]">
-              {article.published_at || '2026'} · {article.reading_time_mins || 9} min read
+              {published || 'Publication date forthcoming'} · {article.reading_time_mins || 9} min read
             </div>
           </div>
         </div>
@@ -193,65 +211,73 @@ export default function Article() {
           </ReactMarkdown>
         </div>
 
-        {!bodyLocked && (
-          <div className="text-center text-[var(--hw-gold)] text-lg mt-12">✦</div>
-        )}
+        {!bodyLocked && <div className="text-center text-[var(--hw-gold)] text-lg mt-12">✦</div>}
 
         {bodyLocked && (
-          <div className="mt-10 border-t border-b border-[rgba(154,125,46,0.18)] py-12 text-center bg-[var(--hw-surface)]">
+          <div className="mt-10 border-y border-[rgba(154,125,46,0.18)] py-12 text-center bg-[var(--hw-surface)] px-6">
+            <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-4">
+              Member reading
+            </div>
             <h3 className="font-serif text-3xl font-light text-[var(--hw-ink)] mb-3">
-              {article.slug === 'relational-faith-the-mirror-at-the-waters-edge'
-                ? 'The preview ends here.'
-                : 'This essay continues for members.'}
+              {isWatersEdge ? 'The preview ends here.' : 'Continue the essay.'}
             </h3>
-            <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-8 max-w-md mx-auto">
-              {article.slug === 'relational-faith-the-mirror-at-the-waters-edge'
-                ? "You've reached about 3 minutes of reading. Log in and start a free trial for the full essay."
-                : 'Log in and start a free trial to read the full archive.'}
+            <p className="font-serif text-lg text-[var(--hw-ink2)] mb-8 max-w-md mx-auto leading-relaxed">
+              {isWatersEdge
+                ? `You've reached about ${WATERS_EDGE_PREVIEW_MINUTES} minutes of reading. Membership opens the rest of this essay and the members archive.`
+                : 'Membership opens the rest of this essay and the members archive.'}
             </p>
             {checkoutError && (
-              <p className="font-serif text-sm text-[var(--hw-gold)] mb-4">{checkoutError}</p>
+              <p className="font-serif text-sm text-[var(--hw-rust)] mb-4" role="alert">{checkoutError}</p>
             )}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4 max-w-md mx-auto">
-              <button
-                type="button"
-                disabled={!!checkoutPlan}
-                onClick={() => handleCheckout('member_monthly')}
-                className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 disabled:opacity-60"
-              >
-                {checkoutPlan === 'member_monthly' ? 'Redirecting…' : '$9 / month'}
-              </button>
-              <button
-                type="button"
-                disabled={!!checkoutPlan}
-                onClick={() => handleCheckout('member_yearly')}
-                className="font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-gold)] border border-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold)] hover:text-[var(--hw-bg)] transition-all duration-300 disabled:opacity-60"
-              >
-                {checkoutPlan === 'member_yearly' ? 'Redirecting…' : '$72 / year — save 33%'}
-              </button>
-            </div>
-            <button
-              type="button"
-              disabled={!!checkoutPlan}
-              onClick={() => handleCheckout('member_app_yearly')}
-              className="inline-block font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--hw-bg)] bg-[var(--hw-gold)] px-8 py-4 hover:bg-[var(--hw-gold-lt)] transition-all duration-300 mb-4 disabled:opacity-60"
-            >
-              {checkoutPlan === 'member_app_yearly'
-                ? 'Redirecting…'
-                : '$96 / year — Member + App Bundle'}
-            </button>
-            <p className="font-serif italic text-sm text-[var(--hw-ink3)] mt-2">
-              <Link
-                to={`/login?next=${encodeURIComponent(`/journal/${article.slug}`)}`}
-                className="text-[var(--hw-gold)] hover:underline"
-              >
-                Log in
-              </Link>
-              {' · '}
-              <Link to="/subscribe" className="text-[var(--hw-gold)] hover:underline">
-                Compare plans
-              </Link>
-            </p>
+
+            {!isAuthenticated ? (
+              <div className="max-w-md mx-auto">
+                <Link
+                  to={loginForYearly}
+                  className="block bg-[var(--hw-gold)] text-[var(--hw-bg)] px-8 py-4 font-mono text-[10px] tracking-[0.25em] uppercase hover:bg-[var(--hw-gold-lt)] transition-colors mb-4"
+                >
+                  Log in & start {yearlyPlan.trialDays}-day trial · {yearlyPlan.amountLabel}
+                </Link>
+                <p className="font-serif text-sm text-[var(--hw-ink3)]">
+                  New reader?{' '}
+                  <Link
+                    to={`/register?next=${encodeURIComponent(returnPath)}&plan=${encodeURIComponent(yearlyPlan.id)}`}
+                    className="text-[var(--hw-gold)] hover:underline"
+                  >
+                    Create an account
+                  </Link>
+                  {' · '}
+                  <Link to="/subscribe" className="text-[var(--hw-gold)] hover:underline">
+                    Compare plans
+                  </Link>
+                </p>
+              </div>
+            ) : (
+              <div className="max-w-md mx-auto">
+                <button
+                  type="button"
+                  disabled={!!checkoutPlan}
+                  onClick={() => handleCheckout(yearlyPlan.id)}
+                  className="w-full bg-[var(--hw-gold)] text-[var(--hw-bg)] px-8 py-4 font-mono text-[10px] tracking-[0.25em] uppercase hover:bg-[var(--hw-gold-lt)] transition-colors disabled:opacity-60 mb-3"
+                >
+                  {checkoutPlan === yearlyPlan.id
+                    ? 'Redirecting…'
+                    : `Start ${yearlyPlan.trialDays}-day trial · ${yearlyPlan.amountLabel}`}
+                </button>
+                <button
+                  type="button"
+                  disabled={!!checkoutPlan}
+                  onClick={() => handleCheckout(monthlyPlan.id)}
+                  className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-gold)] hover:underline disabled:opacity-60"
+                >
+                  {checkoutPlan === monthlyPlan.id ? 'Redirecting…' : `Prefer monthly? ${monthlyPlan.amountLabel}`}
+                </button>
+                <span className="mx-2 text-[var(--hw-ink3)]">·</span>
+                <Link to="/subscribe" className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-gold)] hover:underline">
+                  Compare plans
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
@@ -276,11 +302,16 @@ export default function Article() {
             Read free in {article.series_label}
           </div>
           <Link to={`/journal/${freeCompanion.slug}`} className="group block">
-            <h3 className="font-serif text-3xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-3 leading-tight">
-              {freeCompanion.subtitle || freeCompanion.title}
+            <h3 className="font-serif text-3xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-2 leading-tight">
+              {freeCompanion.title}
             </h3>
+            {freeCompanion.subtitle && (
+              <p className="font-serif italic text-lg text-[var(--hw-rust)] mb-3 leading-relaxed">
+                {freeCompanion.subtitle}
+              </p>
+            )}
             {freeCompanion.excerpt && (
-              <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-5 leading-relaxed">
+              <p className="font-serif text-lg text-[var(--hw-ink2)] mb-5 leading-relaxed">
                 {freeCompanion.excerpt}
               </p>
             )}
@@ -306,14 +337,14 @@ export default function Article() {
                 }`}
               >
                 <div className="font-mono text-[8px] tracking-[0.15em] uppercase text-[var(--hw-ink3)] mb-2">
-                  Essay {String(a.series_order || 1).padStart(2, '0')} of 7
+                  Essay {String(a.series_order || 1).padStart(2, '0')}
                   {a.access_level === 'free' ? ' · Free' : ' · Members'}
                 </div>
                 <h4 className="font-serif text-xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-1">
-                  {a.subtitle || a.title}
+                  {a.title}
                 </h4>
                 {a.subtitle && (
-                  <p className="font-serif italic text-sm text-[var(--hw-ink2)]">{a.title}</p>
+                  <p className="font-serif italic text-sm text-[var(--hw-rust)]">{a.subtitle}</p>
                 )}
               </Link>
             ))}
