@@ -25,6 +25,10 @@
   ],
   "rewrites": [
     {
+      "source": "/og/:slug",
+      "destination": "/api/og?slug=:slug"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://humanweather.base44.app/api/:path*"
     },

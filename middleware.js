@@ -16,32 +16,27 @@ function escapeHtml(value = '') {
     .replaceAll("'", '&#39;');
 }
 
-function absoluteUrl(value, fallback = `${SITE_URL}/og-share.jpg`) {
-  if (!value) return fallback;
-  try {
-    return new URL(value, SITE_URL).toString();
-  } catch {
-    return fallback;
-  }
-}
-
 function replaceTag(html, pattern, replacement) {
   return pattern.test(html)
     ? html.replace(pattern, replacement)
     : html.replace('</head>', `${replacement}\n</head>`);
 }
 
+function essayOgUrl(article) {
+  return `${SITE_URL}/og/${encodeURIComponent(article.slug)}`;
+}
+
 function applyEssayHead(html, article) {
   const essayName = article.title || 'Essay';
-  const series = article.series_label || 'Human Weather';
-  const title = `${essayName} — ${series} | Human Weather`;
+  const seriesName = article.series_label || 'Human Weather';
+  const title = `${essayName} — ${seriesName} | Human Weather`;
   const description =
     article.excerpt ||
     article.subtitle ||
-    `An essay from ${series} by ${article.author_name || 'JP Bobo'}.`;
+    `An essay from ${seriesName} by ${article.author_name || 'JP Bobo'}.`;
   const canonical = `${SITE_URL}/journal/${encodeURIComponent(article.slug)}`;
-  const image = absoluteUrl(article.hero_image_url);
-  const imageAlt = article.hero_image_alt || essayName;
+  const image = essayOgUrl(article);
+  const imageAlt = `${essayName} — ${seriesName}`;
 
   const values = {
     title: escapeHtml(title),
@@ -53,20 +48,13 @@ function applyEssayHead(html, article) {
 
   let output = html;
   output = replaceTag(output, /<title>[^<]*<\/title>/i, `<title>${values.title}</title>`);
-  output = replaceTag(
-    output,
-    /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
-    `<meta name="description" content="${values.description}" />`,
-  );
-  output = replaceTag(
-    output,
-    /<meta\s+property="og:type"\s+content="[^"]*"\s*\/?>/i,
-    '<meta property="og:type" content="article" />',
-  );
+  output = replaceTag(output, /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i, `<meta name="description" content="${values.description}" />`);
+  output = replaceTag(output, /<meta\s+property="og:type"\s+content="[^"]*"\s*\/?>/i, '<meta property="og:type" content="article" />');
   output = replaceTag(output, /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${values.canonical}" />`);
   output = replaceTag(output, /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${values.title}" />`);
   output = replaceTag(output, /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${values.description}" />`);
   output = replaceTag(output, /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image" content="${values.image}" />`);
+  output = replaceTag(output, /<meta\s+property="og:image:type"\s+content="[^"]*"\s*\/?>/i, '<meta property="og:image:type" content="image/png" />');
   output = replaceTag(output, /<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:alt" content="${values.imageAlt}" />`);
   output = replaceTag(output, /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${values.title}" />`);
   output = replaceTag(output, /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${values.description}" />`);
@@ -74,10 +62,7 @@ function applyEssayHead(html, article) {
   output = replaceTag(output, /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${values.canonical}" />`);
 
   if (article.published_at) {
-    output = output.replace(
-      '</head>',
-      `<meta property="article:published_time" content="${escapeHtml(article.published_at)}" />\n</head>`,
-    );
+    output = output.replace('</head>', `<meta property="article:published_time" content="${escapeHtml(article.published_at)}" />\n</head>`);
   }
 
   return output;
@@ -110,9 +95,7 @@ export default async function middleware(request) {
 
   const slug = decodeURIComponent(url.pathname.replace(/^\/journal\//, '')).trim();
   const shellResponse = await fetch(new URL('/index.html', request.url), {
-    headers: {
-      'user-agent': request.headers.get('user-agent') || 'HumanWeather-Metadata',
-    },
+    headers: { 'user-agent': request.headers.get('user-agent') || 'HumanWeather-Metadata' },
   });
 
   if (!shellResponse.ok || !slug) return shellResponse;
@@ -131,8 +114,5 @@ export default async function middleware(request) {
   headers.set('cache-control', 'public, s-maxage=300, stale-while-revalidate=86400');
   headers.delete('content-length');
 
-  return new Response(html, {
-    status: shellResponse.status,
-    headers,
-  });
+  return new Response(html, { status: shellResponse.status, headers });
 }
