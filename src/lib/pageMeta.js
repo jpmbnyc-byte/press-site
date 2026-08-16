@@ -1,17 +1,18 @@
 /**
- * Client-side document meta updates (browsers / some in-app previews).
- * Social crawlers also need the Edge middleware at /journal/:slug.
+ * Client-side document meta updates for browsers and in-app navigation.
+ * Vercel Routing Middleware supplies the initial essay head to crawlers.
  */
 
 import { SITE_URL, absoluteUrl } from '@/lib/site';
 
+const SITE_DESCRIPTION =
+  'Journaling the climate within and around us. Essays on emotional climate, faith, bliss, diaspora, and the interior life by JP Bobo.';
+
 const DEFAULTS = {
   title: 'Human Weather',
-  description:
-    'Journaling the climate within and around us. Essays on emotional climate, faith, bliss, diaspora, and the interior life by JP Bobo.',
+  description: SITE_DESCRIPTION,
   ogTitle: 'Human Weather',
-  ogDescription:
-    'Journaling the climate within and around us. Essays on life, faith & culture. Reflections for a more aware life.',
+  ogDescription: SITE_DESCRIPTION,
   image: `${SITE_URL}/og-share.jpg`,
   imageAlt: 'Human Weather — journaling the climate within and around us',
   url: `${SITE_URL}/`,
