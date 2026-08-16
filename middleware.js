@@ -1,121 +1,138 @@
-/**
- * Edge middleware: social crawlers hitting /journal/:slug get HTML with
- * essay-specific Open Graph tags (hero image + title/excerpt).
- * Humans still receive the SPA via vercel.json rewrites.
- * Home (/) keeps the static og-share.jpg from index.html.
- */
+import { createClient } from '@base44/sdk';
 
-const SITE = 'https://www.humanweather.press';
-const APP_ID = '6a57ce138c2f29923fec6bc4';
-const BASE44 = 'https://humanweather.base44.app';
-
-const BOT_RE =
-  /facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|TelegramBot|SkypeUriPreview|Googlebot|bingbot|Applebot|Pinterest|redditbot|Embedly|Quora Link Preview|BitlyBot|Outbrain|vkShare|W3C_Validator|developers\.google\.com\/\+\/web\/snippet|InstantMessage|Slack-ImgProxy|TwitterBot|LinkedInBot|Baiduspider|DuckDuckBot|YandexBot|ia_archiver|preview|crawler|spider|bot/i;
+const SITE_URL = 'https://www.humanweather.press';
 
 export const config = {
-  matcher: ['/journal/:slug*'],
+  matcher: ['/journal/:slug'],
+  runtime: 'nodejs',
 };
 
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+function escapeHtml(value = '') {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
-function absoluteUrl(url) {
-  if (!url) return `${SITE}/og-share.jpg`;
-  // Prefer .press host when assets were previously stored on the Vercel hostname.
-  const normalized = String(url).replace(
-    /^https?:\/\/humanweather\.vercel\.app/i,
-    SITE,
-  );
-  if (/^https?:\/\//i.test(normalized)) return normalized;
-  return `${SITE}${normalized.startsWith('/') ? '' : '/'}${normalized}`;
+function absoluteUrl(value, fallback = `${SITE_URL}/og-share.jpg`) {
+  if (!value) return fallback;
+  try {
+    return new URL(value, SITE_URL).toString();
+  } catch {
+    return fallback;
+  }
 }
 
-async function fetchArticleBySlug(slug) {
-  const res = await fetch(`${BASE44}/api/entities/Article`, {
-    headers: { 'X-App-Id': APP_ID },
-  });
-  if (!res.ok) return null;
-  const articles = await res.json();
-  if (!Array.isArray(articles)) return null;
-  return articles.find((a) => a.slug === slug) || null;
+function replaceTag(html, pattern, replacement) {
+  return pattern.test(html)
+    ? html.replace(pattern, replacement)
+    : html.replace('</head>', `${replacement}\n</head>`);
 }
 
-function essayShareHtml(article, slug) {
-  const essayName = article.subtitle || article.title || 'Essay';
+function applyEssayHead(html, article) {
+  const essayName = article.title || 'Essay';
   const series = article.series_label || 'Human Weather';
   const title = `${essayName} — ${series} | Human Weather`;
   const description =
     article.excerpt ||
     article.subtitle ||
     `An essay from ${series} by ${article.author_name || 'JP Bobo'}.`;
+  const canonical = `${SITE_URL}/journal/${encodeURIComponent(article.slug)}`;
   const image = absoluteUrl(article.hero_image_url);
   const imageAlt = article.hero_image_alt || essayName;
-  const url = `${SITE}/journal/${slug}`;
-  const e = escapeHtml;
 
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${e(title)}</title>
-  <meta name="description" content="${e(description)}" />
-  <link rel="canonical" href="${e(url)}" />
+  const values = {
+    title: escapeHtml(title),
+    description: escapeHtml(description),
+    canonical: escapeHtml(canonical),
+    image: escapeHtml(image),
+    imageAlt: escapeHtml(imageAlt),
+  };
 
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Human Weather" />
-  <meta property="og:url" content="${e(url)}" />
-  <meta property="og:title" content="${e(title)}" />
-  <meta property="og:description" content="${e(description)}" />
-  <meta property="og:image" content="${e(image)}" />
-  <meta property="og:image:alt" content="${e(imageAlt)}" />
+  let output = html;
+  output = replaceTag(output, /<title>[^<]*<\/title>/i, `<title>${values.title}</title>`);
+  output = replaceTag(
+    output,
+    /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="description" content="${values.description}" />`,
+  );
+  output = replaceTag(
+    output,
+    /<meta\s+property="og:type"\s+content="[^"]*"\s*\/?>/i,
+    '<meta property="og:type" content="article" />',
+  );
+  output = replaceTag(output, /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${values.canonical}" />`);
+  output = replaceTag(output, /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${values.title}" />`);
+  output = replaceTag(output, /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${values.description}" />`);
+  output = replaceTag(output, /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image" content="${values.image}" />`);
+  output = replaceTag(output, /<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:alt" content="${values.imageAlt}" />`);
+  output = replaceTag(output, /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${values.title}" />`);
+  output = replaceTag(output, /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${values.description}" />`);
+  output = replaceTag(output, /<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:image" content="${values.image}" />`);
+  output = replaceTag(output, /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${values.canonical}" />`);
 
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${e(title)}" />
-  <meta name="twitter:description" content="${e(description)}" />
-  <meta name="twitter:image" content="${e(image)}" />
-</head>
-<body>
-  <article>
-    <h1><a href="${e(url)}">${e(essayName)}</a></h1>
-    <p>${e(series)} · ${e(article.author_name || 'JP Bobo')}</p>
-    <p>${e(description)}</p>
-    <p><img src="${e(image)}" alt="${e(imageAlt)}" width="1200" /></p>
-  </article>
-</body>
-</html>`;
+  if (article.published_at) {
+    output = output.replace(
+      '</head>',
+      `<meta property="article:published_time" content="${escapeHtml(article.published_at)}" />\n</head>`,
+    );
+  }
+
+  return output;
+}
+
+async function getPublicArticle(slug) {
+  const appId = process.env.VITE_BASE44_APP_ID;
+  if (!appId) return null;
+
+  const base44 = createClient({
+    appId,
+    serverUrl: process.env.VITE_BASE44_APP_BASE_URL || 'https://humanweather.base44.app',
+  });
+
+  try {
+    const matches = await base44.entities.Article.filter({ slug });
+    const rows = Array.isArray(matches) ? matches : [];
+    return rows.find((article) => article.status === 'published' || article.status === 'featured') || null;
+  } finally {
+    base44.cleanup?.();
+  }
 }
 
 export default async function middleware(request) {
-  const ua = request.headers.get('user-agent') || '';
-  if (!BOT_RE.test(ua)) {
-    return;
+  const url = new URL(request.url);
+
+  if (url.hostname === 'humanweather.press' || url.hostname === 'humanweather.vercel.app') {
+    return Response.redirect(`${SITE_URL}${url.pathname}${url.search}`, 308);
   }
 
-  const { pathname } = new URL(request.url);
-  const match = pathname.match(/^\/journal\/([^/]+)\/?$/);
-  if (!match) return;
+  const slug = decodeURIComponent(url.pathname.replace(/^\/journal\//, '')).trim();
+  const shellResponse = await fetch(new URL('/index.html', request.url), {
+    headers: {
+      'user-agent': request.headers.get('user-agent') || 'HumanWeather-Metadata',
+    },
+  });
 
-  const slug = decodeURIComponent(match[1]);
+  if (!shellResponse.ok || !slug) return shellResponse;
+
+  let html = await shellResponse.text();
+
   try {
-    const article = await fetchArticleBySlug(slug);
-    if (!article) return;
-
-    return new Response(essayShareHtml(article, slug), {
-      status: 200,
-      headers: {
-        'content-type': 'text/html; charset=utf-8',
-        'cache-control': 'public, s-maxage=300, stale-while-revalidate=86400',
-      },
-    });
-  } catch (err) {
-    console.error('[middleware] essay OG', err);
-    return;
+    const article = await getPublicArticle(slug);
+    if (article) html = applyEssayHead(html, article);
+  } catch (error) {
+    console.error('[press metadata middleware]', error);
   }
+
+  const headers = new Headers(shellResponse.headers);
+  headers.set('content-type', 'text/html; charset=utf-8');
+  headers.set('cache-control', 'public, s-maxage=300, stale-while-revalidate=86400');
+  headers.delete('content-length');
+
+  return new Response(html, {
+    status: shellResponse.status,
+    headers,
+  });
 }

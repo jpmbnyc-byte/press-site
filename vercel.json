@@ -95,19 +95,6 @@
           "value": "public, max-age=86400, must-revalidate"
         }
       ]
-    },
-    {
-      "source": "/site.webmanifest",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400, must-revalidate"
-        },
-        {
-          "key": "Content-Type",
-          "value": "application/manifest+json"
-        }
-      ]
     }
   ]
 }
