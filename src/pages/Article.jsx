@@ -13,6 +13,7 @@ import { formatPublicationDate } from '@/lib/editorial';
 import { getSeriesMeta, publicationYear } from '@/lib/editorialSystem';
 import { STRIPE_PLANS } from '@/lib/stripePlans';
 import { getEditorialImage } from '@/lib/editorialImages';
+import EssayThumbnail from '@/components/EssayThumbnail';
 
 const monthlyPlan = STRIPE_PLANS.member_monthly;
 const yearlyPlan = STRIPE_PLANS.member_yearly;
@@ -300,6 +301,7 @@ export default function Article() {
         <section className="max-w-[68ch] mx-auto px-6 py-14 border-t border-[var(--hw-rule)]">
           <div className="hw-label text-[var(--hw-muted)] mb-4">Read free in {article.series_label}</div>
           <Link to={`/journal/${freeCompanion.slug}`} className="group block">
+            <EssayThumbnail article={freeCompanion} compact className="mb-5 max-w-[360px]" />
             <h3 className="font-heading text-3xl font-medium text-[var(--hw-ink)] mb-2 leading-tight">
               {freeCompanion.title}
             </h3>
@@ -330,6 +332,7 @@ export default function Article() {
                 to={`/journal/${a.slug}`}
                 className="group block border-t border-[var(--hw-rule)] pt-4"
               >
+                <EssayThumbnail article={a} compact className="mb-4" />
                 <div className="hw-label text-[var(--hw-muted)] mb-2">
                   Essay {String(a.series_order || 1).padStart(2, '0')}
                   {a.access_level === 'free' ? ' · Free' : ' · Members'}

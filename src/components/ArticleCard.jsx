@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { formatPublicationDate } from '@/lib/editorial';
+import EssayThumbnail from '@/components/EssayThumbnail';
 
 export default function ArticleCard({ article }) {
   const isFree = article.access_level === 'free';
@@ -10,6 +11,7 @@ export default function ArticleCard({ article }) {
       to={`/journal/${article.slug}`}
       className="group block border-t border-[var(--hw-ink)] pt-6"
     >
+      <EssayThumbnail article={article} />
       <div className="flex items-baseline justify-between gap-4 mb-4">
         <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[var(--hw-gold)]">
           {article.series_label || 'Human Weather'}

@@ -273,3 +273,100 @@
     pointer-events: none;
   }
 }
+
+
+/* Homepage gallery installation */
+.hw-gallery-wall {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #dedbd2;
+  background-image:
+    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 46%),
+    linear-gradient(90deg, rgba(77, 70, 58, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(77, 70, 58, 0.025) 1px, transparent 1px);
+  background-size: auto, 96px 96px, 96px 96px;
+  box-shadow: inset 0 -24px 40px rgba(58, 51, 39, 0.08);
+}
+.hw-gallery-wall::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -20% 12% 28%;
+  background: radial-gradient(ellipse at center, rgba(255, 253, 246, 0.9), transparent 68%);
+  filter: blur(12px);
+}
+.hw-gallery-wall::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 10px;
+  border-top: 1px solid rgba(61, 54, 43, 0.16);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.34), rgba(73, 65, 51, 0.08));
+}
+.hw-gallery-installation { position: relative; }
+.hw-gallery-canvas {
+  position: relative;
+  padding: clamp(7px, 0.9vw, 14px);
+  background: #171614;
+  box-shadow: 0 3px 2px rgba(22, 20, 16, 0.2), 0 20px 35px rgba(39, 34, 26, 0.24), 18px 28px 60px rgba(39, 34, 26, 0.14);
+  transform: perspective(1400px) rotateY(-0.65deg) rotateX(0.2deg);
+  transform-origin: center;
+}
+.hw-gallery-canvas::after {
+  content: '';
+  position: absolute;
+  inset: clamp(7px, 0.9vw, 14px);
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.018) 0 1px, transparent 1px 5px);
+  mix-blend-mode: soft-light;
+}
+.hw-gallery-label {
+  width: min(100%, 360px);
+  margin: 1.25rem 0 0 auto;
+  padding: 0.9rem 1rem 0.85rem;
+  border-left: 2px solid var(--hw-gold);
+  background: rgba(247, 244, 238, 0.92);
+  box-shadow: 0 7px 16px rgba(45, 40, 31, 0.1);
+  color: var(--hw-ink3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 8px;
+  line-height: 1.65;
+  letter-spacing: 0.09em;
+}
+.hw-gallery-label-index {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--hw-ink);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+/* Image-aware essay cards */
+.hw-essay-thumbnail {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: var(--hw-surface);
+}
+.hw-essay-thumbnail--compact { aspect-ratio: 4 / 3; }
+.hw-essay-thumbnail img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.group:hover .hw-essay-thumbnail img { transform: scale(1.025); }
+@media (max-width: 767px) {
+  .hw-gallery-canvas {
+    transform: none;
+    box-shadow: 0 2px 2px rgba(22, 20, 16, 0.18), 0 14px 28px rgba(39, 34, 26, 0.2);
+  }
+  .hw-gallery-label { margin-right: auto; }
+}

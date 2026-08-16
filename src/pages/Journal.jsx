@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { formatPublicationDate } from '@/lib/editorial';
+import EssayThumbnail from '@/components/EssayThumbnail';
 
 export default function Journal() {
   const [params] = useSearchParams();
@@ -108,6 +109,7 @@ export default function Journal() {
                 to={`/journal/${essay.slug}`}
                 className="group block border-t-2 border-[var(--hw-sage)] pt-5"
               >
+                <EssayThumbnail article={essay} compact className="mb-4" />
                 <div className="font-mono text-[8px] tracking-[0.2em] uppercase text-[var(--hw-sage)] mb-3">
                   Free · {essay.series_label || 'Human Weather'}
                 </div>
@@ -169,6 +171,7 @@ export default function Journal() {
                 to={`/journal/${article.slug}`}
                 className="group block border-l-2 border-transparent hover:border-[var(--hw-gold)] pl-5 -ml-5 py-8 border-b border-[rgba(154,125,46,0.18)] transition-all duration-300"
               >
+                <EssayThumbnail article={article} compact className="mb-5 max-w-[320px]" />
                 <div className="flex items-center justify-between mb-3">
                   <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-rust)]">
                     {article.series_label || 'Human Weather'}

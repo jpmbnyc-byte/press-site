@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { setSeriesPageMeta } from '@/lib/pageMeta';
+import EssayThumbnail from '@/components/EssayThumbnail';
 
 export default function SeriesDetail() {
   const { slug } = useParams();
@@ -125,6 +126,7 @@ export default function SeriesDetail() {
                     to={`/journal/${essay.slug}`}
                     className="group block border-l-2 border-[var(--hw-sage)] pl-5 -ml-5 py-2"
                   >
+                    <EssayThumbnail article={essay} compact className="mb-5 max-w-[320px]" />
                     <h2 className="font-serif text-2xl md:text-3xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 leading-tight mb-2">
                       {essay.title}
                     </h2>
@@ -147,6 +149,7 @@ export default function SeriesDetail() {
                 to={`/journal/${essay.slug}`}
                 className="group block border-l-2 border-transparent hover:border-[var(--hw-gold)] pl-5 -ml-5 py-8 border-b border-[rgba(154,125,46,0.18)] transition-all duration-300"
               >
+                <EssayThumbnail article={essay} compact className="mb-5 max-w-[320px]" />
                 <div className="flex items-baseline gap-5 mb-2">
                   <span className="font-mono text-2xl text-[var(--hw-gold)] opacity-50">
                     {String(essay.series_order || i + 1).padStart(2, '0')}
