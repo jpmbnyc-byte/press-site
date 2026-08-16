@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { formatPublicationDate } from '@/lib/editorial';
 
 export default function Journal() {
   const [params] = useSearchParams();
@@ -43,7 +44,6 @@ export default function Journal() {
     if (filterAccess !== 'All') result = result.filter(a => a.access_level === filterAccess.toLowerCase());
     if (sortBy === 'Newest') result.sort((a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0));
     if (sortBy === 'Oldest') result.sort((a, b) => new Date(a.published_at || 0) - new Date(b.published_at || 0));
-    if (sortBy === 'Most Read') result.sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
     return result;
   }, [articles, filterSeries, filterAccess, sortBy]);
 
@@ -82,7 +82,6 @@ export default function Journal() {
         {articles.length} essays · {series.length} series · {freeEssays.length} free
       </div>
 
-      {/* Free essays — elevated when browsing the full archive */}
       {!loading && filterAccess === 'All' && filterSeries === 'All' && freeEssays.length > 0 && (
         <section className="mb-14 pb-12 border-b border-[rgba(154,125,46,0.18)]">
           <div className="flex items-baseline justify-between gap-4 mb-8">
@@ -113,9 +112,14 @@ export default function Journal() {
                   Free · {essay.series_label || 'Human Weather'}
                 </div>
                 <h3 className="font-serif text-xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-2 leading-tight">
-                  {essay.subtitle || essay.title}
+                  {essay.title}
                 </h3>
-                <p className="font-serif italic text-sm text-[var(--hw-ink2)] line-clamp-3 leading-relaxed">
+                {essay.subtitle && (
+                  <p className="font-serif italic text-sm text-[var(--hw-rust)] mb-2 leading-relaxed">
+                    {essay.subtitle}
+                  </p>
+                )}
+                <p className="font-serif text-sm text-[var(--hw-ink2)] line-clamp-3 leading-relaxed">
                   {essay.excerpt}
                 </p>
               </Link>
@@ -124,7 +128,6 @@ export default function Journal() {
         </section>
       )}
 
-      {/* Filter bar */}
       <div className="space-y-4 mb-12 sticky top-14 bg-[var(--hw-bg)] py-4 z-30 border-b border-[rgba(154,125,46,0.15)]">
         <div className="flex gap-2 overflow-x-auto pb-1">
           <FilterButton label="All" active={filterSeries === 'All'} onClick={() => setFilterSeries('All')} />
@@ -144,11 +147,9 @@ export default function Journal() {
           <div className="w-px bg-[rgba(154,125,46,0.2)] mx-2" />
           <FilterButton label="Newest" active={sortBy === 'Newest'} onClick={() => setSortBy('Newest')} />
           <FilterButton label="Oldest" active={sortBy === 'Oldest'} onClick={() => setSortBy('Oldest')} />
-          <FilterButton label="Most Read" active={sortBy === 'Most Read'} onClick={() => setSortBy('Most Read')} />
         </div>
       </div>
 
-      {/* Article list */}
       {loading ? (
         <div className="flex justify-center py-20">
           <div className="w-8 h-8 border-2 border-[var(--hw-gold)] border-t-transparent rounded-none animate-spin"></div>
@@ -161,6 +162,7 @@ export default function Journal() {
         <div className="space-y-0">
           {filtered.map(article => {
             const isFree = article.access_level === 'free';
+            const published = formatPublicationDate(article.published_at);
             return (
               <Link
                 key={article.id}
@@ -180,22 +182,23 @@ export default function Journal() {
                       {isFree ? 'Free' : 'Members'}
                     </span>
                     <span className="font-mono text-[8px] tracking-[0.15em] uppercase text-[var(--hw-ink3)]">
-                      Essay {String(article.series_order || 1).padStart(2, '0')} of 07
+                      Essay {String(article.series_order || 1).padStart(2, '0')}
                     </span>
                   </div>
                 </div>
                 <h2 className="font-serif text-2xl md:text-3xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 mb-2 leading-tight">
                   {article.title}
-                  {article.subtitle && (
-                    <span className="text-[var(--hw-ink2)] font-light"> — {article.subtitle}</span>
-                  )}
                 </h2>
-                <p className="font-serif italic text-base text-[var(--hw-ink2)] mb-3 leading-relaxed">
+                {article.subtitle && (
+                  <p className="font-serif italic text-base text-[var(--hw-rust)] mb-2 leading-relaxed">
+                    {article.subtitle}
+                  </p>
+                )}
+                <p className="font-serif text-base text-[var(--hw-ink2)] mb-3 leading-relaxed">
                   {article.excerpt}
                 </p>
                 <div className="font-mono text-[8px] tracking-[0.15em] uppercase text-[var(--hw-ink3)]">
-                  JP Bobo · {article.published_at || '2026'} · {article.reading_time_mins || 9} min read
-                  {article.view_count ? ` · ${article.view_count} views` : ''}
+                  {article.author_name || 'JP Bobo'} · {published || 'Publication date forthcoming'} · {article.reading_time_mins || 9} min read
                 </div>
               </Link>
             );

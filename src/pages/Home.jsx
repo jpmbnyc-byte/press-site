@@ -12,14 +12,14 @@ const HERO_IMAGE =
 const FEATURED_PREVIEW_SLUG = WATERS_EDGE_SLUG;
 
 function essayDisplayTitle(essay) {
-  return essay?.subtitle || essay?.title;
+  return essay?.title;
 }
 
 function essayEyebrow(essay, fallback = 'Featured') {
   return [
     essay?.series_label,
     essay?.series_order
-      ? `Essay ${String(essay.series_order).padStart(2, '0')} of 7`
+      ? `Essay ${String(essay.series_order).padStart(2, '0')}`
       : null,
   ]
     .filter(Boolean)
@@ -47,7 +47,6 @@ export default function Home() {
           .sort((a, b) => (a.featured_order ?? 99) - (b.featured_order ?? 99));
         setFeatured(feat.length ? feat : live.slice(0, 1));
         setLatest(live.slice(0, 4));
-        // Prefer the Relational Faith free essay beside the Waters Edge preview.
         const freeRank = (a) => {
           if (a.slug === 'relational-faith-the-distance-we-choose') return 0;
           if (a.series_slug === 'relational-faith') return 1;
@@ -91,7 +90,6 @@ export default function Home() {
 
   return (
     <div className="bg-[var(--hw-bg)]">
-      {/* Brand hero — full-bleed image + Field Station CTAs */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
         <img
           src={HERO_IMAGE}
@@ -133,7 +131,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured preview — Waters Edge */}
       {spotlight && (
         <section className="py-24 md:py-32 px-6">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
@@ -159,11 +156,16 @@ export default function Home() {
               <div className="font-mono text-[9px] tracking-[0.22em] uppercase text-[var(--hw-ink3)] mb-6">
                 {essayEyebrow(spotlight)}
               </div>
-              <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-light text-[var(--hw-ink)] leading-[1.05] tracking-[-0.01em] mb-6">
+              <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-light text-[var(--hw-ink)] leading-[1.05] tracking-[-0.01em] mb-3">
                 {essayDisplayTitle(spotlight)}
               </h2>
+              {spotlight.subtitle && (
+                <p className="font-serif italic text-xl text-[var(--hw-rust)] mb-5 leading-relaxed max-w-md">
+                  {spotlight.subtitle}
+                </p>
+              )}
               {spotlight.excerpt && (
-                <p className="font-serif italic text-xl text-[var(--hw-ink2)] mb-8 leading-relaxed max-w-md">
+                <p className="font-serif text-lg text-[var(--hw-ink2)] mb-8 leading-relaxed max-w-md">
                   {spotlight.excerpt}
                 </p>
               )}
@@ -182,7 +184,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* Free essays — discoverability */}
       {freeLead && (
         <section className="py-20 md:py-24 px-6 bg-[var(--hw-surface)]">
           <div className="max-w-6xl mx-auto">
@@ -216,11 +217,16 @@ export default function Home() {
                 <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-sage)] mb-3">
                   Free essay · {essayEyebrow(freeLead, freeLead.series_label)}
                 </div>
-                <h3 className="font-serif text-[clamp(28px,4vw,40px)] font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-500 leading-[1.08] mb-4">
+                <h3 className="font-serif text-[clamp(28px,4vw,40px)] font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-500 leading-[1.08] mb-3">
                   {essayDisplayTitle(freeLead)}
                 </h3>
+                {freeLead.subtitle && (
+                  <p className="font-serif italic text-lg text-[var(--hw-rust)] mb-4 leading-relaxed max-w-xl">
+                    {freeLead.subtitle}
+                  </p>
+                )}
                 {freeLead.excerpt && (
-                  <p className="font-serif italic text-lg text-[var(--hw-ink2)] mb-6 leading-relaxed max-w-xl">
+                  <p className="font-serif text-lg text-[var(--hw-ink2)] mb-6 leading-relaxed max-w-xl">
                     {freeLead.excerpt}
                   </p>
                 )}
@@ -246,8 +252,13 @@ export default function Home() {
                       <h3 className="font-serif text-2xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-500 mb-2 leading-tight">
                         {essayDisplayTitle(essay)}
                       </h3>
+                      {essay.subtitle && (
+                        <p className="font-serif italic text-sm text-[var(--hw-rust)] mb-2 leading-relaxed">
+                          {essay.subtitle}
+                        </p>
+                      )}
                       {essay.excerpt && (
-                        <p className="font-serif italic text-base text-[var(--hw-ink2)] line-clamp-2 leading-relaxed">
+                        <p className="font-serif text-base text-[var(--hw-ink2)] line-clamp-2 leading-relaxed">
                           {essay.excerpt}
                         </p>
                       )}
@@ -272,7 +283,6 @@ export default function Home() {
         <div className="w-20 h-px bg-[var(--hw-gold)] opacity-30" />
       </div>
 
-      {/* Recent reports */}
       <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-baseline justify-between mb-16">
@@ -302,7 +312,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Seven series */}
       <section className="py-24 px-6 border-t border-[rgba(108,87,89,0.18)]">
         <div className="max-w-6xl mx-auto">
           <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-4">
@@ -329,7 +338,7 @@ export default function Home() {
                 </h3>
                 <p className="font-serif italic text-sm text-[var(--hw-ink2)] mb-3">{s.tagline}</p>
                 <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-ink3)]">
-                  {s.essay_count_published || 0} of 7 essays
+                  {s.essay_count_published || 0} of {s.total_essays || 0} essays
                 </div>
               </Link>
             ))}
@@ -337,7 +346,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gospels Live callout */}
       <section className="py-24 px-6 bg-[#0e0d0a]">
         <div className="max-w-3xl mx-auto text-center animate-[hw-rise_0.8s_ease-out]">
           <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#c4a84a] mb-5">

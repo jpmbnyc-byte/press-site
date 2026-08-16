@@ -82,7 +82,7 @@ export function setHomePageMeta() {
 
 export function setEssayPageMeta(article) {
   if (!article) return;
-  const essayName = article.subtitle || article.title || 'Essay';
+  const essayName = article.title || 'Essay';
   const series = article.series_label || 'Human Weather';
   const title = `${essayName} — ${series} | Human Weather`;
   const description =

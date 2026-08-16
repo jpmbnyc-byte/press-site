@@ -51,13 +51,14 @@ export default function SeriesDetail() {
     );
   }
 
+  const totalEssays = seriesItem.total_essays || 0;
+
   return (
     <div>
-      {/* Series header — dark */}
       <header className="bg-[#0e0d0a] py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a] mb-4">
-            Series · {String(seriesItem.sort_order || 1).padStart(2, '0')} of 07
+            Series · {String(seriesItem.sort_order || 1).padStart(2, '0')}
           </div>
           <h1 className="font-serif text-[clamp(36px,6vw,52px)] font-light text-[#f0e9d8] mb-4 leading-tight tracking-[-0.01em]">
             {seriesItem.name}
@@ -67,7 +68,7 @@ export default function SeriesDetail() {
             {seriesItem.description}
           </p>
           <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#f0e9d8] opacity-40">
-            {essays.length} essays published of 7 ·{' '}
+            {essays.length} essays published{totalEssays ? ` of ${totalEssays}` : ''} ·{' '}
             {seriesItem.access_level === 'free_first'
               ? 'Free & members essays'
               : seriesItem.access_level === 'members_only'
@@ -77,7 +78,6 @@ export default function SeriesDetail() {
         </div>
       </header>
 
-      {/* Essay list */}
       <section className="max-w-3xl mx-auto px-6 py-16">
         {essays.length === 0 ? (
           <div className="py-20 text-center">
@@ -110,8 +110,13 @@ export default function SeriesDetail() {
                       className="group block border-l-2 border-[var(--hw-sage)] pl-5 -ml-5 py-2"
                     >
                       <h2 className="font-serif text-2xl md:text-3xl font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-300 leading-tight mb-2">
-                        {essay.subtitle || essay.title}
+                        {essay.title}
                       </h2>
+                      {essay.subtitle && (
+                        <p className="font-serif italic text-base text-[var(--hw-rust)] mb-3 leading-relaxed">
+                          {essay.subtitle}
+                        </p>
+                      )}
                       <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-sage)]">
                         Free essay · Read now →
                       </span>
@@ -140,11 +145,11 @@ export default function SeriesDetail() {
                         {essay.title}
                       </h2>
                       {essay.subtitle && (
-                        <p className="font-serif italic text-base text-[var(--hw-ink2)] mb-2">
+                        <p className="font-serif italic text-base text-[var(--hw-rust)] mb-2 leading-relaxed">
                           {essay.subtitle}
                         </p>
                       )}
-                      <p className="font-serif italic text-sm text-[var(--hw-ink3)] mb-3">
+                      <p className="font-serif text-sm text-[var(--hw-ink2)] mb-3 leading-relaxed">
                         {essay.excerpt}
                       </p>
                       <div className="flex items-center gap-4">
