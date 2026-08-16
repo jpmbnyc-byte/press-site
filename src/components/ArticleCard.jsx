@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
+import { formatPublicationDate } from '@/lib/editorial';
 
 export default function ArticleCard({ article }) {
   const isFree = article.access_level === 'free';
+  const published = formatPublicationDate(article.published_at);
 
   return (
     <Link
@@ -20,19 +22,19 @@ export default function ArticleCard({ article }) {
           {isFree ? 'Free' : 'Members'}
         </div>
       </div>
-      <h3 className="font-serif text-[clamp(24px,3vw,32px)] font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-500 mb-3 leading-[1.1]">
-        {article.subtitle || article.title}
+      <h3 className="font-serif text-[clamp(24px,3vw,32px)] font-light text-[var(--hw-ink)] group-hover:text-[var(--hw-gold)] transition-colors duration-500 mb-2 leading-[1.1]">
+        {article.title}
       </h3>
-      {article.subtitle && article.title && (
-        <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-ink3)] mb-4">
-          {article.title}
+      {article.subtitle && (
+        <p className="font-serif italic text-base text-[var(--hw-rust)] mb-4 leading-relaxed">
+          {article.subtitle}
         </p>
       )}
       <p className="font-body text-sm text-[var(--hw-ink2)] mb-6 line-clamp-2 leading-[1.75]">
         {article.excerpt}
       </p>
       <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-ink3)]">
-        {article.published_at || '2026'} · {article.reading_time_mins || 9} min read
+        {published || 'Publication date forthcoming'} · {article.reading_time_mins || 9} min read
       </div>
     </Link>
   );

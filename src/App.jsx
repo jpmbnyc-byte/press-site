@@ -3,8 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
-import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import { AuthProvider } from '@/lib/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 // Add page imports here
 import Layout from '@/components/Layout';
@@ -27,9 +26,8 @@ import AuthGoogleStart from '@/pages/AuthGoogleStart';
 
 const AuthenticatedApp = () => {
   const location = useLocation();
-  const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
 
-  // OAuth hops must not wait on auth boot.
+  // OAuth hops must remain isolated from the public site shell.
   if (location.pathname === '/auth/bridge') {
     return <AuthBridge />;
   }
@@ -37,23 +35,8 @@ const AuthenticatedApp = () => {
     return <AuthGoogleStart />;
   }
 
-  // Brief boot state only — never redirect away from the public press site.
-  if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0e0d0a] gap-4">
-        <div className="w-8 h-8 border-2 border-[#c4a84a] border-t-transparent animate-spin" />
-        <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-[#c4a84a]/70">
-          Opening the field journal…
-        </div>
-      </div>
-    );
-  }
-
-  // Soft handling only — public site must always render routes.
-  if (authError?.type === 'user_not_registered') {
-    return <UserNotRegisteredError />;
-  }
-
+  // Public press routes render immediately. Auth continues to initialize in
+  // AuthProvider without replacing the publication with a blocking boot screen.
   return (
     <Routes>
       <Route element={<Layout />}>
@@ -79,9 +62,7 @@ const AuthenticatedApp = () => {
   );
 };
 
-
 function App() {
-
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>

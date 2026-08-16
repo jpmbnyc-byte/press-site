@@ -6,9 +6,18 @@ import {
   WATERS_EDGE_SLUG,
   WATERS_EDGE_PREVIEW_MINUTES,
 } from '@/lib/membership';
+import { formatPublicationDate } from '@/lib/editorial';
 
 function isLive(article) {
   return article?.status === 'published' || article?.status === 'featured';
+}
+
+function withEditorialDate(article) {
+  if (!article) return article;
+  return {
+    ...article,
+    published_at: formatPublicationDate(article.published_at) || article.published_at,
+  };
 }
 
 function buildPreviewBody(article) {
@@ -28,10 +37,11 @@ export function gateArticleForReader(article, user) {
   const access = String(article.access_level || 'free');
   const entitled = access !== 'members' || hasPressAccess(user);
   const fullBody = String(article.body_md || '');
+  const prepared = withEditorialDate(article);
 
   if (entitled) {
     return {
-      ...article,
+      ...prepared,
       body_md: fullBody,
       body_gated: false,
       can_read_full: true,
@@ -39,7 +49,7 @@ export function gateArticleForReader(article, user) {
   }
 
   return {
-    ...article,
+    ...prepared,
     body_md: buildPreviewBody(article),
     body_gated: true,
     can_read_full: false,
@@ -65,7 +75,10 @@ async function fetchViaFunction(slug) {
     err.code = 'not_found';
     throw err;
   }
-  return data;
+  return {
+    ...data,
+    article: withEditorialDate(data.article),
+  };
 }
 
 async function fetchViaEntities(slug, user) {

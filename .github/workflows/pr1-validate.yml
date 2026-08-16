@@ -1,0 +1,19 @@
+name: PR 1 validation
+
+on:
+  push:
+    branches:
+      - codex/pr1-editorial-foundation
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build

@@ -4,11 +4,17 @@ import { startCheckout, openBillingPortal } from '@/lib/stripeCheckout';
 import { useAuth } from '@/lib/AuthContext';
 import { getAppUnlockUrl, hasAppAccess, hasPressAccess } from '@/lib/membership';
 import { buildAuthPath } from '@/lib/authSession';
+import { STRIPE_PLANS } from '@/lib/stripePlans';
+
+const monthlyPlan = STRIPE_PLANS.member_monthly;
+const yearlyPlan = STRIPE_PLANS.member_yearly;
+const appPlan = STRIPE_PLANS.member_app_yearly;
+const trialDays = yearlyPlan.trialDays;
 
 const tiers = [
   {
     name: 'Free Reader',
-    price: '—',
+    price: 'Free',
     badge: null,
     features: [
       'Essays marked Free in the journal',
@@ -22,34 +28,34 @@ const tiers = [
     filled: false,
   },
   {
-    name: 'Member',
-    price: '$9/mo or $72/yr',
+    name: yearlyPlan.name,
+    price: `${monthlyPlan.amountLabel} or ${yearlyPlan.amountLabel}`,
     badge: 'Most Popular',
     features: [
       'Full access to members essays',
       'Growing archive across seven series',
       'Account & billing self-serve',
-      '7-day free trial',
+      `${trialDays}-day free trial`,
     ],
     planOptions: [
-      { id: 'member_monthly', label: '$9 / month' },
-      { id: 'member_yearly', label: '$72 / year' },
+      { id: monthlyPlan.id, label: monthlyPlan.amountLabel },
+      { id: yearlyPlan.id, label: yearlyPlan.amountLabel },
     ],
     cta: 'Start Free Trial',
     highlighted: true,
     filled: false,
   },
   {
-    name: 'Member + App',
-    price: '$96/year',
+    name: appPlan.name,
+    price: appPlan.amountLabel,
     badge: 'Best Value',
     features: [
       'Everything in Member',
       'humanweather.social app premium',
       'Unlock link after checkout',
-      '7-day free trial',
+      `${appPlan.trialDays}-day free trial`,
     ],
-    planId: 'member_app_yearly',
+    planId: appPlan.id,
     cta: 'Join + App Bundle',
     highlighted: true,
     filled: true,
@@ -59,14 +65,13 @@ const tiers = [
 export default function Subscribe() {
   const [params] = useSearchParams();
   const { user, isAuthenticated, refreshUser } = useAuth();
-  const [memberPlan, setMemberPlan] = useState('member_yearly');
+  const [memberPlan, setMemberPlan] = useState(yearlyPlan.id);
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const plan = params.get('plan');
     if (!plan) return;
-    // Payment Links work logged-out; pass user when present for email / reference id.
     startCheckout(plan, { user }).catch((err) => {
       setError(err.message || 'Checkout failed');
     });
@@ -231,7 +236,7 @@ export default function Subscribe() {
             {tier.href ? (
               <Link
                 to={tier.href}
-                className={`font-mono text-[10px] tracking-[0.25em] uppercase px-6 py-4 text-center transition-all duration-300 border border-[#c4a84a] text-[#c4a84a] hover:bg-[#c4a84a] hover:text-[#0e0d0a]`}
+                className="font-mono text-[10px] tracking-[0.25em] uppercase px-6 py-4 text-center transition-all duration-300 border border-[#c4a84a] text-[#c4a84a] hover:bg-[#c4a84a] hover:text-[#0e0d0a]"
               >
                 {tier.cta}
               </Link>
@@ -263,7 +268,7 @@ export default function Subscribe() {
         {[
           'Cancel any time',
           'Free essays stay free — members unlock the rest',
-          '7-day free trial — no charge until day 8',
+          `${trialDays}-day free trial — no charge until day ${trialDays + 1}`,
           <>
             Questions?{' '}
             <a
