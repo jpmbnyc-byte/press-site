@@ -68,14 +68,6 @@ export default function Home() {
     })();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--hw-bg)]">
-        <div className="w-8 h-8 border-2 border-[var(--hw-gold)] border-t-transparent animate-spin" />
-      </div>
-    );
-  }
-
   const spotlight =
     featured.find(a => a.slug === FEATURED_PREVIEW_SLUG) ||
     latest.find(a => a.slug === FEATURED_PREVIEW_SLUG) ||
@@ -130,6 +122,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {loading && (
+        <div className="px-6 py-5 text-center font-mono text-[9px] tracking-[0.25em] uppercase text-[var(--hw-ink3)]" role="status">
+          Opening the latest field notes…
+        </div>
+      )}
 
       {spotlight && (
         <section className="py-24 md:py-32 px-6">
