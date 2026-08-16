@@ -10,12 +10,12 @@ const monthlyPlan = STRIPE_PLANS.member_monthly;
 const yearlyPlan = STRIPE_PLANS.member_yearly;
 const appPlan = STRIPE_PLANS.member_app_yearly;
 const trialDays = yearlyPlan.trialDays;
+const validPlanIds = new Set([monthlyPlan.id, yearlyPlan.id, appPlan.id]);
 
 const tiers = [
   {
     name: 'Free Reader',
     price: 'Free',
-    badge: null,
     features: [
       'Essays marked Free in the journal',
       'Email list for field notes (when we send)',
@@ -30,7 +30,6 @@ const tiers = [
   {
     name: yearlyPlan.name,
     price: `${monthlyPlan.amountLabel} or ${yearlyPlan.amountLabel}`,
-    badge: 'Most Popular',
     features: [
       'Full access to members essays',
       'Growing archive across seven series',
@@ -48,11 +47,10 @@ const tiers = [
   {
     name: appPlan.name,
     price: appPlan.amountLabel,
-    badge: 'Best Value',
     features: [
       'Everything in Member',
       'humanweather.social app premium',
-      'Unlock link after checkout',
+      'Secure app unlock after checkout',
       `${appPlan.trialDays}-day free trial`,
     ],
     planId: appPlan.id,
@@ -65,25 +63,41 @@ const tiers = [
 export default function Subscribe() {
   const [params] = useSearchParams();
   const { user, isAuthenticated, refreshUser } = useAuth();
-  const [memberPlan, setMemberPlan] = useState(yearlyPlan.id);
+  const requestedPlan = params.get('plan');
+  const safeRequestedPlan = validPlanIds.has(requestedPlan) ? requestedPlan : null;
+  const [memberPlan, setMemberPlan] = useState(
+    safeRequestedPlan === monthlyPlan.id || safeRequestedPlan === yearlyPlan.id
+      ? safeRequestedPlan
+      : yearlyPlan.id,
+  );
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const plan = params.get('plan');
-    if (!plan) return;
-    startCheckout(plan, { user }).catch((err) => {
+    if (!safeRequestedPlan || !isAuthenticated) return;
+    setLoadingPlan(safeRequestedPlan);
+    startCheckout(safeRequestedPlan, { user }).catch((err) => {
       setError(err.message || 'Checkout failed');
+      setLoadingPlan(null);
     });
-  }, [params, user]);
+  }, [safeRequestedPlan, isAuthenticated, user]);
 
   useEffect(() => {
     refreshUser?.();
   }, [refreshUser]);
 
   const handleCheckout = async (planId) => {
-    if (!planId) return;
+    if (!planId || !validPlanIds.has(planId)) return;
     setError('');
+
+    if (!isAuthenticated) {
+      window.location.href = buildAuthPath('login', {
+        next: '/subscribe',
+        plan: planId,
+      });
+      return;
+    }
+
     setLoadingPlan(planId);
     try {
       await startCheckout(planId, { user });
@@ -94,6 +108,7 @@ export default function Subscribe() {
   };
 
   const handleManage = async () => {
+    if (!isAuthenticated) return;
     setError('');
     setLoadingPlan('portal');
     try {
@@ -123,37 +138,16 @@ export default function Subscribe() {
           Seven series. A growing archive. One question. And an app that maps what you feel.
         </p>
         {!isAuthenticated && (
-          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a] mt-6">
-            Checkout is open —{' '}
-            <Link
-              to={buildAuthPath('login', {
-                next: '/subscribe',
-                plan: params.get('plan') || undefined,
-              })}
-              className="underline underline-offset-4"
-            >
-              log in
-            </Link>
-            {' '}or{' '}
-            <Link
-              to={buildAuthPath('register', {
-                next: '/subscribe',
-                plan: params.get('plan') || undefined,
-              })}
-              className="underline underline-offset-4"
-            >
-              create an account
-            </Link>
-            {' '}to link membership to your press login
+          <p className="font-serif text-sm text-[#c8b99a] mt-6 leading-relaxed">
+            Choose a plan below. You’ll log in or create your account before Stripe checkout so the
+            membership is linked to the reader who purchased it.
           </p>
         )}
       </div>
 
       {press && (
         <div className="max-w-xl mx-auto mb-10 border border-[#c4a84a]/40 px-6 py-5 text-center">
-          <p className="font-serif text-[#f0e9d8] mb-2">
-            You have press access ({user.membership_status}).
-          </p>
+          <p className="font-serif text-[#f0e9d8] mb-2">Your press membership is active.</p>
           {app ? (
             <a
               href={unlockUrl}
@@ -163,7 +157,7 @@ export default function Subscribe() {
             </a>
           ) : (
             <p className="font-serif italic text-sm text-[#c8b99a]">
-              Want the PWA too? Upgrade to Member + App below.
+              Add the app with Member + App below.
             </p>
           )}
         </div>
@@ -187,15 +181,6 @@ export default function Subscribe() {
                   : 'border border-[rgba(196,168,74,0.3)] text-[#f0e9d8]'
             }`}
           >
-            {tier.badge && (
-              <div
-                className={`font-mono text-[8px] tracking-[0.2em] uppercase mb-4 ${
-                  tier.filled ? 'text-[#0e0d0a]' : 'text-[#c4a84a]'
-                }`}
-              >
-                {tier.badge}
-              </div>
-            )}
             <div
               className={`font-mono text-[11px] tracking-[0.2em] uppercase mb-3 ${
                 tier.filled ? 'text-[#0e0d0a]' : 'text-[#c4a84a]'
@@ -206,28 +191,28 @@ export default function Subscribe() {
             <div className="font-serif text-2xl font-light mb-6">{tier.price}</div>
             <div className={`h-px mb-6 ${tier.filled ? 'bg-[#0e0d0a] opacity-20' : 'bg-[#c4a84a] opacity-25'}`} />
             <ul className="space-y-3 mb-8 flex-1">
-              {tier.features.map((f) => (
-                <li key={f} className="font-serif text-sm leading-relaxed flex gap-2">
+              {tier.features.map((feature) => (
+                <li key={feature} className="font-serif text-sm leading-relaxed flex gap-2">
                   <span className={tier.filled ? 'text-[#0e0d0a]' : 'text-[#c4a84a]'}>✦</span>
-                  <span>{f}</span>
+                  <span>{feature}</span>
                 </li>
               ))}
             </ul>
 
             {tier.planOptions && (
               <div className="flex gap-2 mb-4">
-                {tier.planOptions.map((opt) => (
+                {tier.planOptions.map((option) => (
                   <button
-                    key={opt.id}
+                    key={option.id}
                     type="button"
-                    onClick={() => setMemberPlan(opt.id)}
+                    onClick={() => setMemberPlan(option.id)}
                     className={`flex-1 font-mono text-[9px] tracking-[0.15em] uppercase px-2 py-2 border transition-colors ${
-                      memberPlan === opt.id
+                      memberPlan === option.id
                         ? 'bg-[#c4a84a] text-[#0e0d0a] border-[#c4a84a]'
                         : 'border-[#c4a84a]/50 text-[#c4a84a] hover:border-[#c4a84a]'
                     }`}
                   >
-                    {opt.label}
+                    {option.label}
                   </button>
                 ))}
               </div>
@@ -244,9 +229,7 @@ export default function Subscribe() {
               <button
                 type="button"
                 disabled={!!loadingPlan}
-                onClick={() =>
-                  handleCheckout(tier.planOptions ? memberPlan : tier.planId)
-                }
+                onClick={() => handleCheckout(tier.planOptions ? memberPlan : tier.planId)}
                 className={`font-mono text-[10px] tracking-[0.25em] uppercase px-6 py-4 text-center transition-all duration-300 disabled:opacity-60 ${
                   tier.filled
                     ? 'bg-[#0e0d0a] text-[#c4a84a] hover:bg-[#1a1810]'
@@ -254,10 +237,11 @@ export default function Subscribe() {
                 }`}
               >
                 {loadingPlan &&
-                (loadingPlan === tier.planId ||
-                  (tier.planOptions && loadingPlan === memberPlan))
+                (loadingPlan === tier.planId || (tier.planOptions && loadingPlan === memberPlan))
                   ? 'Redirecting…'
-                  : tier.cta}
+                  : isAuthenticated
+                    ? tier.cta
+                    : `Continue · ${tier.cta}`}
               </button>
             )}
           </div>
@@ -269,29 +253,38 @@ export default function Subscribe() {
           'Cancel any time',
           'Free essays stay free — members unlock the rest',
           `${trialDays}-day free trial — no charge until day ${trialDays + 1}`,
-          <>
-            Questions?{' '}
-            <a
-              href="mailto:hello@humanweather.social"
-              className="text-[#c4a84a] hover:text-[#e0c870] transition-colors duration-300 not-italic"
-            >
-              hello@humanweather.social
-            </a>
-          </>,
-        ].map((note, i) => (
-          <div key={i} className="font-serif italic text-sm text-[#c8b99a] flex items-center justify-center gap-2">
+        ].map((note) => (
+          <div key={note} className="font-serif italic text-sm text-[#c8b99a] flex items-center justify-center gap-2">
             <span className="text-[#c4a84a]">✦</span>
             {note}
           </div>
         ))}
-        <button
-          type="button"
-          onClick={handleManage}
-          disabled={loadingPlan === 'portal'}
-          className="mt-6 font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border-b border-[#c4a84a]/40 pb-1 hover:text-[#e0c870] transition-colors disabled:opacity-60"
-        >
-          {loadingPlan === 'portal' ? 'Opening…' : 'Manage existing membership →'}
-        </button>
+        <div className="font-serif italic text-sm text-[#c8b99a] flex items-center justify-center gap-2">
+          <span className="text-[#c4a84a]">✦</span>
+          <span>
+            Questions?{' '}
+            <a href="mailto:hello@humanweather.social" className="text-[#c4a84a] not-italic hover:underline">
+              hello@humanweather.social
+            </a>
+          </span>
+        </div>
+        {isAuthenticated ? (
+          <button
+            type="button"
+            onClick={handleManage}
+            disabled={loadingPlan === 'portal'}
+            className="mt-6 font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border-b border-[#c4a84a]/40 pb-1 hover:text-[#e0c870] transition-colors disabled:opacity-60"
+          >
+            {loadingPlan === 'portal' ? 'Opening…' : 'Manage existing membership →'}
+          </button>
+        ) : (
+          <Link
+            to={buildAuthPath('login', { next: '/account' })}
+            className="inline-block mt-6 font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border-b border-[#c4a84a]/40 pb-1 hover:text-[#e0c870]"
+          >
+            Log in to manage membership →
+          </Link>
+        )}
       </div>
     </div>
   );
