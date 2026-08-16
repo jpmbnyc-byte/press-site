@@ -35,31 +35,23 @@ const PERSONAL_IMAGE_SLUGS = new Set([
   'on-bliss-the-temperature-of-her-joy',
 ]);
 
-const INTENTIONALLY_IMAGELESS = new Set([
-  'on-bliss-the-city-that-did-not-ask',
-  'on-bliss-what-the-body-already-knows',
-  'relational-faith-the-mirror-at-the-waters-edge',
-  'relational-faith-the-soft-turn',
-  'relational-faith-the-witness-that-travels',
-  'relational-faith-the-distance-we-choose',
-]);
-
 export function getEditorialImage(article) {
   if (!article?.slug) return null;
 
   const archival = ARCHIVAL_ESSAY_IMAGES[article.slug];
   if (archival) return archival;
 
-  if (PERSONAL_IMAGE_SLUGS.has(article.slug) && article.hero_image_url) {
+  if (article.hero_image_url) {
+    const personalAlt = PERSONAL_IMAGE_SLUGS.has(article.slug)
+      ? 'The author’s grandmother, remembered in The Temperature of Her Joy.'
+      : '';
+
     return {
       src: article.hero_image_url,
-      alt:
-        article.hero_image_alt ||
-        'The author’s grandmother, remembered in The Temperature of Her Joy.',
+      alt: article.hero_image_alt || personalAlt,
       caption: article.hero_image_caption || '',
     };
   }
 
-  if (INTENTIONALLY_IMAGELESS.has(article.slug)) return null;
   return null;
 }
