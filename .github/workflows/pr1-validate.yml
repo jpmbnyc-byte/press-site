@@ -1,9 +1,9 @@
-name: PR 1 validation
+name: CI
 
 on:
   push:
     branches:
-      - codex/pr1-editorial-foundation
+      - main
   pull_request:
     branches:
       - main
