@@ -32,13 +32,18 @@ function syncDocumentChrome(mode) {
   themeMeta.content = themeColor;
 }
 
-export function ThemeProvider({ children }) {
-  const [mode, setMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('hw-mode') || 'day';
-    }
+function getInitialMode() {
+  if (typeof window === 'undefined') return 'day';
+  try {
+    const storedMode = window.localStorage?.getItem('hw-mode');
+    return storedMode === 'night' ? 'night' : 'day';
+  } catch {
     return 'day';
-  });
+  }
+}
+
+export function ThemeProvider({ children }) {
+  const [mode, setMode] = useState(getInitialMode);
 
   useEffect(() => {
     try { localStorage.setItem('hw-mode', mode); } catch (e) { /* ignore */ }
