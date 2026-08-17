@@ -300,7 +300,9 @@ export default async function middleware(request) {
     const headers = new Headers(shellResponse.headers);
     headers.set('content-type', 'text/html; charset=utf-8');
     headers.set('cache-control', 'public, s-maxage=300, stale-while-revalidate=86400');
-    headers.delete('content-length');
+    for (const header of ['content-encoding', 'content-length', 'transfer-encoding', 'etag', 'content-md5', 'content-digest', 'digest']) {
+      headers.delete(header);
+    }
     return new Response(html, { status: shellResponse.status, headers });
   } catch (error) {
     console.error('[press metadata middleware]', error);
