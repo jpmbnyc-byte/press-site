@@ -43,6 +43,7 @@ function setCanonical(href) {
   el.setAttribute('href', href);
 }
 
+// Version share-image URLs so social crawlers see image replacements instead of a stale cached asset.
 function essayShareRevision(article) {
   const seed = article?.updated_date || article?.hero_image_url || article?.published_at || '1';
   return encodeURIComponent(String(seed).replace(/[^A-Za-z0-9._-]/g, '-'));
