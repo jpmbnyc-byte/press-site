@@ -1,0 +1,31 @@
+/* Gospels Live chamber motion. Kept separate from publication-wide motion. */
+@keyframes hw-breath {
+  0%, 100% {
+    transform: scale(0.88);
+    opacity: 0.35;
+  }
+  40% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+  55% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+}
+
+.hw-breath-ring {
+  animation-name: hw-breath;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-breath-ring {
+    animation: none !important;
+    transform: none;
+    opacity: 0.55;
+  }
+}
