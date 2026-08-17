@@ -3,10 +3,15 @@ const SESSION_KEY = 'hw-reader-session-v1';
 const MAX_ARTICLES = 120;
 
 const emptyMemory = () => ({
-  version: 1,
+  version: 2,
   firstSeenAt: null,
   lastSeenAt: null,
   articles: {},
+  gospels: {
+    received: [],
+    daily: {},
+    lastReceivedAt: null,
+  },
 });
 
 function storageArea(kind) {
@@ -31,11 +36,20 @@ function normalize(raw) {
   const base = emptyMemory();
   if (!raw || typeof raw !== 'object') return base;
   const articles = raw.articles && typeof raw.articles === 'object' ? raw.articles : {};
+  const received = Array.isArray(raw.gospels?.received)
+    ? [...new Set(raw.gospels.received.filter(Boolean))]
+    : [];
+  const daily = raw.gospels?.daily && typeof raw.gospels.daily === 'object' ? raw.gospels.daily : {};
   return {
-    version: 1,
+    version: 2,
     firstSeenAt: raw.firstSeenAt || null,
     lastSeenAt: raw.lastSeenAt || null,
     articles,
+    gospels: {
+      received,
+      daily,
+      lastReceivedAt: raw.gospels?.lastReceivedAt || null,
+    },
   };
 }
 
@@ -150,6 +164,28 @@ export function recordArticleProgress(slug, value) {
       },
     }),
   });
+}
+
+export function recordGospelReceived(id, { dailyKey } = {}) {
+  if (!id) return readReaderMemory();
+  const memory = readReaderMemory();
+  const now = new Date().toISOString();
+  const received = [...new Set([...(memory.gospels?.received || []), id])];
+  const daily = dailyKey
+    ? { ...(memory.gospels?.daily || {}), [dailyKey]: id }
+    : memory.gospels?.daily || {};
+  return writeReaderMemory({
+    ...memory,
+    gospels: {
+      received,
+      daily,
+      lastReceivedAt: now,
+    },
+  });
+}
+
+export function gospelReceivedCount(memory = readReaderMemory()) {
+  return memory.gospels?.received?.length || 0;
 }
 
 export function readerArticleEntries(memory = readReaderMemory()) {
