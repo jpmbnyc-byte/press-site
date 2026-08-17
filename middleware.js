@@ -237,8 +237,13 @@ function articleHero(article) {
   };
 }
 
+function shareRevision(article) {
+  const seed = article?.updated_date || article?.hero_image_url || article?.published_at || '1';
+  return encodeURIComponent(String(seed).replace(/[^A-Za-z0-9._-]/g, '-'));
+}
+
 function shareImageUrl(article) {
-  return `${SITE_URL}/og/${encodeURIComponent(article.slug)}`;
+  return `${SITE_URL}/og/${encodeURIComponent(article.slug)}?v=${shareRevision(article)}`;
 }
 
 function applyEssayHead(html, article) {
@@ -295,7 +300,7 @@ async function proxyHeroImage(hero, request) {
     const bytes = await upstream.arrayBuffer();
     const headers = new Headers();
     headers.set('content-type', contentType);
-    headers.set('cache-control', 'public, s-maxage=86400, stale-while-revalidate=604800');
+    headers.set('cache-control', 'public, max-age=86400, s-maxage=31536000, immutable');
     headers.set('x-content-type-options', 'nosniff');
     return new Response(bytes, { status: 200, headers });
   } catch (error) {
@@ -342,7 +347,7 @@ export default async function middleware(request) {
       const proxied = await proxyHeroImage(hero, request);
       if (proxied) return proxied;
       const png = renderEssayPng(data.article, data.series);
-      return new Response(png, { headers: { 'content-type': 'image/png', 'cache-control': 'public, s-maxage=86400, stale-while-revalidate=604800', 'x-content-type-options': 'nosniff' } });
+      return new Response(png, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=86400, s-maxage=31536000, immutable', 'x-content-type-options': 'nosniff' } });
     }
 
     const shellResponse = await fetch(new URL('/index.html', request.url), { headers: { 'user-agent': request.headers.get('user-agent') || 'HumanWeather-Metadata' } });
@@ -351,7 +356,7 @@ export default async function middleware(request) {
     if (data?.article) html = applyEssayHead(html, data.article);
     const headers = new Headers(shellResponse.headers);
     headers.set('content-type', 'text/html; charset=utf-8');
-    headers.set('cache-control', 'public, s-maxage=300, stale-while-revalidate=86400');
+    headers.set('cache-control', 'public, s-maxage=60, stale-while-revalidate=300');
     for (const header of ['content-encoding', 'content-length', 'transfer-encoding', 'etag', 'content-md5', 'content-digest', 'digest']) {
       headers.delete(header);
     }
