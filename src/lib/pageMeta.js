@@ -7,14 +7,16 @@ import { SITE_URL } from '@/lib/site';
 
 const SITE_DESCRIPTION =
   'Journaling the climate within and around us. Essays on emotional climate, faith, bliss, diaspora, and the interior life by JP Bobo.';
+const HOME_SHARE_IMAGE =
+  'https://tile.loc.gov/storage-services/service/pnp/fsa/8c36000/8c36500/8c36556v.jpg?v=20260817-home-hero';
 
 const DEFAULTS = {
   title: 'Human Weather',
   description: SITE_DESCRIPTION,
   ogTitle: 'Human Weather',
   ogDescription: SITE_DESCRIPTION,
-  image: `${SITE_URL}/og-share.jpg`,
-  imageAlt: 'Human Weather — journaling the climate within and around us',
+  image: HOME_SHARE_IMAGE,
+  imageAlt: 'Passengers leaving Hudson on a ferry in New York, October 1941. Photograph by John Collier Jr.',
   url: `${SITE_URL}/`,
   type: 'website',
   robots: 'index,follow',
@@ -39,6 +41,11 @@ function setCanonical(href) {
     document.head.appendChild(el);
   }
   el.setAttribute('href', href);
+}
+
+function essayShareRevision(article) {
+  const seed = article?.updated_date || article?.hero_image_url || article?.published_at || '1';
+  return encodeURIComponent(String(seed).replace(/[^A-Za-z0-9._-]/g, '-'));
 }
 
 export function setPageMeta({
@@ -70,6 +77,7 @@ export function setPageMeta({
   setMeta('property', 'og:title', ot);
   setMeta('property', 'og:description', od);
   setMeta('property', 'og:image', img);
+  setMeta('property', 'og:image:secure_url', img);
   setMeta('property', 'og:image:alt', alt);
 
   setMeta('name', 'twitter:card', 'summary_large_image');
@@ -93,7 +101,7 @@ export function setEssayPageMeta(article) {
     article.excerpt ||
     article.subtitle ||
     `An essay from ${series} by ${article.author_name || 'JP Bobo'}.`;
-  const image = `${SITE_URL}/og/${encodeURIComponent(article.slug)}`;
+  const image = `${SITE_URL}/og/${encodeURIComponent(article.slug)}?v=${essayShareRevision(article)}`;
   const url = `${SITE_URL}/journal/${article.slug}`;
 
   setPageMeta({
