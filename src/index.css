@@ -330,10 +330,10 @@
   width: min(100%, 360px);
   margin: 1.25rem 0 0 auto;
   padding: 0.9rem 1rem 0.85rem;
-  border-left: 2px solid var(--hw-gold);
+  border-left: 2px solid #9b8658;
   background: rgba(247, 244, 238, 0.92);
   box-shadow: 0 7px 16px rgba(45, 40, 31, 0.1);
-  color: var(--hw-ink3);
+  color: #625d54;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 8px;
   line-height: 1.65;
@@ -342,7 +342,7 @@
 .hw-gallery-label-index {
   display: block;
   margin-bottom: 0.3rem;
-  color: var(--hw-ink);
+  color: #171614;
   font-size: 9px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
