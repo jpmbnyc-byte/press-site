@@ -237,6 +237,10 @@ function articleHero(article) {
   };
 }
 
+function shareImageUrl(article) {
+  return `${SITE_URL}/og/${encodeURIComponent(article.slug)}`;
+}
+
 function applyEssayHead(html, article) {
   const essayName = article.title || 'Essay';
   const series = article.series_label || 'Human Weather';
@@ -244,7 +248,7 @@ function applyEssayHead(html, article) {
   const description = article.excerpt || article.subtitle || `An essay from ${series} by ${article.author_name || 'JP Bobo'}.`;
   const canonical = `${SITE_URL}/journal/${encodeURIComponent(article.slug)}`;
   const hero = articleHero(article);
-  const image = hero?.url || `${SITE_URL}/og/${encodeURIComponent(article.slug)}`;
+  const image = shareImageUrl(article);
   const imageAlt = hero?.alt || `${essayName} — ${series}`;
 
   const values = { title: escapeHtml(title), description: escapeHtml(description), canonical: escapeHtml(canonical), image: escapeHtml(image), imageAlt: escapeHtml(imageAlt) };
@@ -256,10 +260,15 @@ function applyEssayHead(html, article) {
   output = replaceTag(output, /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${values.title}" />`);
   output = replaceTag(output, /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${values.description}" />`);
   output = replaceTag(output, /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image" content="${values.image}" />`);
+  output = replaceTag(output, /<meta\s+property="og:image:secure_url"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:secure_url" content="${values.image}" />`);
   if (hero) {
     output = output.replace(/<meta\s+property="og:image:type"\s+content="[^"]*"\s*\/?>/i, '');
+    output = output.replace(/<meta\s+property="og:image:width"\s+content="[^"]*"\s*\/?>/i, '');
+    output = output.replace(/<meta\s+property="og:image:height"\s+content="[^"]*"\s*\/?>/i, '');
   } else {
     output = replaceTag(output, /<meta\s+property="og:image:type"\s+content="[^"]*"\s*\/?>/i, '<meta property="og:image:type" content="image/png" />');
+    output = replaceTag(output, /<meta\s+property="og:image:width"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:width" content="${WIDTH}" />`);
+    output = replaceTag(output, /<meta\s+property="og:image:height"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:height" content="${HEIGHT}" />`);
   }
   output = replaceTag(output, /<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:alt" content="${values.imageAlt}" />`);
   output = replaceTag(output, /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${values.title}" />`);
@@ -268,6 +277,31 @@ function applyEssayHead(html, article) {
   output = replaceTag(output, /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${values.canonical}" />`);
   if (article.published_at) output = output.replace('</head>', `<meta property="article:published_time" content="${escapeHtml(article.published_at)}" />\n</head>`);
   return output;
+}
+
+async function proxyHeroImage(hero, request) {
+  if (!hero?.url) return null;
+  try {
+    const upstream = await fetch(hero.url, {
+      redirect: 'follow',
+      headers: {
+        accept: 'image/avif,image/webp,image/*,*/*;q=0.8',
+        'user-agent': request.headers.get('user-agent') || 'HumanWeather-SocialImage',
+      },
+    });
+    if (!upstream.ok) return null;
+    const contentType = upstream.headers.get('content-type') || '';
+    if (!contentType.toLowerCase().startsWith('image/')) return null;
+    const bytes = await upstream.arrayBuffer();
+    const headers = new Headers();
+    headers.set('content-type', contentType);
+    headers.set('cache-control', 'public, s-maxage=86400, stale-while-revalidate=604800');
+    headers.set('x-content-type-options', 'nosniff');
+    return new Response(bytes, { status: 200, headers });
+  } catch (error) {
+    console.error('[press hero proxy]', error);
+    return null;
+  }
 }
 
 async function getPublicArticleData(slug) {
@@ -305,9 +339,10 @@ export default async function middleware(request) {
     if (isOg) {
       if (!data?.article) return new Response('Essay not found', { status: 404 });
       const hero = articleHero(data.article);
-      if (hero?.url) return Response.redirect(hero.url, 307);
+      const proxied = await proxyHeroImage(hero, request);
+      if (proxied) return proxied;
       const png = renderEssayPng(data.article, data.series);
-      return new Response(png, { headers: { 'content-type': 'image/png', 'cache-control': 'public, s-maxage=86400, stale-while-revalidate=604800' } });
+      return new Response(png, { headers: { 'content-type': 'image/png', 'cache-control': 'public, s-maxage=86400, stale-while-revalidate=604800', 'x-content-type-options': 'nosniff' } });
     }
 
     const shellResponse = await fetch(new URL('/index.html', request.url), { headers: { 'user-agent': request.headers.get('user-agent') || 'HumanWeather-Metadata' } });
