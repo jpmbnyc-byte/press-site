@@ -136,7 +136,7 @@ export default function GospelsDailyLayer() {
             Today&apos;s climate
           </div>
           <h2 className="font-serif text-3xl font-light leading-none mb-3">{command.climate}</h2>
-          <p className="font-serif italic text-lg text-[#F7F4EE]/82 leading-snug mb-3">
+          <p className="font-serif italic text-lg text-[#F7F4EE]/80 leading-snug mb-3">
             {command.command}
           </p>
           {command.latin && (
@@ -172,7 +172,7 @@ export default function GospelsDailyLayer() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="ml-auto min-h-11 flex items-center gap-3 border border-[#c4a84a]/30 bg-[#0e0d0a]/88 px-4 backdrop-blur-md shadow-lg text-left"
+          className="ml-auto min-h-11 flex items-center gap-3 border border-[#c4a84a]/30 bg-[#0e0d0a]/90 px-4 backdrop-blur-md shadow-lg text-left"
           aria-label={`Open today's climate: ${command.climate}`}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[#c4a84a] shrink-0" aria-hidden="true" />
