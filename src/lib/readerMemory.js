@@ -70,7 +70,14 @@ export function writeReaderMemory(next) {
 
 export function beginReaderSession() {
   const session = storageArea('session');
-  const existing = session ? parse(session.getItem(SESSION_KEY), null) : null;
+  let existing = null;
+  if (session) {
+    try {
+      existing = parse(session.getItem(SESSION_KEY), null);
+    } catch {
+      existing = null;
+    }
+  }
   const memory = readReaderMemory();
 
   if (existing?.startedAt) {
