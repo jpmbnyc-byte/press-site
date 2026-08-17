@@ -1,5 +1,6 @@
 import { deflateSync } from 'node:zlib';
 import { createClient } from '@base44/sdk';
+import { getEditorialImage } from './src/lib/editorialImages.js';
 
 const SITE_URL = 'https://www.humanweather.press';
 const WIDTH = 1200;
@@ -227,14 +228,24 @@ function renderEssayPng(article, series) {
   return encodePng(pixels);
 }
 
+function articleHero(article) {
+  const editorialImage = getEditorialImage(article);
+  if (!editorialImage?.src) return null;
+  return {
+    url: new URL(editorialImage.src, `${SITE_URL}/`).toString(),
+    alt: editorialImage.alt || '',
+  };
+}
+
 function applyEssayHead(html, article) {
   const essayName = article.title || 'Essay';
   const series = article.series_label || 'Human Weather';
   const title = `${essayName} — ${series} | Human Weather`;
   const description = article.excerpt || article.subtitle || `An essay from ${series} by ${article.author_name || 'JP Bobo'}.`;
   const canonical = `${SITE_URL}/journal/${encodeURIComponent(article.slug)}`;
-  const image = `${SITE_URL}/og/${encodeURIComponent(article.slug)}`;
-  const imageAlt = `${essayName} — ${series}`;
+  const hero = articleHero(article);
+  const image = hero?.url || `${SITE_URL}/og/${encodeURIComponent(article.slug)}`;
+  const imageAlt = hero?.alt || `${essayName} — ${series}`;
 
   const values = { title: escapeHtml(title), description: escapeHtml(description), canonical: escapeHtml(canonical), image: escapeHtml(image), imageAlt: escapeHtml(imageAlt) };
   let output = html;
@@ -245,7 +256,11 @@ function applyEssayHead(html, article) {
   output = replaceTag(output, /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${values.title}" />`);
   output = replaceTag(output, /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${values.description}" />`);
   output = replaceTag(output, /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image" content="${values.image}" />`);
-  output = replaceTag(output, /<meta\s+property="og:image:type"\s+content="[^"]*"\s*\/?>/i, '<meta property="og:image:type" content="image/png" />');
+  if (hero) {
+    output = output.replace(/<meta\s+property="og:image:type"\s+content="[^"]*"\s*\/?>/i, '');
+  } else {
+    output = replaceTag(output, /<meta\s+property="og:image:type"\s+content="[^"]*"\s*\/?>/i, '<meta property="og:image:type" content="image/png" />');
+  }
   output = replaceTag(output, /<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:alt" content="${values.imageAlt}" />`);
   output = replaceTag(output, /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${values.title}" />`);
   output = replaceTag(output, /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${values.description}" />`);
@@ -289,6 +304,8 @@ export default async function middleware(request) {
     const data = await getPublicArticleData(slug);
     if (isOg) {
       if (!data?.article) return new Response('Essay not found', { status: 404 });
+      const hero = articleHero(data.article);
+      if (hero?.url) return Response.redirect(hero.url, 307);
       const png = renderEssayPng(data.article, data.series);
       return new Response(png, { headers: { 'content-type': 'image/png', 'cache-control': 'public, s-maxage=86400, stale-while-revalidate=604800' } });
     }
