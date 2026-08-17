@@ -4,6 +4,12 @@ import { useAuth } from '@/lib/AuthContext';
 import { openBillingPortal } from '@/lib/stripeCheckout';
 import { getAppUnlockUrl, hasAppAccess, hasPressAccess } from '@/lib/membership';
 import { STRIPE_PLANS } from '@/lib/stripePlans';
+import {
+  gospelReceivedCount,
+  readReaderMemory,
+  readerArticleEntries,
+} from '@/lib/readerMemory';
+import { CHAMBER_COMMANDS } from '@/data/gospelCommands';
 
 function membershipLabel(user) {
   const plan = STRIPE_PLANS[user?.membership_plan];
@@ -36,10 +42,17 @@ export default function Account() {
   const { user, isAuthenticated, isLoadingAuth, logout, refreshUser } = useAuth();
   const [portalLoading, setPortalLoading] = useState(false);
   const [error, setError] = useState('');
+  const [readerMemory, setReaderMemory] = useState(() => readReaderMemory());
 
   useEffect(() => {
     refreshUser?.();
   }, [refreshUser]);
+
+  useEffect(() => {
+    const onMemory = event => setReaderMemory(event.detail || readReaderMemory());
+    window.addEventListener('hw:reader-memory', onMemory);
+    return () => window.removeEventListener('hw:reader-memory', onMemory);
+  }, []);
 
   if (isLoadingAuth) {
     return (
@@ -58,6 +71,13 @@ export default function Account() {
   const unlockUrl = getAppUnlockUrl(user);
   const appPlan = STRIPE_PLANS.member_app_yearly;
   const periodEnd = formatPeriodEnd(user.membership_period_end);
+  const fieldNotes = readerArticleEntries(readerMemory);
+  const completedNotes = fieldNotes.filter(entry => entry.completed).length;
+  const inProgressNotes = fieldNotes.filter(
+    entry => !entry.completed && (Number(entry.progress) || 0) >= 0.08
+  ).length;
+  const gospelCount = gospelReceivedCount(readerMemory);
+  const lastEntry = fieldNotes[0] || null;
 
   const openPortal = async () => {
     setError('');
@@ -74,12 +94,69 @@ export default function Account() {
     <div className="bg-[#0e0d0a] min-h-[70vh] px-6 py-16">
       <div className="max-w-xl mx-auto">
         <div className="font-mono text-[10px] tracking-[0.35em] uppercase text-[#c4a84a] mb-4">
-          Account
+          Field Record
         </div>
         <h1 className="font-serif text-[clamp(32px,5vw,48px)] font-light text-[#f0e9d8] mb-2">
           {user.full_name || 'Member'}
         </h1>
         <p className="font-mono text-[11px] text-[#c8b99a] mb-10">{user.email}</p>
+
+        <section className="border-y border-[#c4a84a]/30 py-7 mb-8">
+          <div className="font-mono text-[9px] tracking-[0.28em] uppercase text-[#c4a84a] mb-5">
+            Your movement through Human Weather
+          </div>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div>
+              <div className="font-serif text-3xl text-[#f0e9d8] leading-none">{fieldNotes.length}</div>
+              <div className="font-mono text-[8px] tracking-[0.15em] uppercase text-[#c8b99a] mt-2">
+                Field notes entered
+              </div>
+            </div>
+            <div>
+              <div className="font-serif text-3xl text-[#f0e9d8] leading-none">{completedNotes}</div>
+              <div className="font-mono text-[8px] tracking-[0.15em] uppercase text-[#c8b99a] mt-2">
+                Notes read
+              </div>
+            </div>
+            <div>
+              <div className="font-serif text-3xl text-[#f0e9d8] leading-none">
+                {gospelCount}<span className="text-base text-[#c8b99a]">/{CHAMBER_COMMANDS.length}</span>
+              </div>
+              <div className="font-mono text-[8px] tracking-[0.15em] uppercase text-[#c8b99a] mt-2">
+                Climates received
+              </div>
+            </div>
+          </div>
+
+          {inProgressNotes > 0 && (
+            <p className="font-serif italic text-sm text-[#c8b99a] mb-5">
+              {inProgressNotes} field {inProgressNotes === 1 ? 'note is' : 'notes are'} still open.
+            </p>
+          )}
+
+          <div className="flex flex-wrap gap-x-6 gap-y-3">
+            {lastEntry && (
+              <Link
+                to={`/journal/${lastEntry.slug}`}
+                className="min-h-11 inline-flex items-center font-mono text-[9px] tracking-[0.22em] uppercase text-[#c4a84a] border-b border-[#c4a84a]/50 hover:border-[#c4a84a]"
+              >
+                Return to last field note →
+              </Link>
+            )}
+            <Link
+              to="/journal"
+              className="min-h-11 inline-flex items-center font-mono text-[9px] tracking-[0.22em] uppercase text-[#c8b99a] border-b border-[#c8b99a]/30 hover:text-[#c4a84a] hover:border-[#c4a84a]"
+            >
+              Open Journal
+            </Link>
+            <Link
+              to="/gospels"
+              className="min-h-11 inline-flex items-center font-mono text-[9px] tracking-[0.22em] uppercase text-[#c8b99a] border-b border-[#c8b99a]/30 hover:text-[#c4a84a] hover:border-[#c4a84a]"
+            >
+              Today&apos;s Gospel
+            </Link>
+          </div>
+        </section>
 
         <div className="border border-[#c4a84a]/30 p-6 mb-6 space-y-3">
           <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#c4a84a]">
@@ -95,7 +172,7 @@ export default function Account() {
           {!press && (
             <Link
               to="/subscribe"
-              className="inline-block font-mono text-[10px] tracking-[0.25em] uppercase text-[#0e0d0a] bg-[#c4a84a] px-6 py-3 mt-2"
+              className="min-h-11 inline-flex items-center font-mono text-[10px] tracking-[0.25em] uppercase text-[#0e0d0a] bg-[#c4a84a] px-6 py-3 mt-2"
             >
               View plans
             </Link>
@@ -113,7 +190,7 @@ export default function Account() {
               </p>
               <a
                 href={unlockUrl}
-                className="inline-block font-mono text-[10px] tracking-[0.25em] uppercase text-[#0e0d0a] bg-[#c4a84a] px-6 py-3 mt-2 hover:bg-[#e0c870]"
+                className="min-h-11 inline-flex items-center font-mono text-[10px] tracking-[0.25em] uppercase text-[#0e0d0a] bg-[#c4a84a] px-6 py-3 mt-2 hover:bg-[#e0c870]"
               >
                 Open Human Weather App →
               </a>
@@ -125,7 +202,7 @@ export default function Account() {
               </p>
               <Link
                 to={`/subscribe?plan=${encodeURIComponent(appPlan.id)}`}
-                className="inline-block font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border border-[#c4a84a] px-6 py-3 mt-2"
+                className="min-h-11 inline-flex items-center font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border border-[#c4a84a] px-6 py-3 mt-2"
               >
                 View app bundle
               </Link>
@@ -140,14 +217,14 @@ export default function Account() {
             type="button"
             onClick={openPortal}
             disabled={portalLoading || !user.stripe_customer_id}
-            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border border-[#c4a84a] px-6 py-3 disabled:opacity-40"
+            className="min-h-11 font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] border border-[#c4a84a] px-6 py-3 disabled:opacity-40"
           >
             {portalLoading ? 'Opening…' : 'Manage billing'}
           </button>
           <button
             type="button"
             onClick={() => logout({ next: '/account' })}
-            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#c8b99a] border-b border-[#c8b99a]/30 pb-1 self-start"
+            className="min-h-11 font-mono text-[10px] tracking-[0.25em] uppercase text-[#c8b99a] border-b border-[#c8b99a]/30 pb-1 self-start"
           >
             Log out
           </button>
@@ -160,7 +237,7 @@ export default function Account() {
           <button
             type="button"
             onClick={() => logout({ serverLogout: true, next: '/account' })}
-            className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] underline underline-offset-4"
+            className="min-h-11 font-mono text-[10px] tracking-[0.25em] uppercase text-[#c4a84a] underline underline-offset-4"
           >
             Switch account
           </button>
