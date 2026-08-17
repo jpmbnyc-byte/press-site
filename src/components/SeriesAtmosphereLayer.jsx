@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import '@/seriesAtmospheres.css';
 
 function routeMatch(pathname) {
+  if (pathname === '/gospels') return { kind: 'gospels', slug: 'gospels' };
   const series = String(pathname || '').match(/^\/series\/([^/?#]+)/);
   if (series) return { kind: 'series', slug: decodeURIComponent(series[1]) };
   const article = String(pathname || '').match(/^\/journal\/([^/?#]+)/);
@@ -24,6 +25,12 @@ export default function SeriesAtmosphereLayer() {
 
     if (!match) return undefined;
     root.setAttribute('data-page-kind', match.kind);
+
+    if (match.kind === 'gospels') {
+      return () => {
+        root.removeAttribute('data-page-kind');
+      };
+    }
 
     if (match.kind === 'series') {
       root.setAttribute('data-series', match.slug);
