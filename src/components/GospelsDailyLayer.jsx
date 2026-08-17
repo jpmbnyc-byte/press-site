@@ -7,6 +7,7 @@ import {
   readReaderMemory,
   recordGospelReceived,
 } from '@/lib/readerMemory';
+import '@/gospelsAtmosphere.css';
 
 function localDayKey(date = new Date()) {
   const year = date.getFullYear();
