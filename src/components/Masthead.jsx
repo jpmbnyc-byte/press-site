@@ -58,18 +58,30 @@ export default function Masthead() {
             {isAuthenticated ? 'Account' : 'Log in'}
           </Link>
           <button
+            type="button"
             onClick={toggle}
-            className="text-[#c8b99a] hover:text-[#c4a84a] transition-colors duration-300 ml-1"
+            className="w-11 h-11 inline-flex items-center justify-center text-[#c8b99a] hover:text-[#c4a84a] hover:bg-[rgba(196,168,74,0.08)] active:bg-[rgba(196,168,74,0.12)] transition-colors duration-300 ml-1 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c4a84a] touch-manipulation"
             aria-label="Toggle day or night mode"
           >
-            {mode === 'day' ? <Moon size={15} /> : <Sun size={15} />}
-          </button>
-        </nav>
-        <div className="flex items-center gap-3 md:hidden">
-          <button onClick={toggle} className="text-[#c8b99a]" aria-label="Toggle theme">
             {mode === 'day' ? <Moon size={16} /> : <Sun size={16} />}
           </button>
-          <button onClick={() => setOpen(!open)} className="text-[#f0e9d8]" aria-label="Open menu">
+        </nav>
+        <div className="flex items-center gap-1 md:hidden">
+          <button
+            type="button"
+            onClick={toggle}
+            className="w-11 h-11 inline-flex items-center justify-center text-[#c8b99a] rounded-sm active:bg-[rgba(196,168,74,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c4a84a] touch-manipulation"
+            aria-label="Toggle theme"
+          >
+            {mode === 'day' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            className="w-11 h-11 inline-flex items-center justify-center text-[#f0e9d8] rounded-sm active:bg-[rgba(196,168,74,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c4a84a] touch-manipulation"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+          >
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
