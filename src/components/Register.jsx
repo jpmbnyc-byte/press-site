@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTheme } from '@/lib/hwTheme';
 import { EDITORIAL_COLORS, formatRegisterCoordinate, getSeriesMeta } from '@/lib/editorialSystem';
 
 const RegisterContext = createContext(null);
@@ -66,17 +67,19 @@ export function useRegister() {
 }
 
 function Register({ entry, progress }) {
+  const { mode } = useTheme();
   const series = formatRegisterCoordinate(entry.seriesOrder);
   const essay = formatRegisterCoordinate(entry.essayOrder);
   const total = formatRegisterCoordinate(entry.essayTotal);
   const essayLabel = essay ? `E${essay}${total ? `/${total}` : ''}` : 'INDEX';
   const seriesLabel = series ? `S${series}` : 'HW';
+  const registerInk = mode === 'night' ? 'var(--hw-ink)' : entry.color;
 
   return (
     <>
       <aside
         className="hw-register fixed left-0 top-14 bottom-0 z-40 hidden w-14 border-r lg:flex lg:flex-col"
-        style={{ '--register-ink': entry.color }}
+        style={{ '--register-ink': registerInk }}
         aria-label="Publication register"
       >
         <div className="px-3 py-5">
@@ -97,7 +100,7 @@ function Register({ entry, progress }) {
 
       <div
         className="hw-register fixed left-0 right-0 top-14 z-40 flex h-8 items-center border-b bg-[var(--hw-paper)] px-4 lg:hidden"
-        style={{ '--register-ink': entry.color }}
+        style={{ '--register-ink': registerInk }}
         aria-label="Publication register"
       >
         <span>{seriesLabel}</span>
