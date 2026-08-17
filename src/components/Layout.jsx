@@ -4,6 +4,7 @@ import Footer from './Footer';
 import { RegisterProvider } from './Register';
 import ReaderMemoryLayer from './ReaderMemoryLayer';
 import ArticleContinuityLayer from './ArticleContinuityLayer';
+import EssayShareFreshnessLayer from './EssayShareFreshnessLayer';
 import GospelsDailyLayer from './GospelsDailyLayer';
 import SeriesAtmosphereLayer from './SeriesAtmosphereLayer';
 import { ThemeProvider } from '@/lib/hwTheme';
@@ -16,6 +17,7 @@ export default function Layout() {
           <Masthead />
           <ReaderMemoryLayer />
           <ArticleContinuityLayer />
+          <EssayShareFreshnessLayer />
           <GospelsDailyLayer />
           <SeriesAtmosphereLayer />
           <div className="flex-1 lg:pl-14">
