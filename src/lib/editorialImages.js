@@ -38,9 +38,6 @@ const PERSONAL_IMAGE_SLUGS = new Set([
 export function getEditorialImage(article) {
   if (!article?.slug) return null;
 
-  const archival = ARCHIVAL_ESSAY_IMAGES[article.slug];
-  if (archival) return archival;
-
   if (article.hero_image_url) {
     const personalAlt = PERSONAL_IMAGE_SLUGS.has(article.slug)
       ? 'The author’s grandmother, remembered in The Temperature of Her Joy.'
@@ -52,6 +49,9 @@ export function getEditorialImage(article) {
       caption: article.hero_image_caption || '',
     };
   }
+
+  const archival = ARCHIVAL_ESSAY_IMAGES[article.slug];
+  if (archival) return archival;
 
   return null;
 }
