@@ -1,0 +1,20 @@
+html[data-page-kind="gospels"] .hw-register {
+  --hw-paper: #0e0d0a;
+  --hw-ink: #c4a84a;
+  --hw-muted: #918979;
+  --hw-rule: rgba(196, 168, 74, 0.2);
+  background-color: #0e0d0a;
+  border-color: rgba(196, 168, 74, 0.2);
+  color: var(--register-ink);
+}
+
+html[data-page-kind="gospels"] .hw-register::selection,
+html[data-page-kind="gospels"] .hw-register *::selection {
+  background: rgba(196, 168, 74, 0.24);
+}
+
+@media (max-width: 1023px) {
+  html[data-page-kind="gospels"] .hw-register {
+    box-shadow: 0 1px 0 rgba(196, 168, 74, 0.08);
+  }
+}
