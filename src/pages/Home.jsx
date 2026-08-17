@@ -10,7 +10,7 @@ const HERO_IMAGE = '/home/human-weather-hero-collier-1941.webp';
 const HERO_CAPTION =
   'John Collier Jr. Hudson River Valley, New York, October 1941. Farm Security Administration/Office of War Information Photograph Collection, Library of Congress.';
 
-const FEATURED_PREVIEW_SLUG = WATERS_EDGE_SLUG;
+const FEATURED_PREVIEW_SLUG = 'human-weather-the-joyful-place';
 
 function essayDisplayTitle(essay) {
   return essay?.title;
@@ -75,7 +75,8 @@ export default function Home() {
     featured[0] ||
     latest[0];
 
-  const spotlightIsWatersEdge = spotlight?.slug === FEATURED_PREVIEW_SLUG;
+  const spotlightIsJoyfulPlace = spotlight?.slug === FEATURED_PREVIEW_SLUG;
+  const spotlightIsWatersEdge = spotlight?.slug === WATERS_EDGE_SLUG;
   const spotlightIsPreview = spotlight?.access_level === 'members';
   const freeToHighlight = freeEssays.filter(a => a.slug !== spotlight?.slug);
   const freeLead = freeToHighlight[0];
@@ -137,28 +138,52 @@ export default function Home() {
 
       {spotlight && (
         <section className="py-24 md:py-32 px-6">
-          <div className="max-w-4xl mx-auto">
-            <div>
+          <div className="max-w-6xl mx-auto">
+            {spotlight.hero_image_url && (
+              <Link to={`/journal/${spotlight.slug}`} className="group block mb-10 md:mb-14">
+                <figure className="m-0">
+                  <div className="overflow-hidden bg-[var(--hw-surface)]">
+                    <img
+                      src={spotlight.hero_image_url}
+                      alt={spotlight.hero_image_alt || essayDisplayTitle(spotlight)}
+                      className="block w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+                      style={{ objectPosition: spotlight.hero_image_object_position || '50% 50%' }}
+                      loading="eager"
+                      decoding="async"
+                    />
+                  </div>
+                  {spotlight.hero_image_caption && (
+                    <figcaption className="hw-media-caption mt-3 max-w-3xl">
+                      {spotlight.hero_image_caption}
+                    </figcaption>
+                  )}
+                </figure>
+              </Link>
+            )}
+
+            <div className="max-w-4xl">
               <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-3">
-                {spotlightIsWatersEdge
-                  ? `Featured Preview · ${WATERS_EDGE_PREVIEW_MINUTES} min free`
-                  : spotlightIsPreview
-                    ? 'Featured Preview'
-                    : 'Featured'}
+                {spotlightIsJoyfulPlace
+                  ? 'Debut Essay · Read Free'
+                  : spotlightIsWatersEdge
+                    ? `Featured Preview · ${WATERS_EDGE_PREVIEW_MINUTES} min free`
+                    : spotlightIsPreview
+                      ? 'Featured Preview'
+                      : 'Featured'}
               </div>
               <div className="font-mono text-[9px] tracking-[0.22em] uppercase text-[var(--hw-ink3)] mb-6">
                 {essayEyebrow(spotlight)}
               </div>
-              <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-light text-[var(--hw-ink)] leading-[1.05] tracking-[-0.01em] mb-3">
+              <h2 className="font-serif text-[clamp(36px,6vw,64px)] font-light text-[var(--hw-ink)] leading-[1.02] tracking-[-0.02em] mb-4">
                 {essayDisplayTitle(spotlight)}
               </h2>
               {spotlight.subtitle && (
-                <p className="font-serif italic text-xl text-[var(--hw-rust)] mb-5 leading-relaxed max-w-md">
+                <p className="font-serif italic text-xl md:text-2xl text-[var(--hw-rust)] mb-5 leading-relaxed max-w-2xl">
                   {spotlight.subtitle}
                 </p>
               )}
               {spotlight.excerpt && (
-                <p className="font-serif text-lg text-[var(--hw-ink2)] mb-8 leading-relaxed max-w-md">
+                <p className="font-serif text-lg md:text-xl text-[var(--hw-ink2)] mb-8 leading-relaxed max-w-2xl">
                   {spotlight.excerpt}
                 </p>
               )}
@@ -166,11 +191,13 @@ export default function Home() {
                 to={`/journal/${spotlight.slug}`}
                 className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-gold)] pb-1 hover:text-[var(--hw-gold)] transition-colors duration-300"
               >
-                {spotlightIsWatersEdge
-                  ? `Begin ${WATERS_EDGE_PREVIEW_MINUTES}-minute preview →`
-                  : spotlightIsPreview
-                    ? 'Begin the preview →'
-                    : 'Read free →'}
+                {spotlightIsJoyfulPlace
+                  ? 'Read the debut essay →'
+                  : spotlightIsWatersEdge
+                    ? `Begin ${WATERS_EDGE_PREVIEW_MINUTES}-minute preview →`
+                    : spotlightIsPreview
+                      ? 'Begin the preview →'
+                      : 'Read free →'}
               </Link>
             </div>
           </div>
