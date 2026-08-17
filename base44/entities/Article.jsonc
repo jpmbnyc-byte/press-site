@@ -30,6 +30,13 @@
     "hero_image_url": { "type": "string" },
     "hero_image_caption": { "type": "string" },
     "hero_image_alt": { "type": "string" },
+    "hero_image_photographer": { "type": "string" },
+    "hero_image_location": { "type": "string" },
+    "hero_image_date_label": { "type": "string" },
+    "hero_image_collection": { "type": "string" },
+    "hero_image_source_url": { "type": "string" },
+    "hero_image_rights": { "type": "string" },
+    "hero_image_object_position": { "type": "string" },
     "status": {
       "type": "string",
       "enum": ["draft", "scheduled", "published", "archived", "featured"],
