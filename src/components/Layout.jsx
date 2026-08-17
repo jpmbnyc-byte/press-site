@@ -3,6 +3,7 @@ import Masthead from './Masthead';
 import Footer from './Footer';
 import { RegisterProvider } from './Register';
 import ReaderMemoryLayer from './ReaderMemoryLayer';
+import ArticleContinuityLayer from './ArticleContinuityLayer';
 import { ThemeProvider } from '@/lib/hwTheme';
 
 export default function Layout() {
@@ -12,6 +13,7 @@ export default function Layout() {
         <div className="min-h-screen flex flex-col bg-[var(--hw-paper)] text-[var(--hw-ink)]">
           <Masthead />
           <ReaderMemoryLayer />
+          <ArticleContinuityLayer />
           <div className="flex-1 lg:pl-14">
             <main className="pt-[5.5rem] lg:pt-14">
               <Outlet />
