@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
+import { useRegister } from './Register';
 import { CHAMBER_COMMANDS } from '@/data/gospelCommands';
 import {
   gospelReceivedCount,
@@ -34,76 +34,23 @@ function speak(text) {
   window.speechSynthesis.speak(utterance);
 }
 
-function DailyClimate({ command, dayKey, memory, onReceive }) {
-  if (!command) return null;
-  const received = memory.gospels?.daily?.[dayKey] === command.id;
-  const count = gospelReceivedCount(memory);
-
-  return (
-    <section className="bg-[#0e0d0a] text-[#F7F4EE] px-6 pt-8 pb-10 border-b border-[#F7F4EE]/10">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-7 md:gap-12 items-end">
-        <div className="md:col-span-3">
-          <div className="font-mono text-[9px] tracking-[0.32em] uppercase text-[#c4a84a] mb-3">
-            Daily Weather · {dayKey.replaceAll('-', '·')}
-          </div>
-          <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#c8b99a]">
-            Field record · {count}/{CHAMBER_COMMANDS.length} received
-          </div>
-        </div>
-
-        <div className="md:col-span-6">
-          <div className="font-mono text-[8px] tracking-[0.3em] uppercase text-[#c4a84a]/70 mb-2">
-            Today&apos;s climate
-          </div>
-          <h2 className="font-serif text-[clamp(30px,5vw,48px)] font-light leading-none mb-4">
-            {command.climate}
-          </h2>
-          <p className="font-serif italic text-xl md:text-2xl text-[#F7F4EE]/85 leading-snug mb-3">
-            {command.command}
-          </p>
-          {command.latin && (
-            <p className="font-mono text-[9px] tracking-[0.18em] uppercase text-[#c4a84a]">
-              {command.latin}
-            </p>
-          )}
-        </div>
-
-        <div className="md:col-span-3 md:text-right">
-          {received ? (
-            <div>
-              <div className="font-mono text-[9px] tracking-[0.25em] uppercase text-[#c4a84a] mb-2">
-                Received today
-              </div>
-              <button
-                type="button"
-                onClick={() => speak(command.command)}
-                className="font-mono text-[9px] tracking-[0.22em] uppercase text-[#F7F4EE]/65 border-b border-[#F7F4EE]/25 pb-1 hover:text-[#c4a84a] hover:border-[#c4a84a] transition-colors"
-              >
-                Hear it again →
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={onReceive}
-              className="font-mono text-[9px] tracking-[0.25em] uppercase bg-[#c4a84a] text-[#0e0d0a] px-6 py-3 hover:bg-[#e0c870] transition-colors"
-            >
-              Receive today&apos;s command →
-            </button>
-          )}
-        </div>
-      </div>
-    </section>
-  );
+function formatDayLabel(key) {
+  const [year, month, day] = key.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+  }).format(date);
 }
 
 export default function GospelsDailyLayer() {
   const location = useLocation();
+  const { setRegister } = useRegister();
   const active = location.pathname === '/gospels';
   const dayKey = useMemo(() => localDayKey(), []);
   const command = useMemo(() => dailyCommand(dayKey), [dayKey]);
   const [memory, setMemory] = useState(() => readReaderMemory());
-  const [target, setTarget] = useState(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const onMemory = event => setMemory(event.detail || readReaderMemory());
@@ -113,22 +60,18 @@ export default function GospelsDailyLayer() {
 
   useEffect(() => {
     if (!active) {
-      setTarget(null);
-      return undefined;
+      setOpen(false);
+      return;
     }
 
-    const main = document.querySelector('main');
-    if (!main) return undefined;
-    const mount = document.createElement('div');
-    mount.dataset.hwGospelsDaily = 'true';
-    main.insertAdjacentElement('afterbegin', mount);
-    setTarget(mount);
-
-    return () => {
-      setTarget(null);
-      mount.remove();
-    };
-  }, [active]);
+    setRegister({
+      pathname: '/gospels',
+      seriesName: 'Gospels Live',
+      reference: 'The Chamber',
+      year: String(new Date().getFullYear()),
+      color: '#c4a84a',
+    });
+  }, [active, setRegister]);
 
   useEffect(() => {
     if (!active) return undefined;
@@ -153,22 +96,90 @@ export default function GospelsDailyLayer() {
     return () => document.removeEventListener('click', capture, true);
   }, [active]);
 
-  if (!active || !target || !command) return null;
+  if (!active || !command) return null;
 
+  const received = memory.gospels?.daily?.[dayKey] === command.id;
+  const count = gospelReceivedCount(memory);
   const receive = () => {
     setMemory(recordGospelReceived(command.id, { dailyKey: dayKey }));
     speak(command.command);
   };
 
-  return createPortal(
-    <div data-hw-gospels-daily="true">
-      <DailyClimate
-        command={command}
-        dayKey={dayKey}
-        memory={memory}
-        onReceive={receive}
-      />
-    </div>,
-    target
+  return (
+    <div
+      data-hw-gospels-daily="true"
+      className="fixed right-4 top-[6.25rem] lg:top-20 z-[35] w-[min(360px,calc(100vw-2rem))]"
+    >
+      {open ? (
+        <section className="border border-[#c4a84a]/35 bg-[#0e0d0a]/95 text-[#F7F4EE] shadow-2xl backdrop-blur-md p-5 md:p-6">
+          <div className="flex items-start justify-between gap-5 mb-5">
+            <div>
+              <div className="font-mono text-[8px] tracking-[0.3em] uppercase text-[#c4a84a] mb-2">
+                Daily Weather · {formatDayLabel(dayKey)}
+              </div>
+              <div className="font-mono text-[8px] tracking-[0.18em] uppercase text-[#c8b99a]">
+                Field record · {count}/{CHAMBER_COMMANDS.length} received
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="min-w-11 min-h-11 -mr-2 -mt-2 inline-flex items-center justify-center font-mono text-lg text-[#c8b99a] hover:text-[#c4a84a] transition-colors"
+              aria-label="Close daily weather"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="font-mono text-[8px] tracking-[0.28em] uppercase text-[#c4a84a]/70 mb-2">
+            Today&apos;s climate
+          </div>
+          <h2 className="font-serif text-3xl font-light leading-none mb-3">{command.climate}</h2>
+          <p className="font-serif italic text-lg text-[#F7F4EE]/82 leading-snug mb-3">
+            {command.command}
+          </p>
+          {command.latin && (
+            <p className="font-mono text-[8px] tracking-[0.17em] uppercase text-[#c4a84a] mb-5">
+              {command.latin}
+            </p>
+          )}
+
+          {received ? (
+            <div className="flex items-center justify-between gap-4 pt-4 border-t border-[#F7F4EE]/10">
+              <span className="font-mono text-[8px] tracking-[0.22em] uppercase text-[#c4a84a]">
+                Received today
+              </span>
+              <button
+                type="button"
+                onClick={() => speak(command.command)}
+                className="min-h-11 font-mono text-[8px] tracking-[0.2em] uppercase text-[#F7F4EE]/65 hover:text-[#c4a84a] transition-colors"
+              >
+                Hear again →
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={receive}
+              className="min-h-11 w-full font-mono text-[9px] tracking-[0.23em] uppercase bg-[#c4a84a] text-[#0e0d0a] px-5 py-3 hover:bg-[#e0c870] transition-colors"
+            >
+              Receive today&apos;s command →
+            </button>
+          )}
+        </section>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="ml-auto min-h-11 flex items-center gap-3 border border-[#c4a84a]/30 bg-[#0e0d0a]/88 px-4 backdrop-blur-md shadow-lg text-left"
+          aria-label={`Open today's climate: ${command.climate}`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-[#c4a84a] shrink-0" aria-hidden="true" />
+          <span className="font-mono text-[8px] tracking-[0.23em] uppercase text-[#c8b99a]">
+            Today · <span className="text-[#c4a84a]">{command.climate}</span>
+          </span>
+        </button>
+      )}
+    </div>
   );
 }
