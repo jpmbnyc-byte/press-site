@@ -39,10 +39,13 @@ export function articleHero(article) {
 
 export async function getPublicArticle(slug) {
   const appId = process.env.VITE_BASE44_APP_ID || HUMAN_WEATHER_APP_ID;
+  const serverUrl = (process.env.VITE_BASE44_APP_BASE_URL || 'https://humanweather.base44.app').replace(/\/$/, '');
 
   const base44 = createClient({
     appId,
-    serverUrl: process.env.VITE_BASE44_APP_BASE_URL || 'https://humanweather.base44.app',
+    serverUrl,
+    appBaseUrl: serverUrl,
+    requiresAuth: false,
   });
 
   try {
