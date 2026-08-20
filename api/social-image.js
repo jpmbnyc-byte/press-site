@@ -5,6 +5,7 @@ function firstQuery(value) {
 }
 
 export default async function handler(request, response) {
+  response.setHeader('X-HW-Social-Route', 'image');
   const slug = String(firstQuery(request.query?.slug) || '').trim();
   if (!slug) {
     response.status(400).send('Missing essay slug');
