@@ -26,6 +26,14 @@
   ],
   "rewrites": [
     {
+      "source": "/journal/:slug",
+      "destination": "/api/social-page?slug=:slug"
+    },
+    {
+      "source": "/og/:slug",
+      "destination": "/api/social-image?slug=:slug"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://humanweather.base44.app/api/:path*"
     },
