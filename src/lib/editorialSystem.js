@@ -3,6 +3,8 @@ export const SERIES_SYSTEM = {
   'on bliss': { order: 2, color: '#E0A21A' },
   'the procession': { order: 3, color: '#8C2F1E' },
   'no parade': { order: 4, color: '#38434D' },
+  'the song of circumstance': { order: 5, color: '#0E6B5A' },
+  // Legacy alias retained for older records/routes.
   'song of circumstance': { order: 5, color: '#0E6B5A' },
   'sunrise protocol': { order: 6, color: '#E23A17' },
   'human weather': { order: 7, color: '#0A0A0A' },
