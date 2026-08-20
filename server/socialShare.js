@@ -2,6 +2,7 @@ import { createClient } from '@base44/sdk';
 import { getEditorialImage } from '../src/lib/editorialImages.js';
 
 export const SITE_URL = 'https://www.humanweather.press';
+const HUMAN_WEATHER_APP_ID = '6a57ce138c2f29923fec6bc4';
 
 export function escapeHtml(value = '') {
   return String(value)
@@ -37,8 +38,7 @@ export function articleHero(article) {
 }
 
 export async function getPublicArticle(slug) {
-  const appId = process.env.VITE_BASE44_APP_ID;
-  if (!appId) return null;
+  const appId = process.env.VITE_BASE44_APP_ID || HUMAN_WEATHER_APP_ID;
 
   const base44 = createClient({
     appId,
