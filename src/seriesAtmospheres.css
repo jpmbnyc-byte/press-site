@@ -43,6 +43,7 @@ html[data-series="no-parade"] {
   --series-image-filter: grayscale(0.22) contrast(1.07);
 }
 
+html[data-series="the-song-of-circumstance"],
 html[data-series="song-of-circumstance"] {
   --series-atmosphere: #0E6B5A;
   --series-wash: rgba(14, 107, 90, 0.055);
