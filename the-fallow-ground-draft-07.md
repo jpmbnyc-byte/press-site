@@ -6,13 +6,23 @@ Relational Faith 05 · draft 07 · complete
 
 ---
 
-There is a field right now that has produced nothing in thirteen years, and nobody calls it lazy.
+There is a field that has not yielded a crop in thirteen years, and this week the people tending it finally let everyone stand a little closer to the fence.
 
-Grand Theft Auto V came out in September of 2013. The sequel was promised for the fall of 2025, then moved to May, then moved again to the nineteenth of November. Two delays, both explained in the language of quality. Pre-orders opened in June and people paid eighty dollars. As of this month there is still no gameplay footage — two trailers in thirteen years, and a third promised at the end of August. Millions have bought a thing none of them has watched move.
+Grand Theft Auto V came out in September of 2013. Its sequel was promised for the fall of 2025, then moved to May, then moved again to the nineteenth of November. Two delays, both explained in the language of quality. Pre-orders opened in June at eighty dollars.
 
-Nobody reads this as neglect. The waiting is taken as the proof. The emptiness of that field is understood, by everyone standing at the fence, as evidence of what is being done to the soil.
+Then, on August the twenty-seventh, Rockstar showed twenty-seven minutes of Grand Theft Auto VI, captured entirely from in-game footage on a base PlayStation 5. For the first time the long wait had an extended visible object: roads, rooms, weather, people moving through the world, brief pieces of the thing itself.
 
-Hold on to that generosity. It does not get extended often, and almost never to a person.
+The field is no longer invisible.
+
+It is also not harvest.
+
+The game still does not arrive until November. Thirteen years after the last one, people have paid for something they still cannot take home.
+
+And this is the part worth keeping.
+
+The twenty-seven minutes did not suddenly make the previous thirteen years legitimate. The generosity had already been extended. Long before anybody was allowed this close, the absence of a finished thing was interpreted as evidence that something was being made. Silence read as work. Delay read as standards. An empty field read as preparation.
+
+That generosity does not get extended often, and almost never to a person.
 
 ---
 
@@ -72,7 +82,7 @@ A fallow field and an abandoned one look identical from the road. Both are empty
 
 The difference is not in the emptiness. It is in whether anything is being done to it. Three plowings. The abandoned field is also resting, and its rest is indistinguishable from patience right up until somebody walks out and puts a hand in the dirt.
 
-Which is the generosity from the beginning of this essay, and the reason it is worth noticing who receives it. A studio gets thirteen years and the silence reads as craft. A man gets seven months and the silence reads as a man who has stopped trying, including to himself.
+Which is the generosity from the beginning of this essay, and the reason it is worth noticing who receives it. A studio gets thirteen years and the delay reads as craft. A man gets seven months and the delay reads as a man who has stopped trying, including to himself.
 
 ---
 
