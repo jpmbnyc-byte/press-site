@@ -2,120 +2,376 @@
 
 *A year of work with no crop, four years of keeping a record honest, and what the first rain is actually for.*
 
-Relational Faith 05 · draft 07 · complete
+No Parade 01 · draft 07 · house edit 01 · complete
 
 ---
 
-There is a field that has not yielded a crop in thirteen years, and this week the people tending it finally let everyone stand a little closer to the fence.
+There was nothing growing in the field.
 
-Grand Theft Auto V came out in September of 2013. Its sequel was promised for the fall of 2025, then moved to May, then moved again to the nineteenth of November. Two delays, both explained in the language of quality. Pre-orders opened in June at eighty dollars.
+That was the first fact, and the least interesting one.
 
-Then, on August the twenty-seventh, Rockstar showed twenty-seven minutes of Grand Theft Auto VI, captured entirely from in-game footage on a base PlayStation 5. For the first time the long wait had an extended visible object: roads, rooms, weather, people moving through the world, brief pieces of the thing itself.
+For thirteen years Rockstar Games had produced no successor to *Grand Theft Auto V* that anybody could take home. The sequel was promised, delayed, moved again, priced, pre-ordered. Then on August 27, Rockstar let people stand closer to the fence: twenty-seven minutes of *Grand Theft Auto VI*, captured from in-game footage on a base PlayStation 5.
 
-The field is no longer invisible.
+Roads. Rooms. Weather. People moving through a world that had previously existed mostly as promise.
 
-It is also not harvest.
+The field was no longer invisible.
 
-The game still does not arrive until November. Thirteen years after the last one, people have paid for something they still cannot take home.
+It was also not harvest.
 
-And this is the part worth keeping.
+The game still does not arrive until November.
 
-The twenty-seven minutes did not suddenly make the previous thirteen years legitimate. The generosity had already been extended. Long before anybody was allowed this close, the absence of a finished thing was interpreted as evidence that something was being made. Silence read as work. Delay read as standards. An empty field read as preparation.
+What interested me was not the footage.
 
-That generosity does not get extended often, and almost never to a person.
+It was the generosity that existed before the footage.
 
----
+For years, the absence of a finished thing had been interpreted as evidence that something was being made. Silence read as craft. Delay read as standards. An apparently empty field read as preparation.
 
-*Sow to yourselves in righteousness, reap in mercy; break up your fallow ground: for it is time to seek the LORD, till he come and rain righteousness upon you.*
+We extend this generosity to studios, buildings under scaffolding, manuscripts, laboratories, athletes in training.
 
-Read the order again. Sow. Reap. Then break the ground.
+We extend it much less reliably to people.
 
-No farmer works that way. The ground is opened first, then seeded, then cut months later. Hosea puts the plow last, after the harvest has already been named. Some translators repair it quietly — the Good News Bible restores the sequence to plow, plant, reap, which is what a man would actually do. The Revised Standard Version leaves the Hebrew where it stands, out of order, and lets the reader trip.
-
----
-
-The word *fallow* has gone soft. It sounds like rest now. It sounds like a field lying in the sun with nothing asked of it, recovering, and the recovery happening on its own.
-
-That is not what the word describes.
-
-In classical antiquity the fallow field was plowed repeatedly through the year it produced nothing. Three plowings in a season was standard. Around the Mediterranean much of the weed control during a fallow year came from animals turned out onto the ground rather than from the blade. Either way a person was out there working a field every season it gave back nothing.
-
-Bare fallow means bare on purpose. It is a maintained condition, not an abandoned one. A man passing on the road sees an empty field and is looking at a year of work with no crop at the end of it.
+That was the case I wanted to understand.
 
 ---
 
-In 2004 I was hired into the mailroom at Swiss American Securities, a Credit Suisse subsidiary. Part of the job was walking. A client would move holdings out of our internal safekeeping, and somebody had to carry the certificates to the receiving firm — engraved paper, signed, and in law not a record of the thing but the thing itself. I went out with them and came back with a receipt. Nobody I passed on those streets knew what I was holding. I had a child at home and I was making mailroom money.
+> *Sow to yourselves in righteousness, reap in mercy; break up your fallow ground: for it is time to seek the LORD, till he come and rain righteousness upon you.*
+
+Hosea 10:12 contains a sequence that bothered me once I saw it.
+
+Sow.
+
+Reap.
+
+Then break the ground.
+
+No farmer works that way.
+
+The ground is opened first, then seeded, then harvested later. Some translations smooth the sequence toward agricultural common sense. Others leave the language where it stands and allow the reader to trip over it.
+
+I prefer the trip.
+
+A strange order is evidence.
+
+It means we may be reading the sentence too quickly.
 
 ---
 
-Then the promise at the end of the verse. *Till he come and rain righteousness upon you.*
+The word *fallow* has become almost therapeutic in modern English.
 
-Rain does something to bare ground that a farmer has to plan around.
+It sounds like rest.
 
-The drop arrives at speed. Its impact shatters the crumb structure at the surface, and the fine material it frees washes down into the pores beneath and fills them. When the sun returns, that wet layer dries into a skin roughly a tenth of a millimeter thick, over a packed region two or three millimeters deep where the pores used to be. The skin is a crust. It sheds water.
+A field lying quietly in the sun. Nothing demanded. Recovery occurring by itself.
 
-So the next rain arrives at a surface the last rain built to turn it away. On crust-prone ground in the Sahel, researchers measured about a quarter of the rainfall running off rather than entering.
+Agricultural history is less sentimental.
 
-Nothing was withheld. Nothing failed to arrive. The water came, stood on top of the ground, and went somewhere else.
+A fallow field could be worked repeatedly during the very season in which it produced no crop. Weed control continued. Animals might graze it. The soil might be plowed more than once.
 
----
+Bare fallow is bare on purpose.
 
-Seven months in they moved me upstairs into fixed operations, and my work for the next four years was the security master file. Every instrument the firm touched had a record in that file describing what it was — identifier, type, terms, the details that let a trade settle as the thing it claimed to be. I did not trade and I did not advise. I kept the description of each thing accurate, one day at a time. When it was accurate, nobody noticed.
+A person passing on the road sees emptiness.
 
-Every morning began at the terminal. Companies changed their names overnight, or merged, or were absorbed, and what came out the other side was frequently the same holding under a different description. I read the day's changes and moved them into the file.
+The farmer sees maintenance.
 
-Then reconciliation. Internal accounts disagree with each other. Sometimes the description was wrong — the file said an instrument was one thing when it was another. Sometimes the position was wrong: a holding showing in one place and not in another, or showing in the wrong size, because an entry had gone in incorrectly upstream and the balance carried the error forward as though it were true. My work was to find where the record had drifted from what was actually held, and to author the entry that corrected it. A correcting entry brings nothing in. No shares arrive. Nothing is bought. It changes the record, so that the record says what was there the whole time.
+That distinction is almost impossible to observe from the fence.
 
----
+And there was the first real problem with my metaphor.
 
-The Hebrew is *nîrû lakem nîr*. Break up for yourselves your fallow ground.
-
-The verb and its object are the same word. The verb means to break up, to freshly till. The noun means the untilled ground — and also the freshly plowed land, the ground after the blade has gone through it. One word for the field on both sides of the work. The lexicons list them separately and number them differently, but they are the same three letters, and the whole Bible uses that verb twice: here, and in Jeremiah, in this identical phrase.
-
-Nothing is added, then. No soil is carted in from a better field. The hard ground and the open ground are one ground, and the language does not distinguish between them, because the difference is not what they are made of. It is only whether they have been opened.
-
-Dust, the account says, and to dust returning. That is not decoration and it is not a flourish about mortality. It puts a man and his field in the same category of matter. He is not the farmer standing over the soil. He is the soil, standing.
+An abandoned field and a fallow one can look alike.
 
 ---
 
-A fallow field and an abandoned one look identical from the road. Both are empty. Nothing is coming up in either. From the fence you cannot tell which is which — and neither, most of the time, can the man standing in the middle of it. He tells himself he is being prepared. He may be hiding. The vocabulary available for both is the same vocabulary, and it flatters him in both cases.
+In 2004 I was hired into the mailroom at Swiss American Securities, a Credit Suisse subsidiary.
 
-The difference is not in the emptiness. It is in whether anything is being done to it. Three plowings. The abandoned field is also resting, and its rest is indistinguishable from patience right up until somebody walks out and puts a hand in the dirt.
+Part of the job involved walking through Manhattan carrying things whose importance was invisible from the sidewalk.
 
-Which is the generosity from the beginning of this essay, and the reason it is worth noticing who receives it. A studio gets thirteen years and the delay reads as craft. A man gets seven months and the delay reads as a man who has stopped trying, including to himself.
+A client would move holdings out of internal safekeeping, and somebody had to deliver the certificates to the receiving firm. Engraved paper. Signed. Legally consequential. I carried them out and came back with a receipt.
+
+Nobody I passed knew what was in the envelope.
+
+I had a child at home.
+
+I was making mailroom money.
+
+If you had watched me from across the street, the scene would not have looked like preparation for anything.
+
+That is the Watson problem of a working life: the person inside the scene often has no more access to its future meaning than the stranger passing him on the sidewalk.
+
+I thought I was delivering certificates.
+
+I was.
+
+That was not the whole record.
 
 ---
 
-The month it ended is a matter of public record.
+Seven months later I moved upstairs into fixed operations.
 
-Lehman Brothers filed at 1:45 on the morning of Monday, September the fifteenth — $639 billion in assets against $613 billion in debt, the largest bankruptcy in the country's history, twenty-five thousand people employed by it the previous Friday. The same day, Merrill Lynch agreed to be absorbed by Bank of America. The next day the Federal Reserve lent AIG eighty-five billion dollars. The Dow closed at 10,917.51, down more than five hundred points, the worst single session since September of 2001.
+For the next four years, much of my work centered on the security master file.
 
-What survives from that month is not a number. It is a photograph, and there are hundreds of versions of the same one: a person on a sidewalk in a good suit, holding a cardboard box. That is the image that lasted, because the box is legible. You do not need to understand a credit default swap to understand a box.
+Every instrument the firm touched needed a correct description: identifier, type, terms, the details required for a trade to settle as the thing it claimed to be.
+
+When the record was correct, nobody celebrated it.
+
+Accuracy is another form of work whose success often resembles nothing happening.
+
+Every morning companies had changed names, merged, been absorbed, issued something new. The file had to keep pace with reality.
+
+Then came reconciliation.
+
+Sometimes the description was wrong.
+
+Sometimes the position was wrong.
+
+Sometimes an upstream entry had drifted and the balance carried the error forward as though repetition could make it true.
+
+The work was to find where the record had separated from what was actually held and author the correction.
+
+A correcting entry can bring nothing new into the account.
+
+No shares arrive.
+
+Nothing is purchased.
+
+The record changes so that it finally says what was there the whole time.
+
+I did not know then how often I would return to that idea outside finance.
 
 ---
 
-I thought it was a shake-up. I assumed I would land somewhere similar, in the same kind of building, doing the same kind of work, and for a while I ran the process that assumption calls for.
+Then there is rain.
 
-The role never came. What came instead was empty. Empty responses from old coworkers. Empty inbox from the firms I sent applications to. Empty strategy, which is to say no next move, only the last one repeated.
+Rain on bare soil is not automatically gentle.
 
-That year I got licensed as a real estate agent in New York City. The collapse of the housing market had taken my job, and the housing market is where I went. It was the first selling I ever did.
+Drops arrive with force. Their impact can break apart surface aggregates; fine particles can move into pores. After drying, some soils develop a thin crust over a denser layer beneath it. The next rain can then meet a surface less willing to receive water than the one before.
+
+On crust-prone ground, meaningful portions of rainfall can become runoff instead of infiltration.
+
+Nothing was withheld.
+
+The rain arrived.
+
+The problem was reception.
+
+This was the second clue.
+
+The promise at the end of Hosea's verse is rain, but rain itself is not identical with harvest.
+
+Rain can arrive at closed ground.
 
 ---
+
+The Hebrew phrase is *nîrû lakem nîr* — break up for yourselves your fallow ground.
+
+The verbal and nominal forms sit remarkably close: the act of freshly tilling and the ground associated with that work sharing the same root-space.
+
+The language lets the field exist on both sides of the blade without becoming a different substance.
+
+Nothing is carted in from a superior field.
+
+The hard ground and the opened ground are made of the same earth.
+
+The difference is condition.
+
+That is where the old biblical image of dust becomes harder to keep decorative.
+
+The man is not simply a farmer standing above the metaphorical soil.
+
+He belongs to the same category of matter.
+
+Dust, and to dust returning.
+
+The field is not an external object to improve.
+
+The field is us.
+
+---
+
+This is also where the metaphor becomes dangerous.
+
+If every empty season can be called fallow, the word becomes flattering.
+
+A person can hide inside it indefinitely.
+
+*I am being prepared.*
+
+Perhaps.
+
+Or perhaps the field has simply been left alone.
+
+From the road the two can look identical.
+
+No crop in either.
+
+No obvious evidence.
+
+The difference is whether anything is being done to the ground.
+
+Three plowings.
+
+Weeding.
+
+Grazing.
+
+Opening.
+
+A maintained emptiness has activity inside it.
+
+Abandonment has only the story we tell about why nothing is happening.
+
+That distinction is less comforting than the modern meaning of fallow.
+
+It is also more useful.
+
+---
+
+The month my financial work ended is public record.
+
+Lehman Brothers filed for bankruptcy in the early hours of September 15, 2008. Merrill Lynch agreed to be acquired by Bank of America. The Federal Reserve moved to support AIG. Markets fell sharply. Institutions that had looked permanent became historical events in a matter of days.
+
+What survives in public memory is often not the balance sheet.
+
+It is the box.
+
+A person in a good suit walking out of a building carrying a cardboard box.
+
+You do not need to understand a credit default swap to understand a box.
+
+I thought, initially, that what had happened to me was a shake-up.
+
+I assumed I would land somewhere similar, doing similar work in another building.
+
+So I repeated the move I knew.
+
+Applications.
+
+Calls.
+
+Old contacts.
+
+The role did not come.
+
+What came was empty response, empty inbox, empty strategy — which is to say the same strategy continuing after the evidence had changed.
+
+That year I became licensed as a real estate agent in New York City.
+
+The housing collapse had helped take my job.
+
+The housing market is where I went next.
+
+It was the first selling I ever did.
+
+At the time the move looked almost absurd.
+
+Years later it looked like a blade entering ground I had mistaken for finished soil.
+
+---
+
+This is why I no longer trust the view from the fence.
+
+A studio gets thirteen years and the delay reads as craft.
+
+A person gets seven months and the delay begins to read as failure — including to himself.
+
+The difference is not that the studio deserves generosity and the person does not.
+
+The difference is that the studio eventually releases footage.
+
+A human life rarely provides a twenty-seven-minute preview of what the hidden years were building toward.
+
+We often have to work without seeing the trailer.
+
+That is harder.
+
+It is also where discernment matters most, because faith in unseen work can become an excuse for not working at all.
+
+The question cannot merely be *Is the field empty?*
+
+The question is *Has anything entered the soil?*
+
+---
+
+The final piece of the verse is the strangest.
 
 *Till he come and rain righteousness upon you.*
 
-The verb is *yārâ*. It carries rain, but rain is not its only work. The same root throws an arrow. It points a finger at a thing so that you will look at it. It teaches — *torah* comes off it. When Jerome brought the line into Latin he did not write rain at all. He wrote *docebit*: he will teach you righteousness.
+The Hebrew verb *yārâ* can carry the sense of rain, but its semantic family also reaches toward pointing and teaching; *torah* belongs to that same broad root tradition. Jerome's Latin renders the line with *docebit* — he will teach.
 
-And the participle of this verb, *yoreh*, is the name of one particular rain. The early rain. The autumn one. The first water after the dry months.
+And *yoreh* names the early rain, the autumn rain associated with the beginning of the agricultural season after the dry period.
 
-The first rain is not the reward at the end of a season. It is what makes ground workable enough to plow. It comes before the seed goes down. The farmer watches the sky for it in order to begin.
+The first rain is not the trophy at the end.
 
-So the promise closing the verse is a promise about the opening of a year. The rain comes. The crust the last rain built gives way. The blade can enter. And everything the verse asked for is still ahead of him.
+It helps make work possible.
 
-Sow. Reap. Break up the ground.
+The farmer waits for moisture because hard ground must become workable.
 
-Any farmer opens the ground first. Hosea puts it last. He names the harvest before he names the work, and the man is told what the field will give while the field is still shut.
+The rain arrives so the blade can enter.
 
-The promise comes first. The work comes after. The ground comes last of all.
+That reverses the sentimental reading.
 
-The first drops land on a surface the last rain closed. Whether they enter is not a question about the rain.
+Rain is not applause for a finished field.
+
+Rain is permission to begin.
+
+---
+
+Now Hosea's strange sequence becomes more interesting.
+
+Sow.
+
+Reap.
+
+Break up the ground.
+
+The harvest is named before the work that should precede it.
+
+The promise appears before the field looks capable of producing the thing promised.
+
+The man is told what the field can give while the field is still shut.
+
+That is not agricultural instruction.
+
+It is an ordering of faith.
+
+The promise is allowed to exist before visible evidence of the process.
+
+Then the rain comes.
+
+Then the work is still required.
+
+---
+
+I return to the field from the beginning.
+
+For thirteen years people looked at Rockstar's silence and assumed hidden labor.
+
+Then twenty-seven minutes appeared and rewarded the assumption with evidence.
+
+Human beings rarely receive that kind of proof on schedule.
+
+Sometimes the field stays visually empty long enough that even the person standing in it cannot tell whether he is fallow or abandoned.
+
+So the test cannot be optimism.
+
+Put a hand in the dirt.
+
+Is anything being opened?
+
+Is the record being corrected?
+
+Is the old strategy being repeated after the evidence changed?
+
+Has the rain arrived and remained on the surface because the crust is still intact?
+
+The first drops land on ground the previous rain may have helped close.
+
+Whether they enter is not a question about the generosity of the sky.
+
+It is a question about the condition of the ground.
+
+The field is no longer invisible.
+
+Neither are we, once the hand goes into the dirt.
+
+✦
+
+*Human Weather · humanweather.press · © JP Bobo 2026 · PBWY™*
