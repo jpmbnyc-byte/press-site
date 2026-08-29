@@ -20,8 +20,8 @@ export default function Layout() {
           <EssayShareFreshnessLayer />
           <GospelsDailyLayer />
           <SeriesAtmosphereLayer />
-          <div className="flex-1 lg:pl-14">
-            <main className="pt-[5.5rem] lg:pt-14">
+          <div className="flex-1">
+            <main className="pt-[5.5rem]">
               <Outlet />
             </main>
             <Footer />
