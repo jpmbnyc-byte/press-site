@@ -76,40 +76,21 @@ function Register({ entry, progress }) {
   const registerInk = mode === 'night' ? 'var(--hw-ink)' : entry.color;
 
   return (
-    <>
-      <aside
-        className="hw-register fixed left-0 top-14 bottom-0 z-40 hidden w-14 border-r lg:flex lg:flex-col"
-        style={{ '--register-ink': registerInk }}
-        aria-label="Publication register"
-      >
-        <div className="px-3 py-5">
-          <div>{seriesLabel}</div>
-          <div className="mt-1">{essayLabel}</div>
-        </div>
-        <div className="px-3 text-[var(--hw-muted)] break-words leading-[1.35]">
-          {entry.reference || entry.seriesName}
-        </div>
-        <div className="mx-3 my-5 flex-1 border-l border-[var(--hw-rule)] relative" aria-hidden="true">
-          <div
-            className="absolute left-[-1px] top-0 w-px bg-[var(--register-ink)]"
-            style={{ height: `${Math.round(progress * 100)}%` }}
-          />
-        </div>
-        <div className="px-3 pb-5 text-[var(--hw-muted)]">{entry.year}</div>
-      </aside>
-
-      <div
-        className="hw-register fixed left-0 right-0 top-14 z-40 flex h-8 items-center border-b bg-[var(--hw-paper)] px-4 lg:hidden"
-        style={{ '--register-ink': registerInk }}
-        aria-label="Publication register"
-      >
-        <span>{seriesLabel}</span>
-        <span className="mx-2 text-[var(--hw-muted)]">·</span>
-        <span>{essayLabel}</span>
-        <span className="ml-3 truncate text-[var(--hw-muted)]">{entry.seriesName}</span>
-        <span className="ml-auto text-[var(--hw-muted)]">{entry.year}</span>
-        <span className="absolute bottom-[-1px] left-0 h-px bg-[var(--register-ink)]" style={{ width: `${Math.round(progress * 100)}%` }} aria-hidden="true" />
-      </div>
-    </>
+    <div
+      className="hw-register fixed left-0 right-0 top-14 z-40 flex h-8 min-w-0 items-center whitespace-nowrap border-b bg-[var(--hw-paper)] px-4"
+      style={{ '--register-ink': registerInk }}
+      aria-label="Publication register"
+    >
+      <span className="shrink-0">{seriesLabel}</span>
+      <span className="mx-2 shrink-0 text-[var(--hw-muted)]">·</span>
+      <span className="shrink-0">{essayLabel}</span>
+      <span className="ml-3 min-w-0 truncate text-[var(--hw-muted)]">{entry.seriesName}</span>
+      <span className="ml-auto shrink-0 pl-3 text-[var(--hw-muted)]">{entry.year}</span>
+      <span
+        className="absolute bottom-[-1px] left-0 h-px bg-[var(--register-ink)]"
+        style={{ width: `${Math.round(progress * 100)}%` }}
+        aria-hidden="true"
+      />
+    </div>
   );
 }
