@@ -9,7 +9,6 @@ import { STRIPE_PLANS } from '@/lib/stripePlans';
 const monthlyPlan = STRIPE_PLANS.member_monthly;
 const yearlyPlan = STRIPE_PLANS.member_yearly;
 const appPlan = STRIPE_PLANS.member_app_yearly;
-const trialDays = yearlyPlan.trialDays;
 const validPlanIds = new Set([monthlyPlan.id, yearlyPlan.id, appPlan.id]);
 
 const tiers = [
@@ -34,13 +33,13 @@ const tiers = [
       'Full access to members essays',
       'Growing archive across seven series',
       'Account & billing self-serve',
-      `${trialDays}-day free trial`,
+      'Membership begins immediately after payment',
     ],
     planOptions: [
       { id: monthlyPlan.id, label: monthlyPlan.amountLabel },
       { id: yearlyPlan.id, label: yearlyPlan.amountLabel },
     ],
-    cta: 'Start Free Trial',
+    cta: 'Join Human Weather',
     highlighted: true,
     filled: false,
   },
@@ -51,7 +50,7 @@ const tiers = [
       'Everything in Member',
       'humanweather.social app premium',
       'Secure app unlock after checkout',
-      `${appPlan.trialDays}-day free trial`,
+      'Membership begins immediately after payment',
     ],
     planId: appPlan.id,
     cta: 'Join + App Bundle',
@@ -250,9 +249,9 @@ export default function Subscribe() {
 
       <div className="max-w-md mx-auto space-y-3 text-center">
         {[
+          'Charged today when you join',
           'Cancel any time',
           'Free essays stay free — members unlock the rest',
-          `${trialDays}-day free trial — no charge until day ${trialDays + 1}`,
         ].map((note) => (
           <div key={note} className="font-serif italic text-sm text-[#c8b99a] flex items-center justify-center gap-2">
             <span className="text-[#c4a84a]">✦</span>

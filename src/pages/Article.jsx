@@ -195,7 +195,6 @@ export default function Article() {
         </div>
       </header>
 
-
       <article className="max-w-[68ch] mx-auto px-6 pb-16">
         <div className="article-body">
           <ReactMarkdown
@@ -239,10 +238,10 @@ export default function Article() {
                   to={loginForYearly}
                   className="block bg-[var(--hw-ink)] text-[var(--hw-paper)] px-8 py-4 hw-label mb-4"
                 >
-                  Log in & start {yearlyPlan.trialDays}-day trial · {yearlyPlan.amountLabel}
+                  Log in & join · {yearlyPlan.amountLabel}
                 </Link>
                 <p className="font-serif text-sm text-[var(--hw-muted)]">
-                  New reader?{' '}
+                  Charged today. New reader?{' '}
                   <Link
                     to={`/register?next=${encodeURIComponent(returnPath)}&plan=${encodeURIComponent(yearlyPlan.id)}`}
                     className="text-[var(--hw-ink)] underline"
@@ -265,7 +264,7 @@ export default function Article() {
                 >
                   {checkoutPlan === yearlyPlan.id
                     ? 'Redirecting…'
-                    : `Start ${yearlyPlan.trialDays}-day trial · ${yearlyPlan.amountLabel}`}
+                    : `Join now · ${yearlyPlan.amountLabel}`}
                 </button>
                 <button
                   type="button"
