@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { buildAuthPath, safeNextPath } from '@/lib/authSession';
 import AuthLayout from '@/components/AuthLayout';
 import { Loader2 } from 'lucide-react';
 
+function resolveResetToken(searchParams, hash = '') {
+  const hashParams = new URLSearchParams(String(hash).replace(/^#\??/, ''));
+  return (
+    searchParams.get('token') ||
+    searchParams.get('reset_token') ||
+    searchParams.get('resetToken') ||
+    hashParams.get('token') ||
+    hashParams.get('reset_token') ||
+    hashParams.get('resetToken') ||
+    ''
+  );
+}
+
 export default function ResetPassword() {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
-  const resetToken = searchParams.get('token');
+  const resetToken = resolveResetToken(searchParams, location.hash);
   const next = safeNextPath(searchParams.get('next'));
   const plan = searchParams.get('plan');
 
