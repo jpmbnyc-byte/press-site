@@ -22,17 +22,14 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Gospels from '@/pages/Gospels';
 import AuthBridge from '@/pages/AuthBridge';
-import AuthGoogleStart from '@/pages/AuthGoogleStart';
 
 const AuthenticatedApp = () => {
   const location = useLocation();
 
-  // OAuth hops must remain isolated from the public site shell.
+  // Keep the legacy bridge isolated only so any already-issued OAuth callback
+  // can return safely to the press. New member auth begins on /login.
   if (location.pathname === '/auth/bridge') {
     return <AuthBridge />;
-  }
-  if (location.pathname === '/auth/google-start') {
-    return <AuthGoogleStart />;
   }
 
   // Public press routes render immediately. Auth continues to initialize in
@@ -56,7 +53,6 @@ const AuthenticatedApp = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
       <Route path="/auth/bridge" element={<AuthBridge />} />
-      <Route path="/auth/google-start" element={<AuthGoogleStart />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
