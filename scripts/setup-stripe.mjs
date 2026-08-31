@@ -41,7 +41,7 @@ const catalog = [
   {
     planId: 'member_monthly',
     productName: 'Human Weather Member',
-    description: 'All 49 essays across seven series, archive access, member dispatch. 7-day free trial.',
+    description: 'All 49 essays across seven series, archive access, member dispatch. Membership begins immediately after payment.',
     unitAmount: 900,
     interval: 'month',
     envKey: 'STRIPE_PRICE_MEMBER_MONTHLY',
@@ -49,7 +49,7 @@ const catalog = [
   {
     planId: 'member_yearly',
     productName: 'Human Weather Member (Annual)',
-    description: 'Annual Member — all essays + archive. Save vs monthly. 7-day free trial.',
+    description: 'Annual Member — all essays + archive. Save vs monthly. Membership begins immediately after payment.',
     unitAmount: 7200,
     interval: 'year',
     envKey: 'STRIPE_PRICE_MEMBER_YEARLY',
@@ -57,7 +57,7 @@ const catalog = [
   {
     planId: 'member_app_yearly',
     productName: 'Human Weather Member + App',
-    description: 'Member benefits + humanweather.social app premium. Founding member tier. 7-day free trial.',
+    description: 'Member benefits + humanweather.social app premium. Founding member tier. Membership begins immediately after payment.',
     unitAmount: 9600,
     interval: 'year',
     envKey: 'STRIPE_PRICE_MEMBER_APP_YEARLY',
@@ -107,12 +107,6 @@ async function ensurePrice(product, item) {
 async function ensurePaymentLink(price, item) {
   try {
     const links = await stripe.paymentLinks.list({ limit: 100, active: true });
-    const existing = links.data.find(
-      (l) =>
-        l.metadata?.planId === item.planId &&
-        l.line_items?.data?.some?.((li) => li.price?.id === price.id)
-    );
-    // list doesn't expand line_items by default — match by metadata alone
     const byMeta = links.data.find((l) => l.metadata?.planId === item.planId);
     if (byMeta) return byMeta;
 
@@ -123,7 +117,6 @@ async function ensurePaymentLink(price, item) {
         redirect: { url: `${SITE_URL}/subscribe/success` },
       },
       subscription_data: {
-        trial_period_days: 7,
         metadata: { planId: item.planId, product: 'human_weather_press' },
       },
       allow_promotion_codes: true,
