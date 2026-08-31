@@ -102,18 +102,37 @@ async function fetchViaEntities(slug, user) {
   };
 }
 
+function entitledReaderReceivedGatedFunctionResponse(data, user) {
+  const article = data?.article;
+  if (!article || !hasPressAccess(user)) return false;
+  if (String(article.access_level || 'free') !== 'members') return false;
+
+  // The local authenticated reader is entitled, but the backend function can
+  // occasionally resolve a different/anonymous session and return a preview.
+  // Treat anything short of an explicit full-body grant as a mismatch and
+  // re-run the existing entity path, which applies the same entitlement helper.
+  return article.can_read_full !== true || article.body_gated === true;
+}
+
 /**
  * Load a published/featured essay with body gating.
  *
  * Prefers Base44 function `getPressArticle` when the plan allows backend
  * functions. Falls back to the public entity API + client-side gating when
- * functions are blocked (402) or unavailable — common on this app today.
+ * functions are blocked (402), unavailable, or return a gated preview for a
+ * reader who the local authenticated session already identifies as entitled.
  */
 export async function fetchPressArticle(slug, user = null) {
   if (!slug) throw new Error('slug is required');
 
   try {
     const data = await fetchViaFunction(slug);
+
+    if (entitledReaderReceivedGatedFunctionResponse(data, user)) {
+      console.warn('[fetchPressArticle] entitled reader received gated function response; using entities');
+      return fetchViaEntities(slug, user);
+    }
+
     return { ...data, source: 'function' };
   } catch (err) {
     // Function missing / plan blocked / network — use entities.
