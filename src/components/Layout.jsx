@@ -13,15 +13,15 @@ export default function Layout() {
   return (
     <ThemeProvider>
       <RegisterProvider>
-        <div className="min-h-screen flex flex-col bg-[var(--hw-paper)] text-[var(--hw-ink)]">
+        <div className="min-h-screen w-full max-w-[100vw] min-w-0 overflow-x-clip flex flex-col bg-[var(--hw-paper)] text-[var(--hw-ink)]">
           <Masthead />
           <ReaderMemoryLayer />
           <ArticleContinuityLayer />
           <EssayShareFreshnessLayer />
           <GospelsDailyLayer />
           <SeriesAtmosphereLayer />
-          <div className="flex-1">
-            <main className="pt-[5.5rem]">
+          <div className="flex-1 min-w-0 max-w-full overflow-x-clip">
+            <main className="min-w-0 max-w-full overflow-x-clip pt-[5.5rem]">
               <Outlet />
             </main>
             <Footer />
