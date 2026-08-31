@@ -51,6 +51,8 @@ const AuthenticatedApp = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/ResetPassword" element={<ResetPassword />} />
+        <Route path="/resetpassword" element={<ResetPassword />} />
       </Route>
       <Route path="/auth/bridge" element={<AuthBridge />} />
       <Route path="*" element={<PageNotFound />} />
