@@ -1,8 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk";
 import { getPriceId, getSiteUrl, stripeRequest } from "../../shared/stripe.ts";
 
-const TRIAL_DAYS = "7";
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
@@ -46,7 +44,7 @@ Deno.serve(async (req) => {
     params.set("billing_address_collection", "auto");
     params.set("line_items[0][price]", priceId);
     params.set("line_items[0][quantity]", "1");
-    params.set("subscription_data[trial_period_days]", TRIAL_DAYS);
+    // No trial period: Stripe creates and charges the first subscription invoice immediately.
     params.set("subscription_data[metadata][planId]", planId);
     params.set("subscription_data[metadata][base44_user_id]", user.id);
     params.set("subscription_data[metadata][email]", user.email || "");
