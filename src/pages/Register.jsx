@@ -3,7 +3,6 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { buildAuthPath, safeNextPath, storeAuthToken } from '@/lib/authSession';
-import { startGoogleSignIn } from '@/lib/authRedirect';
 import { startCheckout } from '@/lib/stripeCheckout';
 import AuthLayout from '@/components/AuthLayout';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
@@ -21,7 +20,6 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [googleBusy, setGoogleBusy] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [resendNote, setResendNote] = useState('');
@@ -113,25 +111,6 @@ export default function Register() {
     }
   };
 
-  const handleGoogle = () => {
-    setError('');
-    setGoogleBusy(true);
-    const dest = plan
-      ? `/subscribe?plan=${encodeURIComponent(plan)}`
-      : next;
-    const start = startGoogleSignIn(dest);
-    if (start.mode === 'navigate') {
-      window.location.href = start.href;
-      return;
-    }
-    try {
-      base44.auth.loginWithProvider('google', start.fromUrl);
-    } catch {
-      setGoogleBusy(false);
-      setError('Could not start Google sign-in. Please try again.');
-    }
-  };
-
   if (showOtp) {
     return (
       <AuthLayout
@@ -203,7 +182,7 @@ export default function Register() {
   return (
     <AuthLayout
       title="Create your account"
-      subtitle="One account for members essays, checkout, and return visits."
+      subtitle="One Human Weather account for members essays, checkout, and return visits."
     >
       {error ? (
         <p
@@ -214,22 +193,6 @@ export default function Register() {
         </p>
       ) : null}
 
-      <button
-        type="button"
-        onClick={handleGoogle}
-        disabled={loading || googleBusy}
-        className="mb-5 flex w-full items-center justify-center gap-2 border border-[rgba(154,125,46,0.35)] bg-[var(--hw-surface)] px-4 py-2.5 font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--hw-ink)] transition hover:border-[var(--hw-gold)] disabled:opacity-60"
-      >
-        {googleBusy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
-        Continue with Google
-      </button>
-
-      <div className="mb-5 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--hw-ink3)]">
-        <span className="h-px flex-1 bg-[rgba(154,125,46,0.25)]" />
-        or email
-        <span className="h-px flex-1 bg-[rgba(154,125,46,0.25)]" />
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="block">
           <span className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--hw-ink3)]">
@@ -239,6 +202,7 @@ export default function Register() {
             type="email"
             required
             autoComplete="email"
+            autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border border-[rgba(154,125,46,0.3)] bg-[var(--hw-bg)] px-3 py-2.5 font-serif text-sm text-[var(--hw-ink)] outline-none focus:border-[var(--hw-gold)]"
@@ -277,7 +241,7 @@ export default function Register() {
         </label>
         <button
           type="submit"
-          disabled={loading || googleBusy}
+          disabled={loading}
           className="flex w-full items-center justify-center gap-2 bg-[var(--hw-gold)] px-4 py-2.5 font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--hw-dark-bg)] transition hover:bg-[var(--hw-gold-lt)] disabled:opacity-60"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
