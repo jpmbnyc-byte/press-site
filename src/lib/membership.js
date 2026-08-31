@@ -3,9 +3,17 @@
 export const BUNDLE_PLAN_ID = 'member_app_yearly';
 export const HW_SOCIAL_APP_URL = 'https://humanweather.social';
 
+// Owner access is keyed to the stable Base44 user id rather than an email
+// address so the owner can use an alternate login without exposing that
+// address in the client bundle or granting Base44 administrator privileges.
+const PRESS_OWNER_USER_IDS = new Set([
+  '6a95e05a933137a209d9593e',
+]);
+
 export function hasPressAccess(user) {
   if (!user) return false;
   if (user.role === 'admin') return true;
+  if (PRESS_OWNER_USER_IDS.has(user.id)) return true;
   const status = user.membership_status;
   return status === 'active' || status === 'trialing';
 }
