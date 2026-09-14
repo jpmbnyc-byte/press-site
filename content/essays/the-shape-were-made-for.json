@@ -13,7 +13,8 @@
   "hero_image_photographer": "Clyde Robinson",
   "hero_image_source_url": "https://www.flickr.com/photos/crobj/7385065498",
   "hero_image_rights": "CC BY 2.0",
-  "status": "draft",
+  "status": "published",
+  "published_at": "2026-09-14",
   "access_level": "free",
   "reading_time_mins": 8,
   "tags": ["koinonia", "trinity", "shalom"]
