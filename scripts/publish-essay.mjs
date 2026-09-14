@@ -105,6 +105,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error('[publish-essay] failed:', err.message || err);
+  console.error('[publish-essay] failed:', err?.message || 'unknown error');
   process.exit(1);
 });
