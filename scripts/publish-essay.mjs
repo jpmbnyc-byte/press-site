@@ -18,12 +18,29 @@ const base44 = createClient({
   serverUrl: SERVER_URL,
   appBaseUrl: SERVER_URL,
   requiresAuth: false,
+  // This is a one-shot CI script, not a running app session — analytics
+  // heartbeat timers would otherwise keep the Node process alive
+  // indefinitely after the work is done.
+  analytics: { enabled: false },
 });
+
+const REQUEST_TIMEOUT_MS = 30_000;
+
+function withTimeout(promise, label) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error(`${label} timed out after ${REQUEST_TIMEOUT_MS}ms`)),
+      REQUEST_TIMEOUT_MS,
+    );
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
 async function resolveSeries(seriesInput) {
   if (!seriesInput) return null;
 
-  const allSeries = await base44.entities.Series.list('sort_order', 50);
+  const allSeries = await withTimeout(base44.entities.Series.list('sort_order', 50), 'Series.list');
 
   if (seriesInput.slug) {
     const found = allSeries.find(s => s.slug === seriesInput.slug);
@@ -36,11 +53,14 @@ async function resolveSeries(seriesInput) {
   if (seriesInput.new) {
     const existing = allSeries.find(s => s.slug === seriesInput.new.slug);
     if (existing) return existing;
-    const created = await base44.entities.Series.create({
-      is_active: true,
-      access_level: 'free_first',
-      ...seriesInput.new,
-    });
+    const created = await withTimeout(
+      base44.entities.Series.create({
+        is_active: true,
+        access_level: 'free_first',
+        ...seriesInput.new,
+      }),
+      'Series.create',
+    );
     console.log(`Created new series: ${created.name} (${created.slug})`);
     return created;
   }
@@ -56,6 +76,7 @@ async function publishOne(filePath) {
     throw new Error(`${filePath}: title and slug are required`);
   }
 
+  console.log(`Resolving series for ${filePath}...`);
   const seriesRecord = await resolveSeries(series);
 
   const payload = {
@@ -71,14 +92,18 @@ async function publishOne(filePath) {
       : {}),
   };
 
-  const existingArticles = await base44.entities.Article.list('-published_at', 200);
+  console.log(`Listing existing articles to check for slug "${payload.slug}"...`);
+  const existingArticles = await withTimeout(
+    base44.entities.Article.list('-published_at', 200),
+    'Article.list',
+  );
   const existing = existingArticles.find(a => a.slug === payload.slug);
 
   if (existing) {
-    await base44.entities.Article.update(existing.id, payload);
+    await withTimeout(base44.entities.Article.update(existing.id, payload), 'Article.update');
     console.log(`Updated article: ${payload.title} (${payload.slug})`);
   } else {
-    await base44.entities.Article.create(payload);
+    await withTimeout(base44.entities.Article.create(payload), 'Article.create');
     console.log(`Created article: ${payload.title} (${payload.slug})`);
   }
 }
@@ -104,7 +129,13 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error('[publish-essay] failed:', err?.message || 'unknown error');
-  process.exit(1);
-});
+main()
+  .then(() => {
+    base44.cleanup();
+    process.exit(0);
+  })
+  .catch(err => {
+    console.error('[publish-essay] failed:', err?.message || 'unknown error');
+    base44.cleanup();
+    process.exit(1);
+  });
