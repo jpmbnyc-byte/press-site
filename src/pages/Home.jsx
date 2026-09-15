@@ -10,7 +10,7 @@ const HERO_IMAGE = '/home/human-weather-hero-collier-1941.webp';
 const HERO_CAPTION =
   'John Collier Jr. Hudson River Valley, New York, October 1941. Farm Security Administration/Office of War Information Photograph Collection, Library of Congress.';
 
-const FEATURED_PREVIEW_SLUG = 'human-weather-the-joyful-place';
+const FEATURED_PREVIEW_SLUG = 'the-shape-were-made-for';
 
 function essayDisplayTitle(essay) {
   return essay?.title;
