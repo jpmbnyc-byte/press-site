@@ -230,8 +230,10 @@ export default function Gospels() {
               What is your weather?
             </h1>
             <p className="font-serif italic text-xl text-[#F7F4EE]/75 max-w-xl mx-auto mb-6 leading-relaxed">
-              Name a climate from this draw — or receive a command at random from all forty-eight.
-              Each one arrives with its Latin form, so the body and the tongue learn together.
+              Forty-eight documented instructions from Jesus, drawn from the biblical record. Name
+              a climate from this draw — or receive a command at random from all forty-eight. Each
+              one arrives in English and Latin, for lingual distinction, so the body and the tongue
+              learn together.
             </p>
             <p className="font-mono text-[9px] tracking-[0.22em] uppercase text-[#c8b99a] mb-10">
               {GATE_SAMPLE_SIZE} climates drawn · {CHAMBER_COMMANDS.length} live commands · Latin included

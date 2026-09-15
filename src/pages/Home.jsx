@@ -368,8 +368,9 @@ export default function Home() {
             The oldest somatic map, spoken aloud.
           </h2>
           <p className="font-serif italic text-lg text-[#c8b99a] mb-4 max-w-xl mx-auto leading-relaxed">
-            Forty-eight live climates — English and Latin. Be not afraid / Nolite timere. Regulation
-            older than polyvagal theory. Draw a climate, or receive a command at random.
+            Forty-eight documented instructions from Jesus, drawn from the biblical record — each
+            rendered in English and Latin for lingual distinction. Be not afraid / Nolite timere.
+            Regulation older than polyvagal theory. Draw a climate, or receive a command at random.
           </p>
           <p className="font-mono text-[9px] tracking-[0.22em] uppercase text-[#c8b99a]/70 mb-10">
             Chamber practice · Learn Latin · Random draw
