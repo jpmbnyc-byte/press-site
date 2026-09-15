@@ -221,7 +221,7 @@ export default function Gospels() {
         <section className="relative z-10 min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-6 py-20">
           <div className="text-center max-w-3xl animate-[hw-rise_1s_ease-out]">
             <div className="flex justify-center mb-10">
-              <AuthorPortrait size="lg" />
+              <AuthorPortrait size="lg" src="/gospels-chamber-portrait.jpg" alt="Jesus" />
             </div>
             <div className="font-mono text-[10px] tracking-[0.4em] uppercase text-[#c4a84a] mb-6">
               Gospels Live · The Chamber

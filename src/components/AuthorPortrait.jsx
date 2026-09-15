@@ -7,9 +7,10 @@ export const AUTHOR_PORTRAIT_FALLBACK =
 /**
  * Minimal gold-circle author portrait for article bylines and author marks.
  */
-export default function AuthorPortrait({ size = 'md', className = '', alt = 'JP Bobo' }) {
+export default function AuthorPortrait({ size = 'md', className = '', alt = 'JP Bobo', src }) {
   const sizeClass =
     size === 'sm' ? 'w-10 h-10' : size === 'lg' ? 'w-16 h-16' : size === 'xl' ? 'w-24 h-24' : 'w-12 h-12';
+  const imgSrc = src || AUTHOR_PORTRAIT_SRC;
 
   return (
     <span
@@ -17,14 +18,14 @@ export default function AuthorPortrait({ size = 'md', className = '', alt = 'JP 
       aria-hidden={alt ? undefined : true}
     >
       <img
-        src={AUTHOR_PORTRAIT_SRC}
+        src={imgSrc}
         alt={alt}
         width={48}
         height={48}
         loading="lazy"
         decoding="async"
         onError={(e) => {
-          if (e.currentTarget.src !== AUTHOR_PORTRAIT_FALLBACK) {
+          if (!src && e.currentTarget.src !== AUTHOR_PORTRAIT_FALLBACK) {
             e.currentTarget.src = AUTHOR_PORTRAIT_FALLBACK;
           }
         }}
