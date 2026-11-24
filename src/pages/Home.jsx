@@ -6,11 +6,11 @@ import NewsletterSignup from '@/components/NewsletterSignup';
 import { WATERS_EDGE_PREVIEW_MINUTES, WATERS_EDGE_SLUG } from '@/lib/membership';
 import { setHomePageMeta } from '@/lib/pageMeta';
 
+import { essayAudio } from '@/lib/essayAudio';
+
 const HERO_IMAGE = '/home/human-weather-hero-collier-1941.webp';
 const HERO_CAPTION =
   'John Collier Jr. Hudson River Valley, New York, October 1941. Farm Security Administration/Office of War Information Photograph Collection, Library of Congress.';
-
-const FEATURED_PREVIEW_SLUG = 'the-shape-were-made-for';
 
 function essayDisplayTitle(essay) {
   return essay?.title;
@@ -70,12 +70,12 @@ export default function Home() {
   }, []);
 
   const spotlight =
-    featured.find(a => a.slug === FEATURED_PREVIEW_SLUG) ||
-    latest.find(a => a.slug === FEATURED_PREVIEW_SLUG) ||
-    featured[0] ||
-    latest[0];
+    freeEssays.reduce((newest, essay) => {
+      if (!essay.featured && essay.status !== 'featured') return newest;
+      return !newest || essay.published_at > newest.published_at ? essay : newest;
+    }, null) || featured[0] || latest[0];
 
-  const spotlightIsJoyfulPlace = spotlight?.slug === FEATURED_PREVIEW_SLUG;
+  const recording = essayAudio[spotlight?.slug];
   const spotlightIsWatersEdge = spotlight?.slug === WATERS_EDGE_SLUG;
   const spotlightIsPreview = spotlight?.access_level === 'members';
   const freeToHighlight = freeEssays.filter(a => a.slug !== spotlight?.slug);
@@ -146,7 +146,7 @@ export default function Home() {
                     <img
                       src={spotlight.hero_image_url}
                       alt={spotlight.hero_image_alt || essayDisplayTitle(spotlight)}
-                      className="block w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+                      className={recording ? "block w-full max-h-[65vh] object-contain" : "block w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"}
                       style={{ objectPosition: spotlight.hero_image_object_position || '50% 50%' }}
                       loading="eager"
                       decoding="async"
@@ -163,8 +163,8 @@ export default function Home() {
 
             <div className="max-w-4xl">
               <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-gold)] mb-3">
-                {spotlightIsJoyfulPlace
-                  ? 'Debut Essay · Read Free'
+                {spotlight?.access_level === 'free'
+                  ? 'Latest release · Read free'
                   : spotlightIsWatersEdge
                     ? `Featured Preview · ${WATERS_EDGE_PREVIEW_MINUTES} min free`
                     : spotlightIsPreview
@@ -191,8 +191,8 @@ export default function Home() {
                 to={`/journal/${spotlight.slug}`}
                 className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-[var(--hw-ink)] border-b border-[var(--hw-gold)] pb-1 hover:text-[var(--hw-gold)] transition-colors duration-300"
               >
-                {spotlightIsJoyfulPlace
-                  ? 'Read the debut essay →'
+                {recording
+                  ? 'Read or listen →'
                   : spotlightIsWatersEdge
                     ? `Begin ${WATERS_EDGE_PREVIEW_MINUTES}-minute preview →`
                     : spotlightIsPreview

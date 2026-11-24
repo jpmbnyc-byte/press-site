@@ -14,6 +14,8 @@ import { getSeriesMeta, publicationYear } from '@/lib/editorialSystem';
 import { STRIPE_PLANS } from '@/lib/stripePlans';
 import { getEditorialImage } from '@/lib/editorialImages';
 import EssayThumbnail from '@/components/EssayThumbnail';
+import { essayAudio } from '@/lib/essayAudio';
+import EssayAudio from '@/components/EssayAudio';
 
 const monthlyPlan = STRIPE_PLANS.member_monthly;
 const yearlyPlan = STRIPE_PLANS.member_yearly;
@@ -59,7 +61,7 @@ export default function Article() {
         const seriesName = found.series_label || 'Human Weather';
         const seriesMeta = getSeriesMeta(seriesName);
         const essayTotal = Math.max(
-          Number(found.series_order) || 1,
+          found.series_slug === 'the-procession' ? 7 : Number(found.series_order) || 1,
           ...sameSeries.map(item => Number(item.series_order) || 0),
         );
         setRegister({
@@ -152,25 +154,24 @@ export default function Article() {
   const seriesMeta = getSeriesMeta(article.series_label || 'Human Weather');
   const editorialImage = getEditorialImage(article);
 
+  const recording = !bodyLocked && essayAudio[article.slug];
+  const figure = editorialImage && (
+    <figure className={recording ? 'hw-essay-figure hw-audio-essay-figure' : 'hw-essay-figure'}>
+      <img src={editorialImage.src} alt={editorialImage.alt} loading="eager" decoding="async" />
+      <figcaption className="hw-media-caption">{editorialImage.caption}</figcaption>
+    </figure>
+  );
+
   return (
     <div style={{ '--series-ink': seriesMeta.color }}>
-      {editorialImage && (
-        <figure className="hw-essay-figure">
-          <img
-            src={editorialImage.src}
-            alt={editorialImage.alt}
-            loading="eager"
-            decoding="async"
-          />
-          <figcaption className="hw-media-caption">{editorialImage.caption}</figcaption>
-        </figure>
-      )}
+      {!recording && figure}
 
       <header className="max-w-[740px] mx-auto px-6 pt-12 pb-8">
         <div className="w-12 h-px bg-[var(--series-ink)] mb-6" />
         <div className="hw-label text-[var(--series-ink)] mb-4">
           {isWatersEdge ? 'Featured Preview · ' : ''}
           {article.series_label || 'Human Weather'} · Essay {String(article.series_order || 1).padStart(2, '0')}
+          {article.series_slug === 'the-procession' ? ' of 7' : ''}
           {article.access_level === 'free' ? ' · Free' : ''}
         </div>
         <h1 className="scroll-mt-20 font-heading text-[32px] md:text-[44px] font-medium leading-[1.04] tracking-[-0.035em] text-[var(--hw-ink)] mb-4">
@@ -193,7 +194,10 @@ export default function Article() {
             </div>
           </div>
         </div>
+        {recording && <EssayAudio key={article.slug} recording={recording} title={article.title} />}
       </header>
+
+      {recording && figure}
 
       <article className="max-w-[68ch] mx-auto px-6 pb-16">
         <div className="article-body">

@@ -61,11 +61,7 @@ export default function Journal() {
     () =>
       articles
         .filter(a => a.access_level === 'free')
-        .sort((a, b) => {
-          if (a.slug === 'relational-faith-the-distance-we-choose') return -1;
-          if (b.slug === 'relational-faith-the-distance-we-choose') return 1;
-          return new Date(b.published_at || 0) - new Date(a.published_at || 0);
-        }),
+        .sort((a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0)),
     [articles]
   );
 

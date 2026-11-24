@@ -239,6 +239,15 @@
     object-fit: cover;
   }
 
+  .hw-audio-essay-figure {
+    max-width: 692px;
+    margin: 0 auto 3rem;
+  }
+
+  .hw-audio-essay-figure img {
+    object-fit: contain;
+  }
+
   .hw-essay-figure .hw-media-caption {
     margin: 0.65rem auto 0;
     padding-inline: 1.5rem;
