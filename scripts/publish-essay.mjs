@@ -106,6 +106,24 @@ async function publishOne(filePath) {
     await withTimeout(base44.entities.Article.create(payload), 'Article.create');
     console.log(`Created article: ${payload.title} (${payload.slug})`);
   }
+
+  if (series?.ordered_slugs) {
+    const siblings = await withTimeout(
+      base44.entities.Article.filter({ series_slug: seriesRecord.slug }),
+      'Article.filter by series',
+    );
+    for (const [index, slug] of series.ordered_slugs.entries()) {
+      const item = siblings.find(article => article.slug === slug);
+      if (!item) throw new Error(`Missing essay in ${seriesRecord.name}: ${slug}`);
+      if (item.series_order !== index + 1) {
+        await withTimeout(base44.entities.Article.update(item.id, { series_order: index + 1 }), 'Article.update order');
+      }
+    }
+    const publishedCount = siblings.filter(item => ['published', 'featured'].includes(item.status)).length;
+    if (seriesRecord.essay_count_published !== publishedCount) {
+      await withTimeout(base44.entities.Series.update(seriesRecord.id, { essay_count_published: publishedCount }), 'Series.update count');
+    }
+  }
 }
 
 async function main() {

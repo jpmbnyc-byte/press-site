@@ -136,7 +136,7 @@ export default function SeriesDetail() {
                       </p>
                     )}
                     <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-[var(--hw-sage)]">
-                      Free essay · Read now →
+                      Essay {String(essay.series_order || 1).padStart(2, '0')} · Free · Read now →
                     </span>
                   </Link>
                 ))}
